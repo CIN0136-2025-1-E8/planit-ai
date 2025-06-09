@@ -10,9 +10,12 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "PlanIt AI"
     DEBUG: bool = False
     DEBUG_HISTORY_FILE_PATH: Path = BASE_DIR / ".venv/history.pkl"
+    API_V1_STR: str = "/api/v1"
 
     GOOGLE_API_KEY: Optional[SecretStr] = None
     GOOGLE_MODEL: str = "gemma-3-27b-it"
+
+    DATABASE_URL: Optional[str] = None
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR/".env",
