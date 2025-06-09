@@ -1,0 +1,219 @@
+{
+  "semesters": [
+    {
+      "name": "2025.1",
+      "start_date": "2025-02-10",
+      "end_date": "2025-06-28",
+      "personal_events": [
+        { "title": "Prova 1 de Cálculo 1", "event_type": "Prova", "start_date": "2025-04-09" },
+        { "title": "Prova 2 de Cálculo 1", "event_type": "Prova", "start_date": "2025-05-28" },
+        { "title": "Prova Final de Cálculo 1", "event_type": "Prova", "start_date": "2025-06-25" },
+        { "title": "Prova 1 de Estruturas de Dados OO", "event_type": "Prova", "start_date": "2025-04-07" },
+        { "title": "Prova 2 de Estruturas de Dados OO", "event_type": "Prova", "start_date": "2025-05-26" },
+        { "title": "Prova Final de Estruturas de Dados OO", "event_type": "Prova", "start_date": "2025-06-23" },
+        { "title": "Prova 1 de Arquitetura e SO", "event_type": "Prova", "start_date": "2025-04-08" },
+        { "title": "Prova 2 de Arquitetura e SO", "event_type": "Prova", "start_date": "2025-06-03" },
+        { "title": "Prova Final de Arquitetura e SO", "event_type": "Prova", "start_date": "2025-06-24" },
+        { "title": "Entrega 1 de Desenvolvimento de Software", "event_type": "Entrega", "start_date": "2025-04-11" },
+        { "title": "Entrega 2 de Desenvolvimento de Software", "event_type": "Entrega", "start_date": "2025-06-06" },
+        { "title": "Apresentação Final de Desenvolvimento de Software", "event_type": "Apresentação", "start_date": "2025-06-27" }
+      ],
+      "classes": [
+        {
+          "class_title": "Cálculo 1",
+          "class_code": "MAT140",
+          "professor_name": "Dra. Sofia Ramos",
+          "lessons": [
+            { "date": "2025-02-12", "topic": "Introdução a Funções e Gráficos", "summary": "Revisão de funções, domínio, imagem e gráficos.", "reading_materials": ["'Cálculo' - James Stewart, Vol. 1, Cap. 1"] },
+            { "date": "2025-02-14", "topic": "Limites: Noção Intuitiva e Definição Formal", "summary": "Introdução ao conceito de limite e sua importância.", "reading_materials": ["'Cálculo' - James Stewart, Vol. 1, Cap. 2"] },
+            { "date": "2025-02-19", "topic": "Cálculo de Limites e Propriedades", "summary": "Técnicas para calcular limites de funções.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-02-21", "topic": "Continuidade", "summary": "Definição de continuidade e Teorema do Valor Intermediário.", "reading_materials": ["'Cálculo' - James Stewart, Vol. 1, Cap. 2"] },
+            { "date": "2025-02-26", "topic": "Derivadas: Definição e Taxas de Variação", "summary": "Introdução à derivada como a inclinação da reta tangente.", "reading_materials": ["'Cálculo' - James Stewart, Vol. 1, Cap. 3"] },
+            { "date": "2025-02-28", "topic": "Regras de Diferenciação: Potência, Produto e Quociente", "summary": "Aprender as regras básicas para calcular derivadas.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-03-07", "topic": "Regra da Cadeia", "summary": "Técnica para derivar funções compostas.", "reading_materials": ["'Cálculo' - James Stewart, Vol. 1, Cap. 3"] },
+            { "date": "2025-03-12", "topic": "Derivação Implícita", "summary": "Como derivar funções definidas implicitamente.", "reading_materials": ["'Cálculo' - James Stewart, Vol. 1, Cap. 3"] },
+            { "date": "2025-03-14", "topic": "Taxas Relacionadas", "summary": "Resolver problemas envolvendo taxas de variação relacionadas.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-03-19", "topic": "Aplicações de Derivadas: Máximos e Mínimos", "summary": "Uso de derivadas para encontrar pontos extremos de funções.", "reading_materials": ["'Cálculo' - James Stewart, Vol. 1, Cap. 4"] },
+            { "date": "2025-03-21", "topic": "Teste da Derivada Primeira e Segunda", "summary": "Análise de concavidade e pontos de inflexão.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-03-26", "topic": "Problemas de Otimização", "summary": "Aplicar derivadas para resolver problemas práticos de otimização.", "reading_materials": ["'Cálculo' - James Stewart, Vol. 1, Cap. 4"] },
+            { "date": "2025-03-28", "topic": "Regra de L'Hôpital", "summary": "Calcular limites de formas indeterminadas.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-04-02", "topic": "Revisão para a Prova 1", "summary": "Revisar todo o conteúdo de limites e derivadas.", "reading_materials": ["Exercícios e resumos"] },
+            { "date": "2025-04-04", "topic": "Sessão de Dúvidas P1", "summary": "Tirar dúvidas antes da primeira prova.", "reading_materials": [] },
+            { "date": "2025-04-11", "topic": "Antiderivadas (Integrais Indefinidas)", "summary": "Introdução ao processo inverso da derivação.", "reading_materials": ["'Cálculo' - James Stewart, Vol. 1, Cap. 5"] },
+            { "date": "2025-04-16", "topic": "A Integral Definida e Áreas", "summary": "Calcular a área sob uma curva.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-04-18", "topic": "Teorema Fundamental do Cálculo", "summary": "A conexão fundamental entre diferenciação e integração.", "reading_materials": ["'Cálculo' - James Stewart, Vol. 1, Cap. 5"] },
+            { "date": "2025-04-23", "topic": "Técnica da Substituição", "summary": "Uma 'regra da cadeia' para integrais.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-04-25", "topic": "Área entre Curvas", "summary": "Calcular a área de regiões delimitadas por múltiplas funções.", "reading_materials": ["'Cálculo' - James Stewart, Vol. 1, Cap. 6"] },
+            { "date": "2025-04-30", "topic": "Volumes de Sólidos de Revolução (Discos)", "summary": "Usar integrais para calcular volumes.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-05-02", "topic": "Volumes de Sólidos de Revolução (Cascas)", "summary": "Método alternativo para calcular volumes.", "reading_materials": ["'Cálculo' - James Stewart, Vol. 1, Cap. 6"] },
+            { "date": "2025-05-07", "topic": "Exercícios de Aplicações de Integrais", "summary": "Praticar problemas de área e volume.", "reading_materials": ["Lista de exercícios"] },
+            { "date": "2025-05-09", "topic": "Funções Logarítmicas e Exponenciais", "summary": "Derivadas e integrais de funções log e exp.", "reading_materials": ["'Cálculo' - James Stewart, Vol. 1, Cap. 7"] },
+            { "date": "2025-05-14", "topic": "Funções Trigonométricas Inversas", "summary": "Derivadas e integrais envolvendo arcos.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-05-16", "topic": "Revisão para a Prova 2", "summary": "Revisar todo o conteúdo de integrais e aplicações.", "reading_materials": ["Exercícios e resumos"] },
+            { "date": "2025-05-21", "topic": "Sessão de Dúvidas P2", "summary": "Tirar dúvidas antes da segunda prova.", "reading_materials": [] },
+            { "date": "2025-05-23", "topic": "Correção da P2 e Discussão", "summary": "Analisar os resultados da prova.", "reading_materials": [] },
+            { "date": "2025-06-04", "topic": "Tópicos Adicionais", "summary": "Introdução a equações diferenciais simples.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-06-06", "topic": "Revisão Geral do Semestre", "summary": "Revisão abrangente de todo o conteúdo de Cálculo 1.", "reading_materials": ["Provas antigas"] },
+            { "date": "2025-06-11", "topic": "Simulado para a Prova Final", "summary": "Resolver um simulado em sala.", "reading_materials": [] },
+            { "date": "2025-06-13", "topic": "Revisão Final e Dúvidas", "summary": "Última oportunidade para tirar dúvidas.", "reading_materials": [] }
+          ],
+          "schedules": [
+            { "day_of_week": "Quarta-feira", "start_time": "08:00", "end_time": "09:00", "location": "Anfiteatro A" },
+            { "day_of_week": "Quarta-feira", "start_time": "09:00", "end_time": "10:00", "location": "Anfiteatro A" },
+            { "day_of_week": "Sexta-feira", "start_time": "08:00", "end_time": "09:00", "location": "Anfiteatro A" },
+            { "day_of_week": "Sexta-feira", "start_time": "09:00", "end_time": "10:00", "location": "Anfiteatro A" }
+          ]
+        },
+        {
+          "class_title": "Estruturas de Dados Orientadas a Objetos",
+          "class_code": "CC210",
+          "professor_name": "Dr. Ricardo Costa",
+          "lessons": [
+            { "date": "2025-02-10", "topic": "Revisão de POO: Classes, Objetos e Herança", "summary": "Consolidar conceitos fundamentais de Programação Orientada a Objetos.", "reading_materials": ["'Java: Como Programar' - Deitel, Cap. 8-9"] },
+            { "date": "2025-02-12", "topic": "Análise de Complexidade e Notação Big-O", "summary": "Introdução à medição de eficiência de algoritmos.", "reading_materials": ["'Introduction to Algorithms' - Cormen, Cap. 1-2"] },
+            { "date": "2025-02-17", "topic": "Listas, Pilhas e Filas com Implementação OO", "summary": "Implementar estruturas de dados lineares usando classes.", "reading_materials": ["'Data Structures and Algorithms in Java' - Lafore, Cap. 4-5"] },
+            { "date": "2025-02-19", "topic": "Recursividade", "summary": "Entender e aplicar o conceito de recursão.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-02-24", "topic": "Árvores Binárias de Busca em POO", "summary": "Implementar árvores com nós como objetos.", "reading_materials": ["'Introduction to Algorithms' - Cormen, Cap. 12"] },
+            { "date": "2025-02-26", "topic": "Percursos em Árvores (pre-order, in-order, post-order)", "summary": "Estudar os diferentes algoritmos para visitar nós.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-03-10", "topic": "Árvores Balanceadas (AVL)", "summary": "Estudar rotações e o algoritmo de balanceamento AVL.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-03-12", "topic": "Tabelas Hash e Tratamento de Colisão", "summary": "Implementar tabelas de espalhamento com uma abordagem orientada a objetos.", "reading_materials": ["'Introduction to Algorithms' - Cormen, Cap. 11"] },
+            { "date": "2025-03-17", "topic": "Grafos: Representação OO", "summary": "Modelar grafos com classes para Vértices e Arestas.", "reading_materials": ["'Introduction to Algorithms' - Cormen, Cap. 22"] },
+            { "date": "2025-03-19", "topic": "Busca em Largura (BFS) e Busca em Profundidade (DFS)", "summary": "Implementar algoritmos de travessia em grafos.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-03-24", "topic": "Revisão para a Prova 1", "summary": "Revisão de Listas, Pilhas, Filas, Árvores e Grafos.", "reading_materials": ["Exercícios e resumos"] },
+            { "date": "2025-03-26", "topic": "Sessão de Dúvidas P1", "summary": "Tirar dúvidas antes da primeira prova.", "reading_materials": [] },
+            { "date": "2025-03-31", "topic": "Algoritmos de Ordenação Simples (Bubble, Insertion, Selection)", "summary": "Analisar algoritmos com complexidade O(n^2).", "reading_materials": ["'Introduction to Algorithms' - Cormen, Cap. 2"] },
+            { "date": "2025-04-02", "topic": "Algoritmos de Ordenação Eficientes (MergeSort, QuickSort)", "summary": "Estudar algoritmos de divisão e conquista.", "reading_materials": ["'Introduction to Algorithms' - Cormen, Cap. 7"] },
+            { "date": "2025-04-14", "topic": "Heap e HeapSort", "summary": "Usar a estrutura de dados heap para ordenação eficiente.", "reading_materials": ["'Introduction to Algorithms' - Cormen, Cap. 6"] },
+            { "date": "2025-04-16", "topic": "Algoritmo de Dijkstra", "summary": "Encontrar o caminho mais curto em grafos ponderados.", "reading_materials": ["'Introduction to Algorithms' - Cormen, Cap. 24"] },
+            { "date": "2025-04-23", "topic": "Árvore Geradora Mínima (Prim e Kruskal)", "summary": "Algoritmos para encontrar a sub-árvore de custo mínimo.", "reading_materials": ["'Introduction to Algorithms' - Cormen, Cap. 23"] },
+            { "date": "2025-04-28", "topic": "Programação Dinâmica: Introdução", "summary": "Conceito de subproblemas sobrepostos e otimalidade.", "reading_materials": ["'Introduction to Algorithms' - Cormen, Cap. 15"] },
+            { "date": "2025-04-30", "topic": "Programação Dinâmica: Problema da Mochila", "summary": "Aplicação prática de programação dinâmica.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-05-05", "topic": "Tópicos Avançados: Árvores-B", "summary": "Estruturas de dados usadas em bancos de dados e sistemas de arquivos.", "reading_materials": ["'Introduction to Algorithms' - Cormen, Cap. 18"] },
+            { "date": "2025-05-07", "topic": "Revisão para a Prova 2", "summary": "Revisão de ordenação, algoritmos em grafos e PD.", "reading_materials": ["Exercícios e resumos"] },
+            { "date": "2025-05-12", "topic": "Sessão de Dúvidas P2", "summary": "Tirar dúvidas antes da segunda prova.", "reading_materials": [] },
+            { "date": "2025-05-14", "topic": "Trabalho Prático: Início do Desenvolvimento", "summary": "Aplicar os conceitos aprendidos em um projeto.", "reading_materials": ["Especificação do projeto"] },
+            { "date": "2025-05-19", "topic": "Trabalho Prático: Acompanhamento", "summary": "Sessão de acompanhamento e tira-dúvidas do projeto.", "reading_materials": [] },
+            { "date": "2025-05-21", "topic": "Correção da P2 e Discussão", "summary": "Analisar os resultados da prova.", "reading_materials": [] },
+            { "date": "2025-06-02", "topic": "Trabalho Prático: Acompanhamento Final", "summary": "Últimos ajustes no projeto prático.", "reading_materials": [] },
+            { "date": "2025-06-04", "topic": "Revisão Geral do Semestre", "summary": "Revisão abrangente de todas as estruturas e algoritmos.", "reading_materials": ["Provas antigas"] },
+            { "date": "2025-06-09", "topic": "Apresentação dos Trabalhos Práticos", "summary": "Apresentação dos projetos finais.", "reading_materials": [] },
+            { "date": "2025-06-11", "topic": "Apresentação dos Trabalhos Práticos", "summary": "Continuação das apresentações.", "reading_materials": [] },
+            { "date": "2025-06-16", "topic": "Revisão Final e Dúvidas", "summary": "Última oportunidade para tirar dúvidas.", "reading_materials": [] }
+          ],
+          "schedules": [
+            { "day_of_week": "Segunda-feira", "start_time": "10:00", "end_time": "11:00", "location": "Laboratório 1" },
+            { "day_of_week": "Segunda-feira", "start_time": "11:00", "end_time": "12:00", "location": "Laboratório 1" },
+            { "day_of_week": "Quarta-feira", "start_time": "10:00", "end_time": "11:00", "location": "Laboratório 1" },
+            { "day_of_week": "Quarta-feira", "start_time": "11:00", "end_time": "12:00", "location": "Laboratório 1" }
+          ]
+        },
+        {
+          "class_title": "Arquitetura de Computadores e Sistemas Operacionais",
+          "class_code": "CC231",
+          "professor_name": "Msc. Beatriz Lima",
+          "lessons": [
+            { "date": "2025-02-11", "topic": "Sistemas de Numeração e Portas Lógicas", "summary": "Fundamentos de sistemas digitais (binário, hexadecimal) e lógica booleana.", "reading_materials": ["'Organização e Projeto de Computadores' - Patterson & Hennessy, Cap. 1"] },
+            { "date": "2025-02-13", "topic": "Arquitetura de Von Neumann e Componentes do CPU", "summary": "Estudo da Unidade Central de Processamento (CPU) e memória.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-02-18", "topic": "Hierarquia de Memória: Cache, RAM, Disco", "summary": "Entender os diferentes níveis de memória e sua performance.", "reading_materials": ["'Organização e Projeto de Computadores' - Patterson & Hennessy, Cap. 5"] },
+            { "date": "2025-02-20", "topic": "Introdução a Sistemas Operacionais (SO)", "summary": "O papel do SO como gerenciador de recursos.", "reading_materials": ["'Sistemas Operacionais Modernos' - Tanenbaum, Cap. 1"] },
+            { "date": "2025-02-25", "topic": "Gerenciamento de Processos e Threads", "summary": "Conceitos de processos, threads e concorrência.", "reading_materials": ["'Sistemas Operacionais Modernos' - Tanenbaum, Cap. 2"] },
+            { "date": "2025-02-27", "topic": "Escalonamento de CPU", "summary": "Algoritmos de escalonamento (FIFO, Round Robin, etc.).", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-03-04", "topic": "Sincronização de Processos: Semáforos e Monitores", "summary": "Resolver problemas de condição de corrida.", "reading_materials": ["'Sistemas Operacionais Modernos' - Tanenbaum, Cap. 2"] },
+            { "date": "2025-03-06", "topic": "Deadlocks: Detecção e Prevenção", "summary": "Estudo de impasses em sistemas concorrentes.", "reading_materials": ["'Sistemas Operacionais Modernos' - Tanenbaum, Cap. 6"] },
+            { "date": "2025-03-11", "topic": "Revisão para a Prova 1", "summary": "Revisão de Arquitetura, Processos e Sincronização.", "reading_materials": ["Exercícios e resumos"] },
+            { "date": "2025-03-13", "topic": "Gerenciamento de Memória: Paginação e Segmentação", "summary": "Técnicas para gerenciar a memória principal.", "reading_materials": ["'Sistemas Operacionais Modernos' - Tanenbaum, Cap. 3"] },
+            { "date": "2025-03-18", "topic": "Memória Virtual e Swapping", "summary": "Técnicas que permitem executar processos maiores que a memória física.", "reading_materials": ["'Sistemas Operacionais Modernos' - Tanenbaum, Cap. 3"] },
+            { "date": "2025-03-20", "topic": "Sistemas de Arquivos: Estrutura e Implementação", "summary": "Estrutura e organização de sistemas de arquivos.", "reading_materials": ["'Sistemas Operacionais Modernos' - Tanenbaum, Cap. 4"] },
+            { "date": "2025-03-25", "topic": "Gerenciamento de Dispositivos de E/S", "summary": "Como o SO gerencia a comunicação com hardware.", "reading_materials": ["'Sistemas Operacionais Modernos' - Tanenbaum, Cap. 5"] },
+            { "date": "2025-03-27", "topic": "Segurança em Sistemas Operacionais", "summary": "Mecanismos de proteção e controle de acesso.", "reading_materials": ["'Sistemas Operacionais Modernos' - Tanenbaum, Cap. 9"] },
+            { "date": "2025-04-01", "topic": "Estudo de Caso: Linux", "summary": "Análise da arquitetura do kernel do Linux.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-04-03", "topic": "Estudo de Caso: Windows", "summary": "Análise da arquitetura do Windows NT.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-04-10", "topic": "Virtualização", "summary": "Conceitos de máquinas virtuais e hypervisors.", "reading_materials": ["'Sistemas Operacionais Modernos' - Tanenbaum, Cap. 7"] },
+            { "date": "2025-04-15", "topic": "Sistemas Distribuídos: Introdução", "summary": "Conceitos fundamentais de sistemas que rodam em múltiplas máquinas.", "reading_materials": ["'Sistemas Operacionais Modernos' - Tanenbaum, Cap. 8"] },
+            { "date": "2025-04-17", "topic": "Revisão para a Prova 2", "summary": "Revisão de Gerência de Memória, Arquivos, E/S e Segurança.", "reading_materials": ["Exercícios e resumos"] },
+            { "date": "2025-04-22", "topic": "Apresentação de Seminários", "summary": "Apresentação de trabalhos sobre tópicos avançados.", "reading_materials": [] },
+            { "date": "2025-04-24", "topic": "Apresentação de Seminários", "summary": "Continuação das apresentações.", "reading_materials": [] },
+            { "date": "2025-04-29", "topic": "Correção da P2 e Discussão", "summary": "Analisar os resultados da prova.", "reading_materials": [] },
+            { "date": "2025-05-06", "topic": "Revisão Geral do Semestre", "summary": "Revisão abrangente de todos os tópicos de Arquitetura e SO.", "reading_materials": ["Provas antigas"] },
+            { "date": "2025-05-08", "topic": "Revisão Final e Dúvidas", "summary": "Última oportunidade para tirar dúvidas.", "reading_materials": [] }
+          ],
+          "schedules": [
+            { "day_of_week": "Terça-feira", "start_time": "08:00", "end_time": "09:00", "location": "Sala 301" },
+            { "day_of_week": "Terça-feira", "start_time": "09:00", "end_time": "10:00", "location": "Sala 301" },
+            { "day_of_week": "Quinta-feira", "start_time": "08:00", "end_time": "09:00", "location": "Sala 301" },
+            { "day_of_week": "Quinta-feira", "start_time": "09:00", "end_time": "10:00", "location": "Sala 301" }
+          ]
+        },
+        {
+          "class_title": "Desenvolvimento de Software",
+          "class_code": "ES101",
+          "professor_name": "Dr. Fernando Martins",
+          "lessons": [
+            { "date": "2025-02-10", "topic": "Introdução à Engenharia de Software e Ciclo de Vida", "summary": "Visão geral do processo de desenvolvimento de software.", "reading_materials": ["'Engenharia de Software' - Sommerville, Cap. 1-2"] },
+            { "date": "2025-02-14", "topic": "Metodologias Ágeis: Scrum e Kanban", "summary": "Estudo de modelos de desenvolvimento iterativos e incrementais.", "reading_materials": ["'Scrum: A Arte de Fazer o Dobro do Trabalho na Metade do Tempo' - Sutherland"] },
+            { "date": "2025-02-17", "topic": "Levantamento e Análise de Requisitos", "summary": "Técnicas para entender e documentar as necessidades do cliente.", "reading_materials": ["'Engenharia de Software' - Sommerville, Cap. 4"] },
+            { "date": "2025-02-21", "topic": "Versionamento de Código com Git", "summary": "Introdução prática ao sistema de controle de versão Git.", "reading_materials": ["Tutorial online do Git (Pro Git)"] },
+            { "date": "2025-02-24", "topic": "Prática de Git e GitHub", "summary": "Exercícios práticos de branching, merging e pull requests.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-02-28", "topic": "Modelagem com UML: Diagramas de Casos de Uso e Classes", "summary": "Uso da UML para modelar o sistema.", "reading_materials": ["'UML: Guia do Usuário' - Booch, Rumbaugh, Jacobson"] },
+            { "date": "2025-03-07", "topic": "Modelagem com UML: Diagramas de Sequência e Atividade", "summary": "Modelar o comportamento dinâmico do sistema.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-03-10", "topic": "Definição do Projeto Final da Disciplina", "summary": "Formação de grupos e escolha dos temas para o projeto semestral.", "reading_materials": ["Documento de especificação do projeto"] },
+            { "date": "2025-03-14", "topic": "Desenvolvimento do Projeto - Sprint 0", "summary": "Configuração do ambiente e planejamento inicial.", "reading_materials": [] },
+            { "date": "2025-03-17", "topic": "Introdução a Padrões de Projeto (Design Patterns)", "summary": "Conceito de padrões de projeto e exemplos (Singleton, Factory).", "reading_materials": ["'Use a Cabeça! Padrões de Projetos' - Freeman et al."] },
+            { "date": "2025-03-21", "topic": "Padrões de Projeto Estruturais (Adapter, Decorator)", "summary": "Padrões que lidam com a composição de classes e objetos.", "reading_materials": ["'Use a Cabeça! Padrões de Projetos' - Freeman et al."] },
+            { "date": "2025-03-24", "topic": "Padrões de Projeto Comportamentais (Strategy, Observer)", "summary": "Padrões que lidam com a comunicação entre objetos.", "reading_materials": ["'Use a Cabeça! Padrões de Projetos' - Freeman et al."] },
+            { "date": "2025-03-28", "topic": "Arquitetura de Software: MVC", "summary": "Estudo do padrão arquitetural Model-View-Controller.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-03-31", "topic": "Desenvolvimento do Projeto - Sprint 1", "summary": "Acompanhamento do desenvolvimento da primeira entrega.", "reading_materials": [] },
+            { "date": "2025-04-04", "topic": "Revisão para a Entrega 1", "summary": "Tirar dúvidas e revisar o progresso dos projetos.", "reading_materials": [] },
+            { "date": "2025-04-07", "topic": "Qualidade e Testes de Software", "summary": "Tipos de testes (unitário, integração, sistema) e sua importância.", "reading_materials": ["'Engenharia de Software' - Sommerville, Cap. 8"] },
+            { "date": "2025-04-14", "topic": "Testes Unitários na Prática", "summary": "Implementar testes unitários com um framework (ex: JUnit, pytest).", "reading_materials": ["Documentação do framework"] },
+            { "date": "2025-04-18", "topic": "Desenvolvimento Orientado a Testes (TDD)", "summary": "Introdução ao ciclo Red-Green-Refactor.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-04-25", "topic": "Integração Contínua e Entrega Contínua (CI/CD)", "summary": "Automatizar o processo de build, teste e deploy.", "reading_materials": ["Artigos sobre Jenkins, GitHub Actions"] },
+            { "date": "2025-04-28", "topic": "Desenvolvimento do Projeto - Sprint 2", "summary": "Acompanhamento do desenvolvimento da segunda entrega.", "reading_materials": [] },
+            { "date": "2025-05-02", "topic": "Gerência de Projetos de Software", "summary": "Estimativas, planejamento e monitoramento.", "reading_materials": ["'Engenharia de Software' - Sommerville, Cap. 5"] },
+            { "date": "2025-05-05", "topic": "Refatoração de Código", "summary": "Técnicas para melhorar a qualidade do código existente sem alterar seu comportamento.", "reading_materials": ["'Refactoring' - Martin Fowler"] },
+            { "date": "2025-05-09", "topic": "Desenvolvimento do Projeto - Sprint 3", "summary": "Acompanhamento e preparação para a entrega final.", "reading_materials": [] },
+            { "date": "2025-05-12", "topic": "Revisão por Pares e Code Review", "summary": "Práticas para melhorar a qualidade do código em equipe.", "reading_materials": ["Notas de aula"] },
+            { "date": "2025-05-16", "topic": "Documentação de Software", "summary": "A importância e as boas práticas de documentação.", "reading_materials": [] },
+            { "date": "2025-05-19", "topic": "Preparação para a Entrega 2", "summary": "Tirar dúvidas finais sobre a segunda entrega.", "reading_materials": [] },
+            { "date": "2025-05-23", "topic": "Desenvolvimento do Projeto - Reta Final", "summary": "Foco na finalização e polimento do projeto.", "reading_materials": [] },
+            { "date": "2025-05-26", "topic": "Desenvolvimento do Projeto - Reta Final", "summary": "Continuação do trabalho no projeto.", "reading_materials": [] },
+            { "date": "2025-05-30", "topic": "Preparação para a Apresentação Final", "summary": "Dicas e estrutura para a apresentação do projeto.", "reading_materials": [] },
+            { "date": "2025-06-02", "topic": "Ensaio das Apresentações", "summary": "Os grupos ensaiam suas apresentações.", "reading_materials": [] },
+            { "date": "2025-06-09", "topic": "Revisão Geral do Semestre", "summary": "Revisão de todos os conceitos de Engenharia de Software.", "reading_materials": ["Resumos e anotações"] }
+          ],
+          "schedules": [
+            { "day_of_week": "Segunda-feira", "start_time": "14:00", "end_time": "15:00", "location": "Laboratório 2" },
+            { "day_of_week": "Segunda-feira", "start_time": "15:00", "end_time": "16:00", "location": "Laboratório 2" },
+            { "day_of_week": "Sexta-feira", "start_time": "14:00", "end_time": "15:00", "location": "Laboratório 2" },
+            { "day_of_week": "Sexta-feira", "start_time": "15:00", "end_time": "16:00", "location": "Laboratório 2" }
+          ]
+        }
+      ]
+    }
+  ],
+  "general_personal_events": [
+    {
+      "title": "Carnaval",
+      "event_type": "Feriado",
+      "start_date": "2025-03-03",
+      "end_date": "2025-03-05"
+    },
+    {
+      "title": "Páscoa",
+      "event_type": "Feriado",
+      "start_date": "2025-04-20",
+      "end_date": "2025-04-21"
+    },
+    {
+      "title": "Dia do Trabalho",
+      "event_type": "Feriado",
+      "start_date": "2025-05-01"
+    },
+    {
+      "title": "Férias de Inverno",
+      "event_type": "Férias",
+      "start_date": "2025-07-01",
+      "end_date": "2025-07-31"
+    }
+  ]
+}
