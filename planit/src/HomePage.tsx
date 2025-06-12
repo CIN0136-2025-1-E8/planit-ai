@@ -1,14 +1,30 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box, Container } from '@mui/material';
+import Grid from '@mui/material/Grid';
+import logo from './assets/logo.png'; 
+import { useNavigate } from 'react-router-dom';
 
 export default function HomePage() {
+  const navigate = useNavigate();
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        width: '100vw',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        bgcolor: '#040032', 
+        color: '#fff',
+      }}
+    >
       {/* Barra superior */}
       <AppBar position="static" sx={{ backgroundColor: '#f5f5f5', boxShadow: 'none', color: 'black' }}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Box display="flex" alignItems="center">
-            <img src="/logo.png" alt="Planit Logo" style={{ height: 40, marginRight: 8 }} />
+            <img src={logo} alt="Planit Logo" style={{ height: 40, marginRight: 8 }} />
             <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#3b82f6' }}>
               Planit
             </Typography>
@@ -26,6 +42,7 @@ export default function HomePage() {
                 textTransform: 'none',
                 borderRadius: '12px'
               }}
+              onClick={()=> navigate("/planit")}
             >
               Experimente o Planit
             </Button>
@@ -33,34 +50,49 @@ export default function HomePage() {
         </Toolbar>
       </AppBar>
 
-      {/* Conteúdo centralizado no restante da tela */}
+      
       <Box
         sx={{
           flex: 1,
-          backgroundColor: '#040032',
-          color: '#fff',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          textAlign: 'left',
-          px: 4,
+          px: 0,
         }}
       >
-        <Box>
-          <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#fff' }}>
-            Organize sua
-          </Typography>
-          <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#fff' }}>
-            vida de
-          </Typography>
-          <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#fff' }}>
-            estudos com{' '}
-            <Box component="span" sx={{ color: '#60a5fa' }}>
-              Planit
-            </Box>
-            .
-          </Typography>
-        </Box>
+        <Container maxWidth="lg">
+          <Grid container spacing={4} alignItems="center">
+            <Grid item xs={12} md={7}>
+              <Typography variant="h2" sx={{ fontWeight: 'bold', color: '#fff', mb: 2 }}>
+                Organize sua vida de estudos com{' '}
+                <Box component="span" sx={{ color: '#60a5fa' }}>
+                  Planit
+                </Box>
+                .
+              </Typography>
+              <Typography variant="h5" sx={{ color: '#cbd5e1', mb: 4 }}>
+                Uma plataforma inteligente para planejar, acompanhar e otimizar seus estudos.
+              </Typography>
+              <Button
+                variant="contained"
+                size="large"
+                sx={{
+                  backgroundColor: '#3b82f6',
+                  fontWeight: 'bold',
+                  textTransform: 'none',
+                  borderRadius: '12px',
+                  px: 4,
+                  py: 1.5,
+                  fontSize: '1.2rem'
+                }}
+                onClick={()=> navigate("/planit")}
+              >
+    
+                Experimente o Planit
+              </Button>
+            </Grid>
+          </Grid>
+        </Container>
       </Box>
     </Box>
   );
