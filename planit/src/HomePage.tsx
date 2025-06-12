@@ -1,8 +1,11 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography, Button, Box, Container, Grid } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box, Container } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import logo from './assets/logo.png'; 
+import { useNavigate } from 'react-router-dom';
 
 export default function HomePage() {
+  const navigate = useNavigate();
   return (
     <Box
       sx={{
@@ -13,7 +16,7 @@ export default function HomePage() {
         position: 'absolute',
         top: 0,
         left: 0,
-        bgcolor: '#040032', // Set background color for the whole page
+        bgcolor: '#040032', 
         color: '#fff',
       }}
     >
@@ -39,6 +42,7 @@ export default function HomePage() {
                 textTransform: 'none',
                 borderRadius: '12px'
               }}
+              onClick={()=> navigate("/planit")}
             >
               Experimente o Planit
             </Button>
@@ -46,7 +50,7 @@ export default function HomePage() {
         </Toolbar>
       </AppBar>
 
-      {/* Conteúdo centralizado e responsivo para web */}
+      
       <Box
         sx={{
           flex: 1,
@@ -81,18 +85,12 @@ export default function HomePage() {
                   py: 1.5,
                   fontSize: '1.2rem'
                 }}
+                onClick={()=> navigate("/planit")}
               >
+    
                 Experimente o Planit
               </Button>
             </Grid>
-            {/*para ser adicionado no futuro*/}
-            {/*Grid item xs={12} md={5} sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'center' }}>
-              <img
-                src="/hero-illustration.png"
-                alt="Ilustração Planit"
-                style={{ maxWidth: '100%', height: 'auto', borderRadius: 16 }}
-              />
-            </Grid>*/}
           </Grid>
         </Container>
       </Box>
