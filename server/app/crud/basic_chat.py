@@ -27,6 +27,7 @@ class CRUDBasicChat:
 
     def write_chat_history_by_session_id(self, chat_history: BasicChatHistory) -> None:
         self.history[chat_history.session_id] = chat_history.history
+        self.save_history_to_file()
         return
 
 
