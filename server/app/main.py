@@ -6,7 +6,7 @@ from routers import basic_chat_router
 
 app = FastAPI()
 app.include_router(basic_chat_router)
-basic_chat_crud.load_history_from_file()
+basic_chat_crud.read_history_from_file()
 
 if __name__ == "__main__":
     uvicorn.run(
