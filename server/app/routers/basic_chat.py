@@ -30,7 +30,7 @@ async def basic_chat_message(request: BasicChatRequest):
     else:
         chat = client.aio.chats.create(model=settings.GOOGLE_MODEL_BASIC)
     response = await chat.send_message(request.message)
-    basic_chat_crud.write_chat_history_by_session_id(
+    basic_chat_crud.set_chat_history_by_session_id(
         BasicChatHistory(session_id=request.session_id, history=chat.get_history()))
     return BasicChatResponse(reply=response.text)
 
@@ -45,7 +45,7 @@ async def basic_chat_message_streaming(request: BasicChatRequest, background_tas
         chat = client.aio.chats.create(model=settings.GOOGLE_MODEL_BASIC)
 
     def save_chat_history_task():
-        basic_chat_crud.write_chat_history_by_session_id(
+        basic_chat_crud.set_chat_history_by_session_id(
             BasicChatHistory(session_id=request.session_id, history=chat.get_history()))
 
     background_tasks.add_task(save_chat_history_task)
