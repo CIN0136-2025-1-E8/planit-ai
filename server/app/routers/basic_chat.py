@@ -1,5 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, BackgroundTasks
 from google import genai
+from starlette.responses import StreamingResponse
 
 from core.config import settings
 from crud import basic_chat_crud
@@ -32,3 +33,26 @@ async def basic_chat_message(request: BasicChatRequest):
     basic_chat_crud.write_chat_history_by_session_id(
         BasicChatHistory(session_id=request.session_id, history=chat.get_history()))
     return BasicChatResponse(reply=response.text)
+
+
+@basic_chat_router.post("/message_streaming", response_model=BasicChatResponse)
+async def basic_chat_message_streaming(request: BasicChatRequest, background_tasks: BackgroundTasks):
+    client = genai.Client(api_key=settings.GOOGLE_API_KEY.get_secret_value())
+    chat_history = basic_chat_crud.get_chat_history_by_session_id(request.session_id)
+    if chat_history:
+        chat = client.aio.chats.create(model=settings.GOOGLE_MODEL_BASIC, history=chat_history.history)
+    else:
+        chat = client.aio.chats.create(model=settings.GOOGLE_MODEL_BASIC)
+
+    def save_chat_history_task():
+        basic_chat_crud.write_chat_history_by_session_id(
+            BasicChatHistory(session_id=request.session_id, history=chat.get_history()))
+
+    background_tasks.add_task(save_chat_history_task)
+
+    async def streaming_chat_message():
+        async for chunk in await chat.send_message_stream(request.message):
+            if chunk.text:
+                yield chunk.text
+
+    return StreamingResponse(streaming_chat_message())
