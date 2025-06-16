@@ -26,9 +26,9 @@ async def basic_chat_message(request: BasicChatRequest):
     client = genai.Client(api_key=settings.GOOGLE_API_KEY.get_secret_value())
     chat_history = basic_chat_crud.get_chat_history_by_session_id(request.session_id)
     if chat_history:
-        chat = client.aio.chats.create(model=settings.GOOGLE_MODEL_BASIC, history=chat_history.history)
+        chat = client.aio.chats.create(model=settings.GOOGLE_BASIC_MODEL, history=chat_history.history)
     else:
-        chat = client.aio.chats.create(model=settings.GOOGLE_MODEL_BASIC)
+        chat = client.aio.chats.create(model=settings.GOOGLE_BASIC_MODEL)
     response = await chat.send_message(request.message)
     basic_chat_crud.set_chat_history_by_session_id(
         BasicChatHistory(session_id=request.session_id, history=chat.get_history()))
@@ -40,9 +40,9 @@ async def basic_chat_message_streaming(request: BasicChatRequest, background_tas
     client = genai.Client(api_key=settings.GOOGLE_API_KEY.get_secret_value())
     chat_history = basic_chat_crud.get_chat_history_by_session_id(request.session_id)
     if chat_history:
-        chat = client.aio.chats.create(model=settings.GOOGLE_MODEL_BASIC, history=chat_history.history)
+        chat = client.aio.chats.create(model=settings.GOOGLE_BASIC_MODEL, history=chat_history.history)
     else:
-        chat = client.aio.chats.create(model=settings.GOOGLE_MODEL_BASIC)
+        chat = client.aio.chats.create(model=settings.GOOGLE_BASIC_MODEL)
 
     def save_chat_history_task():
         basic_chat_crud.set_chat_history_by_session_id(

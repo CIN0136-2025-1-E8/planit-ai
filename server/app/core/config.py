@@ -1,8 +1,8 @@
 from pathlib import Path
-
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import HttpUrl, SecretStr
 from typing import Optional
+
+from pydantic import SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from schemas.json_definitions import AvailableSchemas
 
@@ -11,11 +11,11 @@ class Settings(BaseSettings):
     BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent
     PROJECT_NAME: str = "PlanIt AI"
     DEBUG: bool = False
-    DEBUG_HISTORY_FILE_PATH: Path = BASE_DIR / ".venv/history.pkl"
+    DEBUG_BASIC_CHAT_HISTORY_FILE_PATH: Path = BASE_DIR / ".venv/basic_chat_history.pkl"
     DEBUG_ADVANCED_CHAT_HISTORY_FILE_PATH: Path = BASE_DIR / ".venv/advanced_chat_history.pkl"
 
     GOOGLE_API_KEY: Optional[SecretStr] = None
-    GOOGLE_MODEL_BASIC: str = "gemma-3-27b-it"
+    GOOGLE_BASIC_MODEL: str = "gemma-3-27b-it"
     GOOGLE_ADVANCED_MODEL: str = "gemini-2.0-flash"
 
     LLM_STRUCTURED_OUTPUT_SYSTEM_INSTRUCTIONS: dict[AvailableSchemas, str] = {
@@ -24,19 +24,23 @@ class Settings(BaseSettings):
     }
 
     model_config = SettingsConfigDict(
-        env_file=BASE_DIR/".env",
+        env_file=BASE_DIR / ".env",
         env_file_encoding='utf-8',
         extra='ignore'
     )
 
+
 settings = Settings()
 
 if __name__ == "__main__":
-    print("--- Configurações Carregadas ---")
-    print(f"Nome do Projeto: {settings.PROJECT_NAME}")
-    print(f"Modo Debug: {settings.DEBUG}")
-    print(f"DEBUG - Arquivo de histórico: {settings.DEBUG_HISTORY_FILE_PATH}")
-    print(f"Chave de API Google: {'Configurada' if settings.GOOGLE_API_KEY.get_secret_value() else 'NÃO CONFIGURADA'}")
-    print(f"Modelo: {settings.GOOGLE_MODEL_BASIC}")
-
-    print("\nLembre-se de criar um arquivo '.env' na pasta 'server/' com os valores reais das suas chaves e segredos!")
+    print("--- Loaded Settings ---")
+    print(f"Project name: {settings.PROJECT_NAME}")
+    print(f"Debug mode: {settings.DEBUG}")
+    print(f"DEBUG - History file for basic chat: {settings.DEBUG_BASIC_CHAT_HISTORY_FILE_PATH}")
+    print(f"DEBUG - History file for advanced chat: {settings.DEBUG_ADVANCED_CHAT_HISTORY_FILE_PATH}")
+    print(f"Google API Key: {'Configurada' if settings.GOOGLE_API_KEY.get_secret_value() else 'NÃO CONFIGURADA'}")
+    print(f"Basic LLM: {settings.GOOGLE_BASIC_MODEL}")
+    print(f"Advanced LLM: {settings.GOOGLE_ADVANCED_MODEL}")
+    print(f"System instructions for LLM:")
+    for key, value in settings.LLM_STRUCTURED_OUTPUT_SYSTEM_INSTRUCTIONS.items():
+        print(f"    {key}: {value}")
