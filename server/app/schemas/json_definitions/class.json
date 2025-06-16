@@ -1,0 +1,128 @@
+{
+  "type": "object",
+  "properties": {
+    "class": {
+      "type": "object",
+      "properties": {
+        "class_title": {
+          "type": "string",
+          "description": "Title of the course."
+        },
+        "class_code": {
+          "type": "string",
+          "description": "Code for the course."
+        },
+        "professor_name": {
+          "type": "string",
+          "description": "Name of the professor."
+        },
+        "lessons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string",
+                "description": "Date of the lesson."
+              },
+              "topic": {
+                "type": "string",
+                "description": "Topic of the lesson."
+              },
+              "details": {
+                "type": "string",
+                "description": "Details or summary of the lesson's content."
+              },
+              "reading_materials": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Recommended reading materials."
+              }
+            },
+            "required": [
+              "date",
+              "topic"
+            ]
+          },
+          "description": "List of lessons for the course."
+        },
+        "schedules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "day_of_week": {
+                "type": "string",
+                "description": "Day of the week."
+              },
+              "start_time": {
+                "type": "string",
+                "description": "Start time."
+              },
+              "end_time": {
+                "type": "string",
+                "description": "End time."
+              },
+              "location": {
+                "type": "string",
+                "description": "Location of the class."
+              }
+            },
+            "required": [
+              "day_of_week",
+              "start_time",
+              "end_time",
+              "location"
+            ]
+          },
+          "description": "Fixed schedules for the course."
+        },
+        "evaluations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "description": "Title of the evaluation."
+              },
+              "evaluation_type": {
+                "type": "string",
+                "description": "Type of evaluation (e.g., 'Exam', 'Assignment', 'Presentation')."
+              },
+              "date": {
+                "type": "string",
+                "description": "Date of the evaluation."
+              },
+              "start_time": {
+                "type": "string",
+                "description": "Start time of the evaluation."
+              },
+              "end_time": {
+                "type": "string",
+                "description": "End time of the evaluation."
+              }
+            },
+            "required": [
+              "title",
+              "evaluation_type",
+              "date",
+              "start_time",
+              "end_time"
+            ]
+          },
+          "description": "List of evaluations for the course."
+        }
+      },
+      "required": [
+        "class_title",
+        "lessons",
+        "schedules",
+        "evaluations"
+      ],
+      "description": "Details of a course of a higher education program."
+    }
+  }
+}
