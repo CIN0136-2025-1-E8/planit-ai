@@ -21,6 +21,19 @@ import {
   Public as GlobeIcon,
 } from "@mui/icons-material"
 
+async function sendMessageToBackend(sessionId: string, message: string): Promise<string> {
+  const response = await fetch("http://localhost:8000/chat/message", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ session_id: sessionId, message }),
+  });
+  if (!response.ok) throw new Error("Erro ao enviar mensagem");
+  const data = await response.json();
+  return data.reply;
+}
+
+
+
 type Message = {
   id: string
   role: "user" | "assistant"
@@ -96,7 +109,8 @@ export default function PlanitPage() {
     setIsLoading(true)
 
     try {
-      const response = "olá"
+      const sessionId = "demo-session";
+      const response = await sendMessageToBackend(sessionId, input);
 
       setMessages((prev) => [
         ...prev,
@@ -105,9 +119,9 @@ export default function PlanitPage() {
           role: "assistant",
           content: response,
         },
-      ])
+      ]);
     } catch (error) {
-      console.error("Error getting response:", error)
+      console.error("Error getting response:", error);
       setMessages((prev) => [
         ...prev,
         {
@@ -115,7 +129,7 @@ export default function PlanitPage() {
           role: "assistant",
           content: "Desculpe, tive um problema ao processar sua mensagem. Pode tentar novamente?",
         },
-      ])
+      ]);
     } finally {
       setIsLoading(false)
     }
