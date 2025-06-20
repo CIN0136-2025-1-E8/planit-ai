@@ -13,6 +13,27 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     DEBUG_BASIC_CHAT_HISTORY_FILE_PATH: Path = BASE_DIR / ".venv/basic_chat_history.pkl"
     DEBUG_ADVANCED_CHAT_HISTORY_FILE_PATH: Path = BASE_DIR / ".venv/advanced_chat_history.pkl"
+    DEBUG_FILE_LIST_FILE_PATH: Path = BASE_DIR / ".venv/file_list.pkl"
+
+    UPLOAD_DIR: Path = BASE_DIR / ".venv" / "uploads"
+    FILE_UPLOAD_SIZE_LIMIT_BYTES: int = 10 * 1024 * 1024  # 10MB
+    FILE_UPLOAD_SUPPORTED_TYPES: list[str] = ["application/pdf",
+                                              "application/x-javascript",
+                                              "text/javascript",
+                                              "application/x-python",
+                                              "text/x-python",
+                                              "text/plain",
+                                              "text/html",
+                                              "text/css",
+                                              "text/md",
+                                              "text/csv",
+                                              "text/xml",
+                                              "text/rtf",
+                                              "image/png",
+                                              "image/jpeg",
+                                              "image/webp",
+                                              "image/heic",
+                                              "image/heif"]
 
     GOOGLE_API_KEY: Optional[SecretStr] = None
     GOOGLE_BASIC_MODEL: str = "gemma-3-27b-it"
