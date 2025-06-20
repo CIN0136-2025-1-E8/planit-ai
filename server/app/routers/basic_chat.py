@@ -7,8 +7,8 @@ from crud import basic_chat_crud
 from schemas import BasicChatResponse, BasicChatRequest, BasicChatHistory, BasicChatHistoryRequest
 
 basic_chat_router = APIRouter(
-    prefix="/chat",
-    tags=["chat"],
+    prefix="/basic_chat",
+    tags=["basic chat"],
     responses={404: {"description": "Not found"}},
 )
 
