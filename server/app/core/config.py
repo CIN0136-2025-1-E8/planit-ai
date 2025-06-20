@@ -12,7 +12,6 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "PlanIt AI"
     DEBUG: bool = False
     DEBUG_BASIC_CHAT_HISTORY_FILE_PATH: Path = BASE_DIR / ".venv/basic_chat_history.pkl"
-    DEBUG_ADVANCED_CHAT_HISTORY_FILE_PATH: Path = BASE_DIR / ".venv/advanced_chat_history.pkl"
     DEBUG_FILE_LIST_FILE_PATH: Path = BASE_DIR / ".venv/file_list.pkl"
 
     UPLOAD_DIR: Path = BASE_DIR / ".venv" / "uploads"
@@ -58,7 +57,6 @@ if __name__ == "__main__":
     print(f"Project name: {settings.PROJECT_NAME}")
     print(f"Debug mode: {settings.DEBUG}")
     print(f"DEBUG - History file for basic chat: {settings.DEBUG_BASIC_CHAT_HISTORY_FILE_PATH}")
-    print(f"DEBUG - History file for advanced chat: {settings.DEBUG_ADVANCED_CHAT_HISTORY_FILE_PATH}")
     print(f"Google API Key: {'Configurada' if settings.GOOGLE_API_KEY.get_secret_value() else 'NÃO CONFIGURADA'}")
     print(f"Basic LLM: {settings.GOOGLE_BASIC_MODEL}")
     print(f"Advanced LLM: {settings.GOOGLE_ADVANCED_MODEL}")
