@@ -1,3 +1,4 @@
+import io
 import mimetypes
 import os
 import shutil
@@ -17,6 +18,23 @@ def validate_file(file: File):
         raise HTTPException(status_code=413, detail="Request Entity Too Large")
     if file.content_type not in settings.SUPPORTED_FILE_TYPES:
         raise HTTPException(status_code=415, detail="Unsupported Media Type")
+
+
+def validate_filename(filename: str) -> None:
+    if ".." in filename or filename.startswith(('/', '\\')):
+        raise HTTPException(status_code=404, detail="File Not Found")
+    if not os.path.isfile(settings.UPLOAD_DIR / filename):
+        raise HTTPException(status_code=404, detail="File Not Found")
+
+
+def validate_filenames(filenames: list[str]) -> None:
+    for filename in filenames:
+        validate_filename(filename)
+
+
+def get_buffered_reader_from_filename(filename: str) -> io.BufferedReader:
+    validate_filename(filename)
+    return io.open(settings.UPLOAD_DIR / filename, "rb")
 
 
 def save_file(file_path: str, data: Any) -> datetime:
