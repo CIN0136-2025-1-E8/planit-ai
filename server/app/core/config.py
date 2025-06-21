@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent
     PROJECT_NAME: str = "PlanIt AI"
     DEBUG: bool = False
+    DEBUG_CHAT_HISTORY_FILE_PATH: Path = BASE_DIR / ".venv/chat_history.json"
     DEBUG_BASIC_CHAT_HISTORY_FILE_PATH: Path = BASE_DIR / ".venv/basic_chat_history.pkl"
     DEBUG_FILE_LIST_FILE_PATH: Path = BASE_DIR / ".venv/file_list.pkl"
 
