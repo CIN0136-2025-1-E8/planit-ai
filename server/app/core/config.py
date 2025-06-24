@@ -44,6 +44,8 @@ class Settings(BaseSettings):
         AvailableSchemas.SEMESTER: "You must always respond in Brazilian Portuguese. When filling properties, you must always trim white-spaces, remove line breaks, separate words that were mistakenly merged and normalize the case."
     }
 
+    DATABASE_URL: Optional[str] = None
+
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",
         env_file_encoding='utf-8',
