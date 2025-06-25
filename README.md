@@ -63,7 +63,7 @@ pip install -r requirements.txt
 [Wilhyã Pedro](https://github.com/Wilhy-p)  
 [Luan Romero](https://github.com/luanromerolcc)  
 [Guimel Filipe](https://github.com/filipeguimel)  
-[Leandro Junior](https://github.com/LeandroJrMarques)  
-[Maia Ferreira]  
+[Leandro Junior](https://github.com/LeandroJrMarques)     
+[Maia Ferreira](https://github.com/maia-cin)    
 [Thiago Alves](https://github.com/ThAlvesM)  
 [Denilson França](https://github.com/altinctrl) 
