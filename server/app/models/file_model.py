@@ -14,6 +14,6 @@ class File(Base):
     size = Column(Integer, nullable=False)
     uploaded_at = Column(String, nullable=False)
 
-    owner_uuid = Column(String, ForeignKey("user.uuid"), nullable=False)
+    owner_uuid = Column(String, ForeignKey("users.uuid"), nullable=False)
 
     owner = relationship("User", back_populates="files")

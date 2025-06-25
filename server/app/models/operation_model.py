@@ -21,6 +21,6 @@ class Operation(Base):
     inverse_operation_data = Column(Text, nullable=False)
     timestamp = Column(String, default=str(datetime.now), nullable=False)
 
-    owner_id = Column(String, ForeignKey("user.uuid"), nullable=False)
+    owner_id = Column(String, ForeignKey("users.uuid"), nullable=False)
 
     owner = relationship("User", back_populates="operation_log")
