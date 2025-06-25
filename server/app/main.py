@@ -4,12 +4,13 @@ import uvicorn
 from fastapi import FastAPI
 
 from core import settings
+from core.db import Base, engine
 from crud import basic_chat_crud, chat_crud, files_crud
 from routers import basic_chat_router, chat_router, files_router
 from schemas.json_definitions import load_schemas_into_registry
 from fastapi.middleware.cors import CORSMiddleware
 
-
+Base.metadata.create_all(bind=engine)
 app = FastAPI()
 app.include_router(files_router)
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
