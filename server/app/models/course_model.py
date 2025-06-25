@@ -15,6 +15,5 @@ class Course(Base):
     owner_uuid = Column(String, ForeignKey("user.uuid"), nullable=False)
 
     owner = relationship("User", back_populates="courses")
-    course_files = relationship("CourseFile", back_populates="course", cascade="all, delete-orphan")
     evaluations = relationship("Evaluation", back_populates="course", cascade="all, delete-orphan")
     lectures = relationship("Lecture", back_populates="course", cascade="all, delete-orphan")

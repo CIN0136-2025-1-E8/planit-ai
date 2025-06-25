@@ -4,16 +4,16 @@ from sqlalchemy.orm import relationship
 from app.core.db import Base
 
 
-class CourseFile(Base):
-    __tablename__ = "course_files"
+class File(Base):
+    __tablename__ = "files"
 
     uuid = Column(String, primary_key=True, index=True)
-    purpose = Column(String, nullable=False)
     original_name = Column(String, nullable=False)
     new_name = Column(String, nullable=False)
     mime_type = Column(String, nullable=False)
     size = Column(Integer, nullable=False)
     uploaded_at = Column(String, nullable=False)
 
-    course_uuid = Column(String, ForeignKey("course.uuid"), nullable=False)
-    course = relationship("Course", back_populates="course_files")
+    owner_uuid = Column(String, ForeignKey("user.uuid"), nullable=False)
+
+    owner = relationship("User", back_populates="files")
