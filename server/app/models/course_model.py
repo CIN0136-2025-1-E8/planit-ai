@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, ForeignKey
+from sqlalchemy import Column, String, Text, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 
 from app.core.db import Base
@@ -9,6 +9,7 @@ class Course(Base):
 
     uuid = Column(String, primary_key=True, index=True)
     title = Column(String, nullable=False)
+    description = Column(Text, nullable=True)
     semester = Column(String, nullable=True)
     archived = Column(Boolean, default=False)
 
