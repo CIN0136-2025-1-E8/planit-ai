@@ -7,11 +7,13 @@ from fastapi.middleware.cors import CORSMiddleware
 
 
 from app.core import settings
+from app.core.db import Base, engine
 from app.crud import chat_crud, course_crud, files_crud
 from app.routers import chat_router, course_router, files_router
 
 
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+Base.metadata.create_all(bind=engine)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

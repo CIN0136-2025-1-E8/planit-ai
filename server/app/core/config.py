@@ -59,6 +59,8 @@ class Settings(BaseSettings):
                                        "image/heic",
                                        "image/heif"]
 
+    DATABASE_URL: Optional[str] = None
+
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",
         env_file_encoding='utf-8',
