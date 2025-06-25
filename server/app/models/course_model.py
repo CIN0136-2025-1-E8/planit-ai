@@ -11,7 +11,7 @@ class Course(Base):
     title = Column(String, nullable=False)
     description = Column(Text, nullable=True)
     semester = Column(String, nullable=True)
-    archived = Column(Boolean, default=False)
+    archived = Column(Boolean, default=False, nullable=False)
 
     owner_uuid = Column(String, ForeignKey("users.uuid"), nullable=False)
 
