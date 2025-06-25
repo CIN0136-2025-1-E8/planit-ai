@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean
+from sqlalchemy import Column, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 
 from app.core.db import Base
@@ -12,6 +12,9 @@ class Course(Base):
     semester = Column(String, nullable=True)
     archived = Column(Boolean, nullable=False, default=False)
 
+    owner_uuid = Column(String, ForeignKey("user.uuid"), nullable=False)
+
+    owner = relationship("User", back_populates="courses")
     course_files = relationship("CourseFile", back_populates="courses", cascade="all, delete-orphan")
     evaluations = relationship("Evaluation", back_populates="courses", cascade="all, delete-orphan")
     lectures = relationship("Lecture", back_populates="courses", cascade="all, delete-orphan")
