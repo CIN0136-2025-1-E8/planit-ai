@@ -10,11 +10,11 @@ class Course(Base):
     uuid = Column(String, primary_key=True, index=True)
     title = Column(String, nullable=False)
     semester = Column(String, nullable=True)
-    archived = Column(Boolean, nullable=False, default=False)
+    archived = Column(Boolean, default=False)
 
     owner_uuid = Column(String, ForeignKey("user.uuid"), nullable=False)
 
     owner = relationship("User", back_populates="courses")
-    course_files = relationship("CourseFile", back_populates="courses", cascade="all, delete-orphan")
-    evaluations = relationship("Evaluation", back_populates="courses", cascade="all, delete-orphan")
-    lectures = relationship("Lecture", back_populates="courses", cascade="all, delete-orphan")
+    course_files = relationship("CourseFile", back_populates="course", cascade="all, delete-orphan")
+    evaluations = relationship("Evaluation", back_populates="course", cascade="all, delete-orphan")
+    lectures = relationship("Lecture", back_populates="course", cascade="all, delete-orphan")
