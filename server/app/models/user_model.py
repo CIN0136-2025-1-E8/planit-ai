@@ -17,4 +17,4 @@ class User(Base):
     events = relationship("Event", back_populates="owner")
     files = relationship("File", back_populates="owner")
     operation_log = relationship("OperationLog", back_populates="owner")
-    chat_history = relationship("ChatHistory", back_populates="owner")
+    chat_history = relationship("ChatMessage", order_by="ChatMessage.order", back_populates="owner")
