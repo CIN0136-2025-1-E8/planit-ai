@@ -1,6 +1,5 @@
 from pydantic import BaseModel, ConfigDict
 
-from .course_file import CourseFile
 from .evaluation import Evaluation
 from .lecture import Lecture
 
@@ -29,4 +28,3 @@ class Course(CourseBase):
 class CourseWithDetails(Course):
     lectures: list[Lecture] = []
     evaluations: list[Evaluation] = []
-    files: list[CourseFile] = []
