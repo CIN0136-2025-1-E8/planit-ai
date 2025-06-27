@@ -5,7 +5,7 @@ from fastapi import APIRouter, UploadFile
 from starlette import status
 
 from crud import files_crud
-from schemas.files import FileRecord
+from schemas import FileRecord
 from utils import file_handling
 
 files_router = APIRouter(

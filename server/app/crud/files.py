@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Dict
 
 from core import settings
-from schemas.files import FileRecord
+from schemas import FileRecord
 
 
 class CRUDFiles:
