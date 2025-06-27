@@ -1,3 +1,8 @@
 from .chat_schemas import ChatRole, ChatMessage
-from .course_schema import Course, CourseBase, CoursesList, Lecture, Evaluation, EvaluationTypes
+from .course_schema import Course, CourseBase, CoursesList, CourseCreate, CourseUpdate, CourseSummary
+from .evaluation_schema import EvaluationTypes, Evaluation, EvaluationBase, EvaluationCreate, EvaluationUpdate
+from .event_schema import Event, EventBase, EventCreate, EventUpdate
 from .files_schema import FileRecord
+from .lecture_schema import Lecture, LectureBase, LectureCreate, LectureUpdate
+from .routine_schema import RoutineWeekdays, Routine, RoutineBase, RoutineCreate, RoutineUpdate
+from .user_schema import User, UserBase, UserCreate, UserUpdate, UserProfile
