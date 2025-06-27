@@ -5,8 +5,7 @@ from google import genai
 from google.genai.types import Blob, Content, Part
 
 from core import settings
-from schemas import ChatMessageParts, ChatHistory
-from schemas.chat import ChatPartTypes
+from schemas import ChatPartTypes, ChatMessageParts, ChatHistory
 from utils.file_handling import get_buffered_reader_from_filename
 
 

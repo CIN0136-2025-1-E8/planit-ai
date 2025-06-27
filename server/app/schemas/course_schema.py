@@ -1,7 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
-from .evaluation import Evaluation
-from .lecture import Lecture
+from schemas import Evaluation, Lecture
 
 
 class CourseBase(BaseModel):
