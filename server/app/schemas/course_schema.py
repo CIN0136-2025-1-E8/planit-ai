@@ -21,9 +21,11 @@ class CourseUpdate(BaseModel):
 
 class Course(CourseBase):
     uuid: str
+    lectures: list[Lecture] = []
+    evaluations: list[Evaluation] = []
     model_config = ConfigDict(from_attributes=True)
 
 
-class CourseWithDetails(Course):
-    lectures: list[Lecture] = []
-    evaluations: list[Evaluation] = []
+class CourseSummary(CourseBase):
+    uuid: str
+    model_config = ConfigDict(from_attributes=True)
