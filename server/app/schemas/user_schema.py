@@ -1,5 +1,3 @@
-import uuid
-
 from pydantic import BaseModel, ConfigDict
 
 from schemas import Event, Routine, FileRecord, CourseSummary
@@ -23,7 +21,7 @@ class UserUpdate(BaseModel):
 
 
 class User(UserBase):
-    user_uuid: uuid.UUID
+    uuid: str
     courses: list[CourseSummary]
     events: list[Event]
     routines: list[Routine]
@@ -32,5 +30,5 @@ class User(UserBase):
 
 
 class UserProfile(UserBase):
-    user_uuid: uuid.UUID
+    uuid: str
     model_config = ConfigDict(from_attributes=True)

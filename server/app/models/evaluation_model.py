@@ -1,7 +1,5 @@
-import uuid
-
-from sqlalchemy import Column, String, ForeignKey, Boolean, Uuid, text
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy import Column, String, ForeignKey, Boolean
+from sqlalchemy.orm import relationship
 
 from core.db import Base
 
@@ -9,11 +7,7 @@ from core.db import Base
 class Evaluation(Base):
     __tablename__ = "evaluations"
 
-    uuid: Mapped[uuid.UUID] = mapped_column(
-        Uuid(as_uuid=True),
-        primary_key=True,
-        server_default=text("gen_random_uuid()"),
-        default=uuid.uuid4)
+    uuid = Column(String, primary_key=True, index=True)
     type = Column(String, nullable=False)
     title = Column(String, nullable=False)
     start_datetime = Column(String, nullable=False)
