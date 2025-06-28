@@ -1,3 +1,5 @@
+import uuid
+
 from pydantic import BaseModel, ConfigDict
 
 from schemas import Evaluation, Lecture
@@ -20,12 +22,12 @@ class CourseUpdate(BaseModel):
 
 
 class Course(CourseBase):
-    uuid: str
+    course_uuid: uuid.UUID
     lectures: list[Lecture] = []
     evaluations: list[Evaluation] = []
     model_config = ConfigDict(from_attributes=True)
 
 
 class CourseSummary(CourseBase):
-    uuid: str
+    course_uuid: uuid.UUID
     model_config = ConfigDict(from_attributes=True)

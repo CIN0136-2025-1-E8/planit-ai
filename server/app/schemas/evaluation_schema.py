@@ -1,3 +1,4 @@
+import uuid
 from enum import Enum
 
 from pydantic import BaseModel, ConfigDict
@@ -20,7 +21,7 @@ class EvaluationBase(BaseModel):
 
 
 class EvaluationCreate(EvaluationBase):
-    course_uuid: str
+    course_uuid: uuid.UUID
 
 
 class EvaluationUpdate(BaseModel):
@@ -32,5 +33,5 @@ class EvaluationUpdate(BaseModel):
 
 
 class Evaluation(EvaluationBase):
-    uuid: str
+    evaluation_uuid: uuid.UUID
     model_config = ConfigDict(from_attributes=True)

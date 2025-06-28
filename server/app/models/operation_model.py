@@ -1,7 +1,8 @@
+import uuid
 from datetime import datetime
 
-from sqlalchemy import Column, String, Integer, Text, Boolean, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, String, Integer, Text, Boolean, ForeignKey, Uuid, text
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 from core.db import Base
 
@@ -9,7 +10,11 @@ from core.db import Base
 class Operation(Base):
     __tablename__ = "operations"
 
-    uuid = Column(String, primary_key=True)
+    uuid: Mapped[uuid.UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        primary_key=True,
+        server_default=text("gen_random_uuid()"),
+        default=uuid.uuid4)
     order = Column(Integer, nullable=False)
     batch_uuid = Column(String, nullable=False)
     action = Column(String, nullable=False)

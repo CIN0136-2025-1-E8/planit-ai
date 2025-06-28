@@ -1,3 +1,4 @@
+import uuid
 from enum import Enum
 
 from pydantic import BaseModel, ConfigDict
@@ -36,5 +37,5 @@ class RoutineUpdate(BaseModel):
 
 
 class Routine(RoutineBase):
-    uuid: str
+    routine_uuid: uuid.UUID
     model_config = ConfigDict(from_attributes=True)

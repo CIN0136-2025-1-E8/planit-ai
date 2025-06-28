@@ -1,5 +1,7 @@
-from sqlalchemy import Boolean, Column, String
-from sqlalchemy.orm import relationship
+import uuid
+
+from sqlalchemy import Boolean, Column, String, Uuid, text
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 from core.db import Base
 
@@ -7,7 +9,11 @@ from core.db import Base
 class User(Base):
     __tablename__ = "users"
 
-    uuid = Column(String, primary_key=True, index=True)
+    uuid: Mapped[uuid.UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        primary_key=True,
+        server_default=text("gen_random_uuid()"),
+        default=uuid.uuid4)
     name = Column(String, nullable=False)
     nickname = Column(String, nullable=True)
     email = Column(String, unique=True, index=True, nullable=False)
