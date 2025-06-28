@@ -1,5 +1,3 @@
-import uuid
-
 from pydantic import BaseModel, ConfigDict
 
 
@@ -22,5 +20,5 @@ class EventUpdate(BaseModel):
 
 
 class Event(EventBase):
-    event_uuid: uuid.UUID
+    uuid: str
     model_config = ConfigDict(from_attributes=True)

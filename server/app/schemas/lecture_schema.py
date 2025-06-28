@@ -1,5 +1,3 @@
-import uuid
-
 from pydantic import BaseModel, ConfigDict
 
 
@@ -12,7 +10,7 @@ class LectureBase(BaseModel):
 
 
 class LectureCreate(LectureBase):
-    course_uuid: uuid.UUID
+    course_uuid: str
 
 
 class LectureUpdate(BaseModel):
@@ -24,5 +22,5 @@ class LectureUpdate(BaseModel):
 
 
 class Lecture(LectureBase):
-    lecture_uuid: uuid.UUID
+    uuid: str
     model_config = ConfigDict(from_attributes=True)
