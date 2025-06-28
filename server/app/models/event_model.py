@@ -13,6 +13,6 @@ class Event(Base):
     start_datetime = Column(String, nullable=False)
     end_datetime = Column(String, nullable=False)
 
-    owner_uuid = Column(String, ForeignKey("users.uuid"), nullable=True)
+    owner_uuid = Column(String, ForeignKey("users.uuid"), index=True, nullable=False)
 
     owner = relationship("User", back_populates="events")

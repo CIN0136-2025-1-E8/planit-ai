@@ -13,6 +13,6 @@ class Lecture(Base):
     end_datetime = Column(String, nullable=False)
     present = Column(Boolean, nullable=False, default=False)
 
-    course_uuid = Column(String, ForeignKey("courses.uuid"), nullable=False)
+    course_uuid = Column(String, ForeignKey("courses.uuid"), index=True, nullable=False)
 
     course = relationship("Course", back_populates="lectures")
