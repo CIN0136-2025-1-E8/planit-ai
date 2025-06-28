@@ -13,7 +13,7 @@ class Course(Base):
     semester = Column(String, nullable=True)
     archived = Column(Boolean, default=False, nullable=False)
 
-    owner_uuid = Column(String, ForeignKey("users.uuid"), nullable=False)
+    owner_uuid = Column(String, ForeignKey("users.uuid"), index=True, nullable=False)
 
     owner = relationship("User", back_populates="courses")
     evaluations = relationship("Evaluation", back_populates="course", cascade="all, delete-orphan")

@@ -12,6 +12,6 @@ class ChatMessage(Base):
     role = Column(String, nullable=False)
     content = Column(Text, nullable=False)
 
-    owner_uuid = Column(Integer, ForeignKey("users.uuid"))
+    owner_uuid = Column(Integer, ForeignKey("users.uuid"), index=True, nullable=False)
 
     owner = relationship("User", back_populates="chat_history")

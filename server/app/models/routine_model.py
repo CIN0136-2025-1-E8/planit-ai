@@ -15,7 +15,7 @@ class Routine(Base):
     end_time = Column(String, nullable=False)
     days_of_the_week = Column(Integer, nullable=False)
 
-    owner_uuid = Column(String, ForeignKey("users.uuid"), nullable=True)
+    owner_uuid = Column(String, ForeignKey("users.uuid"), index=True, nullable=False)
 
     owner = relationship("User", back_populates="routines")
 
