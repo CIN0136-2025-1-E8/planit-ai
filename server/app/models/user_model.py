@@ -2,12 +2,12 @@ from sqlalchemy import Boolean, Column, String
 from sqlalchemy.orm import relationship
 
 from core.db import Base
-
+import uuid
 
 class User(Base):
     __tablename__ = "users"
 
-    uuid = Column(String, primary_key=True, index=True)
+    uuid = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     name = Column(String, nullable=False)
     nickname = Column(String, nullable=True)
     email = Column(String, unique=True, index=True, nullable=False)
