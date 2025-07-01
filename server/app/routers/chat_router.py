@@ -3,50 +3,50 @@ from google import genai
 from starlette.responses import StreamingResponse
 
 from core.config import settings
-from crud import basic_chat_crud
-from schemas import BasicChatResponse, BasicChatRequest, BasicChatHistory, BasicChatHistoryRequest
+from crud import chat_crud
+from schemas import ChatResponse, ChatRequest, ChatHistory, ChatHistoryRequest
 
-basic_chat_router = APIRouter(
+chat_router = APIRouter(
     prefix="/chat",
     tags=["chat"],
     responses={404: {"description": "Not found"}},
 )
 
 
-@basic_chat_router.post("/history", response_model=BasicChatHistory)
-async def basic_chat_get_history(request: BasicChatHistoryRequest):
-    chat_history = basic_chat_crud.get_chat_history_by_session_id(request.session_id)
+@chat_router.post("/history", response_model=ChatHistory)
+async def get_chat_history(request: ChatHistoryRequest):
+    chat_history = chat_crud.get_chat_history_by_session_id(request.session_id)
     if not chat_history:
         raise HTTPException(status_code=404, detail="Not Found")
-    return basic_chat_crud.get_chat_history_by_session_id(request.session_id)
+    return chat_crud.get_chat_history_by_session_id(request.session_id)
 
 
-@basic_chat_router.post("/message", response_model=BasicChatResponse)
-async def basic_chat_message(request: BasicChatRequest):
+@chat_router.post("/message", response_model=ChatResponse)
+async def send_chat_message(request: ChatRequest):
     client = genai.Client(api_key=settings.GOOGLE_API_KEY.get_secret_value())
-    chat_history = basic_chat_crud.get_chat_history_by_session_id(request.session_id)
+    chat_history = chat_crud.get_chat_history_by_session_id(request.session_id)
     if chat_history:
         chat = client.aio.chats.create(model=settings.GOOGLE_BASIC_MODEL, history=chat_history.history)
     else:
         chat = client.aio.chats.create(model=settings.GOOGLE_BASIC_MODEL)
     response = await chat.send_message(request.message)
-    basic_chat_crud.set_chat_history_by_session_id(
-        BasicChatHistory(session_id=request.session_id, history=chat.get_history()))
-    return BasicChatResponse(reply=response.text)
+    chat_crud.set_chat_history_by_session_id(
+        ChatHistory(session_id=request.session_id, history=chat.get_history()))
+    return ChatResponse(reply=response.text)
 
 
-@basic_chat_router.post("/message_streaming", response_model=BasicChatResponse)
-async def basic_chat_message_streaming(request: BasicChatRequest, background_tasks: BackgroundTasks):
+@chat_router.post("/message_streaming", response_model=ChatResponse)
+async def send_chat_message_streaming_response(request: ChatRequest, background_tasks: BackgroundTasks):
     client = genai.Client(api_key=settings.GOOGLE_API_KEY.get_secret_value())
-    chat_history = basic_chat_crud.get_chat_history_by_session_id(request.session_id)
+    chat_history = chat_crud.get_chat_history_by_session_id(request.session_id)
     if chat_history:
         chat = client.aio.chats.create(model=settings.GOOGLE_BASIC_MODEL, history=chat_history.history)
     else:
         chat = client.aio.chats.create(model=settings.GOOGLE_BASIC_MODEL)
 
     def save_chat_history_task():
-        basic_chat_crud.set_chat_history_by_session_id(
-            BasicChatHistory(session_id=request.session_id, history=chat.get_history()))
+        chat_crud.set_chat_history_by_session_id(
+            ChatHistory(session_id=request.session_id, history=chat.get_history()))
 
     background_tasks.add_task(save_chat_history_task)
 

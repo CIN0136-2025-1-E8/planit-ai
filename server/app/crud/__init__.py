@@ -1,1 +1,1 @@
-from .basic_chat import basic_chat_crud
+from .chat_crud import chat_crud

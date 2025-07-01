@@ -1,1 +1,1 @@
-from .basic_chat import BasicChatHistory, BasicChatRequest, BasicChatResponse, BasicChatHistoryRequest
+from .chat_schemas import ChatHistory, ChatRequest, ChatResponse, ChatHistoryRequest
