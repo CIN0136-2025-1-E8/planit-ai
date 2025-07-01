@@ -1,8 +1,8 @@
 import uvicorn
 from fastapi import FastAPI
 
-from crud import basic_chat_crud, rich_chat_crud
-from routers import basic_chat_router, rich_chat_router
+from crud import basic_chat_crud
+from routers import basic_chat_router
 from schemas.json_definitions import load_schemas_into_registry
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -10,8 +10,6 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 app.include_router(basic_chat_router)
 basic_chat_crud.read_history_from_file()
-app.include_router(rich_chat_router)
-rich_chat_crud.read_history_from_file()
 load_schemas_into_registry()
 app.add_middleware(
     CORSMiddleware,
