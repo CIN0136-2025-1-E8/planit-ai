@@ -11,7 +11,9 @@ def get_chat_crud():
 
 
 class CRUDChat:
-    history: list[Content] = []
+    def __init__(self):
+        self.history: list[Content] = []
+        self.read_history_from_file()
 
     def read_history_from_file(self) -> None:
         if os.path.exists(settings.DEBUG_CHAT_HISTORY_FILE_PATH):
