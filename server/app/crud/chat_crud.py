@@ -1,12 +1,13 @@
 import os
 import pickle
 
+from google.genai.types import Content
+
 from core import settings
-from schemas import ChatHistory
 
 
 class CRUDBasicChat:
-    history = {}
+    history: list[Content] = []
 
     def read_history_from_file(self) -> None:
         if os.path.exists(settings.DEBUG_CHAT_HISTORY_FILE_PATH):
@@ -20,13 +21,11 @@ class CRUDBasicChat:
             pickle.dump(self.history, f)
         return
 
-    def get_chat_history_by_session_id(self, session_id: str) -> ChatHistory | None:
-        if session_id in self.history:
-            return ChatHistory(session_id=session_id, history=self.history[session_id])
-        return None
+    def get_chat_history(self) -> list[Content] | None:
+        return self.history
 
-    def set_chat_history_by_session_id(self, chat_history: ChatHistory) -> None:
-        self.history[chat_history.session_id] = chat_history.history
+    def set_chat_history(self, chat_history: list[Content]) -> None:
+        self.history = chat_history
         self.write_history_to_file()
         return
 
