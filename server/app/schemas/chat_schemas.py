@@ -2,19 +2,19 @@ from google.genai.types import Content
 from pydantic import BaseModel
 
 
-class BasicChatRequest(BaseModel):
+class ChatRequest(BaseModel):
     session_id: str
     message: str
 
 
-class BasicChatResponse(BaseModel):
+class ChatResponse(BaseModel):
     reply: str
 
 
-class BasicChatHistoryRequest(BaseModel):
+class ChatHistoryRequest(BaseModel):
     session_id: str
 
 
-class BasicChatHistory(BaseModel):
+class ChatHistory(BaseModel):
     session_id: str
     history: list[Content]
