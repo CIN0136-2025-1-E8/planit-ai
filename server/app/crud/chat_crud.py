@@ -6,7 +6,7 @@ from google.genai.types import Content
 from core import settings
 
 
-class CRUDBasicChat:
+class CRUDChat:
     history: list[Content] = []
 
     def read_history_from_file(self) -> None:
@@ -30,4 +30,4 @@ class CRUDBasicChat:
         return
 
 
-chat_crud = CRUDBasicChat()
+chat_crud = CRUDChat()
