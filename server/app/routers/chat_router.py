@@ -1,9 +1,8 @@
-from fastapi import APIRouter, HTTPException
-from google import genai
+from fastapi import APIRouter, HTTPException, Depends, Form
 from google.genai.types import Content
 
-from core.config import settings
-from crud import chat_crud
+from crud import get_chat_crud
+from services import get_google_ai_service
 
 chat_router = APIRouter(
     prefix="/chat",
@@ -13,18 +12,14 @@ chat_router = APIRouter(
 
 
 @chat_router.post("/history", response_model=list[Content])
-async def get_chat_history():
-    chat_history = chat_crud.get_chat_history()
-    if not chat_history:
-        raise HTTPException(status_code=404, detail="Not Found")
-    return chat_crud.get_chat_history()
+async def get_chat_history(crud=Depends(get_chat_crud)):
+    return crud.get_chat_history()
 
 
 @chat_router.post("/message", response_model=str)
-async def send_chat_message(message: str):
-    client = genai.Client(api_key=settings.GOOGLE_API_KEY.get_secret_value())
-    chat_history = chat_crud.get_chat_history()
-    chat = client.aio.chats.create(model=settings.GOOGLE_BASIC_MODEL, history=chat_history)
-    response = await chat.send_message(message)
-    chat_crud.set_chat_history(chat.get_history())
-    return response.text
+async def send_chat_message(message: str = Form(None),
+                            crud=Depends(get_chat_crud),
+                            ai_service=Depends(get_google_ai_service)):
+    response, chat_history = await ai_service.send_message(message=message, chat_history=crud.get_chat_history())
+    crud.set_chat_history(chat_history)
+    return response

@@ -6,6 +6,10 @@ from google.genai.types import Content
 from core import settings
 
 
+def get_chat_crud():
+    return chat_crud
+
+
 class CRUDChat:
     history: list[Content] = []
 
