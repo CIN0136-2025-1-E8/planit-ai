@@ -3,11 +3,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from routers import chat_router
-from schemas.json_definitions import load_schemas_into_registry
 
 app = FastAPI()
 app.include_router(chat_router)
-load_schemas_into_registry()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
