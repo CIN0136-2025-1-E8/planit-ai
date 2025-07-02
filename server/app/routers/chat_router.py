@@ -13,13 +13,13 @@ chat_router = APIRouter(
 
 @chat_router.post("/history", response_model=list[Content])
 async def get_chat_history(crud=Depends(get_chat_crud)):
-    return crud.get_chat_history()
+    return crud.get_llm_context()
 
 
 @chat_router.post("/message", response_model=str)
 async def send_chat_message(message: str = Form(None),
                             crud=Depends(get_chat_crud),
                             ai_service=Depends(get_google_ai_service)):
-    response, chat_history = await ai_service.send_message(message=message, chat_history=crud.get_chat_history())
-    crud.set_chat_history(chat_history)
+    response, llm_context = await ai_service.send_message(message=message, llm_context=crud.get_llm_context())
+    crud.set_llm_context(llm_context)
     return response
