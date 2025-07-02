@@ -17,7 +17,7 @@ async def get_chat_history(crud=Depends(get_chat_crud)):
 
 
 @chat_router.post("/message", response_model=str)
-async def send_chat_message(message: str = Form(None),
+async def send_chat_message(message: str = Form(),
                             crud=Depends(get_chat_crud),
                             ai_service=Depends(get_google_ai_service)):
     llm_context = crud.get_llm_context()
