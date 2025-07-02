@@ -16,9 +16,9 @@ class GoogleAIService:
 
     async def send_message(self,
                            message: str,
-                           chat_history: list[Content] | None = None
+                           llm_context: list[Content] | None = None
                            ) -> tuple[str, list[Content]]:
-        chat = self.client.aio.chats.create(model=settings.GOOGLE_BASIC_MODEL, history=chat_history)
+        chat = self.client.aio.chats.create(model=settings.GOOGLE_BASIC_MODEL, history=llm_context)
         response = await chat.send_message(message)
         return response.text, chat.get_history()
 
