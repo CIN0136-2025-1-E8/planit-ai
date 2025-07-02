@@ -67,3 +67,22 @@ button:focus-visible {
   }
 }
 
+/* Minimalistic custom scrollbar for chat and sidebar sections */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #bdbdbd #f0f0f0;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  background: #f0f0f0;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #bdbdbd;
+  border-radius: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+}
