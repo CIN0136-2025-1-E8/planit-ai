@@ -1,5 +1,5 @@
 from google import genai
-from google.genai.types import Content
+from google.genai.types import Content, Part
 
 from core import settings
 
@@ -19,8 +19,9 @@ class GoogleAIService:
                            llm_context: list[Content] | None = None
                            ) -> tuple[str, list[Content]]:
         chat = self.client.aio.chats.create(model=settings.GOOGLE_BASIC_MODEL, history=llm_context)
-        response = await chat.send_message(message)
-        return response.text, chat.get_history()
+        response = (await chat.send_message(message)).text
+        return (response, [Content(role="user", parts=[Part(text=message)]),
+                           Content(role="model", parts=[Part(text=response)])])
 
 
 google_ai_service = GoogleAIService(api_key=settings.GOOGLE_API_KEY.get_secret_value())

@@ -33,8 +33,8 @@ class CRUDChat:
     def get_llm_context(self) -> list[Content] | None:
         return self.llm_context
 
-    def set_llm_context(self, llm_context: list[Content]) -> None:
-        self.llm_context = llm_context
+    def append_llm_context(self, new_content: list[Content]) -> None:
+        self.llm_context.extend(new_content)
         self.write_llm_context_to_file()
         return
 
