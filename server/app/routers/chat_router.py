@@ -11,7 +11,7 @@ chat_router = APIRouter(
 )
 
 
-@chat_router.post("/history", response_model=list[ChatMessage])
+@chat_router.get("/history", response_model=list[ChatMessage])
 async def get_chat_history(crud=Depends(get_chat_crud)):
     return crud.get_chat_history()
 
