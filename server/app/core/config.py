@@ -17,6 +17,26 @@ class Settings(BaseSettings):
     GOOGLE_BASIC_MODEL: str = "gemma-3-27b-it"
     GOOGLE_ADVANCED_MODEL: str = "gemini-2.0-flash"
 
+    SYSTEM_MESSAGE_MARKER_START: str = "[PlanIt AI - System Message - START]: "
+    SYSTEM_MESSAGE_MARKER_END: str = " :[PlanIt AI - System Message - END]\n"
+
+    CHAT_SYSTEM_INSTRUCTIONS: str = ("The system can send information to you as messages that begin with '[PlanIt AI - "
+                                     "System Message - START]:' and conclude with ':[PlanIt AI - System Message - "
+                                     "END]'. These messages may or may not contain JSON formatted data. System "
+                                     "messages are not visible in the chat UI but serve as crucial context for "
+                                     "generating accurate responses. When the system provides details about a newly "
+                                     "enrolled course or an update to an existing one, inform the user naturally that "
+                                     "you've noted the addition and offer assistance related to this new information. "
+                                     "Always respond in the language inferred from the user's message history, "
+                                     "unless explicitly requested otherwise. Format all date, time, and currency data "
+                                     "according to the region inferred from the user's message history. If a user "
+                                     "asks you to add, edit, or update a course, lecture, evaluation, event, "
+                                     "or study plan, politely explain that you're not yet able to perform such "
+                                     "actions directly within the chat. However, strive to be helpful by, "
+                                     "for instance, returning the relevant object or list of objects that would have "
+                                     "been updated by their requested action. Only generate responses in code or JSON "
+                                     "if requested.")
+
     SUPPORTED_FILE_TYPES: list[str] = ["application/pdf",
                                        "application/x-javascript",
                                        "text/javascript",
@@ -54,4 +74,5 @@ if __name__ == "__main__":
     print(f"Google API Key: {'Configurada' if settings.GOOGLE_API_KEY.get_secret_value() else 'NÃO CONFIGURADA'}")
     print(f"Basic LLM: {settings.GOOGLE_BASIC_MODEL}")
     print(f"Advanced LLM: {settings.GOOGLE_ADVANCED_MODEL}")
+    print(f"Chat system instructions: {settings.CHAT_SYSTEM_INSTRUCTIONS}")
     print(f"Supported file types: {settings.SUPPORTED_FILE_TYPES}")

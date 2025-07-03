@@ -16,13 +16,20 @@ class GoogleAIService:
         self.client = genai.Client(api_key=api_key)
 
     async def send_message(self,
+                           instruction: str,
                            message: str,
                            llm_context: list[Content] | None = None
                            ) -> tuple[str, list[Content]]:
-        chat = self.client.aio.chats.create(model=settings.GOOGLE_BASIC_MODEL, history=llm_context)
-        response = (await chat.send_message(message)).text
-        return (response, [Content(role="user", parts=[Part(text=message)]),
-                           Content(role="model", parts=[Part(text=response)])])
+        user_content: Content = Content(role="user", parts=[Part(text=message)])
+        contents: list[Content] = list(llm_context) if llm_context else []
+        contents.append(user_content)
+        response = (await self.client.aio.models.generate_content(
+            model=settings.GOOGLE_ADVANCED_MODEL,
+            contents=contents,
+            config=GenerateContentConfig(
+                system_instruction=instruction))).text
+        model_content: Content = Content(role="model", parts=[Part(text=response)])
+        return response, [user_content, model_content]
 
     async def generate_structured_output(self,
                                          instruction: str,
