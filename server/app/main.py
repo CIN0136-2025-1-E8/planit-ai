@@ -2,10 +2,11 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import chat_router
+from routers import chat_router, course_router
 
 app = FastAPI()
 app.include_router(chat_router)
+app.include_router(course_router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
