@@ -35,6 +35,7 @@ async def create_course(
         files=[[await file.read(), file.content_type] for file in files],
         message=message
     )
+    print('AI service returned JSON:', course_json)  # Debug print
     course_base: CourseBase = CourseBase.model_validate_json(course_json)
     course: Course = Course(uuid=str(uuid.uuid4()), **course_base.model_dump())
     course_crud.append_course(course)

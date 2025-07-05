@@ -18,7 +18,7 @@ import AddSubjectDialog from "./AddSubjectDialog";
 // Subject and file types
 type Subject = {
   id: string;
-  name: string;
+  title: string; // changed from name to title
   color: string;
   files: { name: string; url: string }[];
   expanded?: boolean;
@@ -69,9 +69,9 @@ async function fetchSubjects(): Promise<Subject[]> {
   return await res.json();
 }
 
-async function addSubject(name: string, file: File): Promise<any> {
+async function addSubject(title: string, file: File): Promise<any> {
   const formData = new FormData();
-  formData.append("message", name); // nome da materia
+  formData.append("message", title); // nome da materia
   formData.append("files", file);   // arquivo
   const res = await fetch("http://localhost:8000/course/create", {
     method: "POST",
@@ -117,14 +117,22 @@ export default function SubjectsSection() {
     );
   };
 
-  const handleAddSubject = async (name: string, file: File | null) => {
+  const handleAddSubject = async (title: string, file: File | null) => {
     if (!newSubject.trim()) return;
     setAdding(true);
     try {
       const created = await addSubject(newSubject.trim(), file!);
+      // Normalize the created subject to ensure id and title are present
+      const normalized = {
+        ...created,
+        id: created.id || created.uuid || '',
+        title: created.title || created.name || newSubject.trim(),
+        color: getRandomSubjectColor(),
+        expanded: true,
+      };
       setSubjects((prev) => [
         ...prev,
-        { ...created, color: getRandomSubjectColor(), expanded: true },
+        normalized,
       ]);
       setNewSubject("");
     } finally {
@@ -138,18 +146,22 @@ export default function SubjectsSection() {
   };
 
   // New handler for dialog submit
-  const handleDialogSubmit = async (name: string, file: File | null) => {
-    if (!name || !file) return;
+  const handleDialogSubmit = async (title: string, file: File | null) => {
+    if (!title || !file) return;
     setAdding(true);
     try {
-      const created = await addSubject(name, file);
+      const created = await addSubject(title, file);
+      // Normalize the created subject to ensure id and title are present
+      const normalized = {
+        ...created,
+        id: created.id || created.uuid || '',
+        title: created.title || created.name || title,
+        color: getRandomSubjectColor(),
+        expanded: true,
+      };
       setSubjects((prev) => [
         ...prev,
-        {
-          ...created,
-          color: getRandomSubjectColor(),
-          expanded: true,
-        },
+        normalized,
       ]);
       setDialogOpen(false);
     } finally {
