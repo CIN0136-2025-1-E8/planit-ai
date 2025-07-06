@@ -29,17 +29,15 @@ async def create_course(
         course_crud=Depends(get_course_crud),
         ai_service=Depends(get_google_ai_service)):
     validate_files(files)
-    course_json = await ai_service.generate_structured_output(
+    course_base: CourseBase = await ai_service.generate_structured_output(
         instruction=None,
         schema=CourseBase,
         files=[[await file.read(), file.content_type] for file in files],
         message=message
     )
-    print('AI service returned JSON:', course_json)  # Debug print
-    course_base: CourseBase = CourseBase.model_validate_json(course_json)
     course: Course = Course(uuid=str(uuid.uuid4()), **course_base.model_dump())
+    system_message = settings.SYSTEM_MESSAGE_MARKER_START + course_base.model_dump_json() + settings.SYSTEM_MESSAGE_MARKER_END
     course_crud.append_course(course)
-    system_message = settings.SYSTEM_MESSAGE_MARKER_START + course_json + settings.SYSTEM_MESSAGE_MARKER_END
     chat_crud.append_llm_context([Content(role="user", parts=[Part(text=system_message)])])
     chat_crud.append_llm_context([Content(role="model", parts=[Part(text="Certo. Lembrarei disso.")])])
 

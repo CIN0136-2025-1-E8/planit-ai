@@ -36,7 +36,7 @@ class GoogleAIService:
                                          schema: type[BaseModel],
                                          files: list[tuple[bytes, str]],
                                          message: str | None = None
-                                         ) -> str:
+                                         ) -> BaseModel:
         content: Content = await create_content_from_files(role="user", files=files)
         if message:
             content.parts.append(Part(text=message))
@@ -47,7 +47,7 @@ class GoogleAIService:
                 system_instruction=instruction,
                 response_mime_type="application/json",
                 response_schema=schema))).text
-        return response
+        return schema.model_validate_json(response)
 
 
 async def create_content_from_files(role: str, files: list[tuple[bytes, str]]) -> Content:
