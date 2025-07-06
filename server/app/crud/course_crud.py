@@ -31,7 +31,6 @@ class CRUDCourse:
 
     def append_course(self, course: Course) -> None:
         self.courses.append(course)
-        self.write_courses_to_file()
 
 
 course_crud = CRUDCourse()

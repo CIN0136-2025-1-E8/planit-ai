@@ -37,7 +37,6 @@ class CRUDChat:
 
     def append_llm_context(self, new_content: list[Content]) -> None:
         self.llm_context.extend(new_content)
-        self.write_llm_context_to_file()
         return
 
     def read_chat_history_from_file(self, file_path: str = settings.DEBUG_CHAT_HISTORY_FILE_PATH) -> None:
@@ -57,7 +56,6 @@ class CRUDChat:
 
     def append_chat_history(self, chat_message: ChatMessage) -> None:
         self.chat_history.append(chat_message)
-        self.write_chat_history_to_file()
 
 
 chat_crud = CRUDChat()
