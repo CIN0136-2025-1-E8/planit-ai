@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import ChatSection from "./ChatSection";
 import type { Message } from "./types";
-import { sendMessageToBackend } from "./api";
+import { sendMessageToBackend, fetchChatHistory } from "./api";
 
 export default function ChatContainer() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -9,15 +9,29 @@ export default function ChatContainer() {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Fetch chat history on mount
   useEffect(() => {
-    setMessages([
-      {
-        id: "initial",
-        role: "assistant",
-        content:
-          "Bom dia! Meu nome é Planit AI e estou aqui para lhe ajudar em sua organização de estudos! Já fiz um design inicial do seu cronograma de acordo com suas matérias, há alguma alteração que você gostaria de fazer?",
-      },
-    ]);
+    fetchChatHistory()
+      .then((history) =>
+        setMessages(
+          history.map((msg, idx) => ({
+            id: String(idx),
+            role: msg.role === "model" ? "assistant" : "user",
+            content: msg.text,
+          }))
+        )
+      )
+      .catch(() => {
+        // fallback: show initial assistant message if history fails
+        setMessages([
+          {
+            id: "initial",
+            role: "assistant",
+            content:
+              "Bom dia! Meu nome é Planit AI e estou aqui para lhe ajudar em sua organização de estudos! Já fiz um design inicial do seu cronograma de acordo com suas matérias, há alguma alteração que você gostaria de fazer?",
+          },
+        ]);
+      });
   }, []);
 
   useEffect(() => {

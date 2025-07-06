@@ -56,4 +56,34 @@ async def create_content_from_files(role: str, files: list[tuple[bytes, str]]) -
     return Content(role=role, parts=parts)
 
 
-google_ai_service = GoogleAIService(api_key=settings.GOOGLE_API_KEY.get_secret_value())
+if not settings.GOOGLE_API_KEY or not settings.GOOGLE_API_KEY.get_secret_value():
+    class DummyGoogleAIService:
+        async def send_message(self, *args, **kwargs):
+            return "Resposta fake do mock", []
+        async def generate_structured_output(self, *args, **kwargs):
+            return '''
+            {
+                "uuid": "mock-uuid-123",
+                "title": "Matemática Mock",
+                "semester": "2025.1",
+                "lectures": [
+                    {
+                        "title": "Aula 1",
+                        "start_datetime": "2025-03-01T08:00:00",
+                        "end_datetime": "2025-03-01T10:00:00",
+                        "summary": "Introdução ao mock"
+                    }
+                ],
+                "evaluations": [
+                    {
+                        "type": "exam",
+                        "title": "Prova 1",
+                        "start_datetime": "2025-04-01T08:00:00",
+                        "end_datetime": "2025-04-01T10:00:00"
+                    }
+                ]
+            }
+            '''
+    google_ai_service = DummyGoogleAIService()
+else:
+    google_ai_service = GoogleAIService(api_key=settings.GOOGLE_API_KEY.get_secret_value())
