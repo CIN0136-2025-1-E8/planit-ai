@@ -12,20 +12,22 @@ def get_chat_crud():
 
 
 class CRUDChat:
-    def __init__(self):
+    def __init__(self,
+                 llm_context_file_path: str = settings.DEBUG_LLM_CONTEXT_FILE_PATH,
+                 chat_history_file_path: str = settings.DEBUG_CHAT_HISTORY_FILE_PATH):
         self.llm_context: list[Content] = []
-        self.read_llm_context_from_file()
+        self.read_llm_context_from_file(llm_context_file_path)
         self.chat_history: list[ChatMessage] = []
-        self.read_chat_history_from_file()
+        self.read_chat_history_from_file(chat_history_file_path)
 
-    def read_llm_context_from_file(self) -> None:
-        if os.path.exists(settings.DEBUG_LLM_CONTEXT_FILE_PATH):
-            with open(settings.DEBUG_LLM_CONTEXT_FILE_PATH, 'rb') as file:
+    def read_llm_context_from_file(self, file_path: str = settings.DEBUG_LLM_CONTEXT_FILE_PATH) -> None:
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as file:
                 self.llm_context = pickle.load(file)
         return
 
-    def write_llm_context_to_file(self) -> None:
-        with open(settings.DEBUG_LLM_CONTEXT_FILE_PATH, "wb") as f:
+    def write_llm_context_to_file(self, file_path: str = settings.DEBUG_LLM_CONTEXT_FILE_PATH) -> None:
+        with open(file_path, "wb") as f:
             # noinspection PyTypeChecker
             pickle.dump(self.llm_context, f)
         return
@@ -38,14 +40,14 @@ class CRUDChat:
         self.write_llm_context_to_file()
         return
 
-    def read_chat_history_from_file(self) -> None:
-        if os.path.exists(settings.DEBUG_CHAT_HISTORY_FILE_PATH):
-            with open(settings.DEBUG_CHAT_HISTORY_FILE_PATH, 'rb') as file:
+    def read_chat_history_from_file(self, file_path: str = settings.DEBUG_CHAT_HISTORY_FILE_PATH) -> None:
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as file:
                 self.chat_history = pickle.load(file)
         return
 
-    def write_chat_history_to_file(self) -> None:
-        with open(settings.DEBUG_CHAT_HISTORY_FILE_PATH, "wb") as f:
+    def write_chat_history_to_file(self, file_path: str = settings.DEBUG_CHAT_HISTORY_FILE_PATH) -> None:
+        with open(file_path, "wb") as f:
             # noinspection PyTypeChecker
             pickle.dump(self.chat_history, f)
         return

@@ -10,18 +10,18 @@ def get_course_crud():
 
 
 class CRUDCourse:
-    def __init__(self):
+    def __init__(self, courses_file_path: str = settings.DEBUG_COURSES_FILE_PATH):
         self.courses: list[Course] = []
-        self.read_courses_from_file()
+        self.read_courses_from_file(courses_file_path)
 
-    def read_courses_from_file(self) -> None:
-        if os.path.exists(settings.DEBUG_COURSES_FILE_PATH):
-            with open(settings.DEBUG_COURSES_FILE_PATH, 'rb') as file:
+    def read_courses_from_file(self, file_path: str = settings.DEBUG_COURSES_FILE_PATH) -> None:
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as file:
                 self.courses = pickle.load(file)
         return
 
-    def write_courses_to_file(self) -> None:
-        with open(settings.DEBUG_COURSES_FILE_PATH, "wb") as f:
+    def write_courses_to_file(self, file_path: str = settings.DEBUG_COURSES_FILE_PATH) -> None:
+        with open(file_path, "wb") as f:
             # noinspection PyTypeChecker
             pickle.dump(self.courses, f)
         return
