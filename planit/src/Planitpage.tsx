@@ -17,6 +17,7 @@ import {
 } from "@mui/icons-material"
 //sessoes da sidebar
 import ChatContainer from "./sidebar/chat/ChatContainer"
+import SubjectsSection from "./sidebar/subjects/SubjectsSection"
 
 // Criando o tema da página
 const theme = createTheme({
@@ -79,10 +80,10 @@ export default function PlanitPage() {
             <Avatar sx={{ bgcolor: "#ff9800" }}>
               <CalendarIcon />
             </Avatar>
-            <Avatar sx={{ bgcolor: "#4caf50" }}>
+            <Avatar sx={{ bgcolor: "#4caf50" }} onClick={() => setActiveSection("chat")}>
               <ChatIcon />
             </Avatar>
-            <Avatar sx={{ bgcolor: "#9c27b0" }}>
+            <Avatar sx={{ bgcolor: "#9c27b0" }} onClick={() => setActiveSection("subjects")}>
               <FileIcon />
             </Avatar>
           </Box>
