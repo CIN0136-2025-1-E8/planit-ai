@@ -29,12 +29,14 @@ async def create_course(
         course_crud=Depends(get_course_crud),
         ai_service=Depends(get_google_ai_service)):
     validate_files(files)
-    course_base: CourseBase = await ai_service.generate_structured_output(
-        instruction=None,
-        schema=CourseBase,
-        files=[[await file.read(), file.content_type] for file in files],
-        message=message
-    )
+    try:
+        course_base: CourseBase = await ai_service.generate_structured_output(
+            instruction=None,
+            schema=CourseBase,
+            files=[[await file.read(), file.content_type] for file in files],
+            message=message)
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
     course: Course = Course(uuid=str(uuid.uuid4()), **course_base.model_dump())
     system_message = settings.SYSTEM_MESSAGE_MARKER_START + course_base.model_dump_json() + settings.SYSTEM_MESSAGE_MARKER_END
     course_crud.append_course(course)
