@@ -5,12 +5,7 @@ import {
   Typography,
   Button,
   IconButton,
-  Collapse,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  TextField,
+
 } from "@mui/material";
 import { ExpandLess, ExpandMore, Delete, Add, Description } from "@mui/icons-material";
 import AddSubjectDialog from "./AddSubjectDialog";
@@ -117,28 +112,30 @@ export default function SubjectsSection() {
     );
   };
 
-  const handleAddSubject = async (title: string, file: File | null) => {
-    if (!newSubject.trim()) return;
-    setAdding(true);
-    try {
-      const created = await addSubject(newSubject.trim(), file!);
-      // Normalize the created subject to ensure id and title are present
-      const normalized = {
-        ...created,
-        id: created.id || created.uuid || '',
-        title: created.title || created.name || newSubject.trim(),
-        color: getRandomSubjectColor(),
-        expanded: true,
-      };
-      setSubjects((prev) => [
-        ...prev,
-        normalized,
-      ]);
-      setNewSubject("");
-    } finally {
-      setAdding(false);
-    }
-  };
+
+  // const handleAddSubject = async (title: string, file: File | null) => {
+  //   if (!newSubject.trim()) return;
+  //   setAdding(true);
+  //   try {
+  //     const created = await addSubject(newSubject.trim(), file!);
+  //     // Normalize the created subject to ensure id and title are present
+  //     const normalized = {
+  //       ...created,
+  //       id: created.id || created.uuid || '',
+  //       title: created.title || created.name || newSubject.trim(),
+  //       color: getRandomSubjectColor(),
+  //       expanded: true,
+  //     };
+  //     setSubjects((prev) => [
+  //       ...prev,
+  //       normalized,
+  //     ]);
+  //     setNewSubject("");
+  //   } finally {
+  //     setAdding(false);
+  //   }
+  // };
+
 
   const handleDelete = async (id: string) => {
     await deleteSubject(id);
@@ -179,7 +176,10 @@ export default function SubjectsSection() {
       ) : (
         subjects.map((subject) => (
           <Paper
-            key={subject.id || subject.uuid} // use uuid if id is not present
+
+            key={subject.id} // use id as key
+
+
             sx={{
               mb: 2,
               p: 1.5,
@@ -192,7 +192,9 @@ export default function SubjectsSection() {
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <IconButton
                   size="small"
-                  onClick={() => handleToggle(subject.id || subject.uuid)}
+
+                  onClick={() => handleToggle(subject.id)}
+
                   sx={{ color: "#fff" }}
                 >
                   {subject.expanded ? <ExpandLess /> : <ExpandMore />}
@@ -203,7 +205,9 @@ export default function SubjectsSection() {
               </Box>
               <IconButton
                 size="small"
-                onClick={() => handleDelete(subject.id || subject.uuid)}
+
+                onClick={() => handleDelete(subject.id)}
+
                 sx={{ color: "#fff" }}
                 aria-label="Remover matéria"
               >

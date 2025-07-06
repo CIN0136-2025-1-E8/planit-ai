@@ -1,3 +1,4 @@
+import React from "react";
 import { useState, useEffect, useRef } from "react";
 import ChatSection from "./ChatSection";
 import type { Message } from "./types";
