@@ -4,8 +4,8 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from crud import chat_crud, course_crud
-from routers import chat_router, course_router
+from app.crud import chat_crud, course_crud
+from app.routers import chat_router, course_router
 
 
 @asynccontextmanager

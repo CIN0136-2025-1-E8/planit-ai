@@ -4,11 +4,10 @@ import pytest
 from fastapi.testclient import TestClient
 from google.genai.types import Content, Part
 
-from app.crud.chat_crud import CRUDChat
+from app.crud import CRUDChat, get_chat_crud
 from app.main import app
-from app.routers.chat_router import get_chat_crud, get_google_ai_service
-from app.services.google_ai_service import GoogleAIService
-from schemas import ChatMessage, ChatRole
+from app.schemas import ChatMessage, ChatRole
+from app.services import GoogleAIService, get_google_ai_service
 
 
 @pytest.fixture

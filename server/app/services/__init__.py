@@ -1,1 +1,1 @@
-from .google_ai_service import get_google_ai_service
+from .google_ai_service import get_google_ai_service, GoogleAIService

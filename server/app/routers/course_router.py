@@ -4,10 +4,10 @@ from fastapi import APIRouter, HTTPException, Form, UploadFile, Depends
 from google.genai.types import Content, Part
 from starlette import status
 
-from core.config import settings
-from crud import get_chat_crud, get_course_crud
-from schemas import Course, CourseBase
-from services import get_google_ai_service
+from app.core.config import settings
+from app.crud import get_chat_crud, get_course_crud
+from app.schemas import Course, CourseBase
+from app.services import get_google_ai_service
 
 course_router = APIRouter(
     prefix="/course",

@@ -6,12 +6,10 @@ import pytest
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
-from app.crud.chat_crud import CRUDChat
-from app.crud.course_crud import CRUDCourse
+from app.crud import CRUDChat, CRUDCourse, get_chat_crud, get_course_crud
 from app.main import app
-from app.routers.course_router import get_chat_crud, get_course_crud, get_google_ai_service
-from app.services.google_ai_service import GoogleAIService
-from schemas import Course, CourseBase
+from app.schemas import Course, CourseBase
+from app.services import GoogleAIService, get_google_ai_service
 
 
 @pytest.fixture

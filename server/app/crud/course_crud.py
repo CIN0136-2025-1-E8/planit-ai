@@ -1,8 +1,8 @@
 import os
 import pickle
 
-from core import settings
-from schemas import Course
+from app.core import settings
+from app.schemas import Course
 
 
 def get_course_crud():

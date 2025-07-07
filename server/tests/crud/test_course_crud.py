@@ -4,8 +4,8 @@ import uuid
 
 import pytest
 
-from app.crud.course_crud import CRUDCourse
-from schemas import Course
+from app.crud import CRUDCourse
+from app.schemas import Course
 
 
 @pytest.fixture

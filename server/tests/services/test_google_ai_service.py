@@ -3,9 +3,8 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from pydantic import ValidationError
 
-from app.services.google_ai_service import GoogleAIService
-from schemas import CourseBase
-from schemas.course_schema import Lecture, Evaluation, EvaluationTypes
+from app.schemas import CourseBase, Lecture, Evaluation, EvaluationTypes
+from app.services import GoogleAIService
 
 
 @pytest.fixture

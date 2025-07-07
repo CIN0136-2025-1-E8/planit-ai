@@ -4,8 +4,8 @@ import pickle
 import pytest
 from google.genai.types import Content, Part
 
-from app.crud.chat_crud import CRUDChat
-from schemas import ChatMessage, ChatRole
+from app.crud import CRUDChat
+from app.schemas import ChatMessage, ChatRole
 
 
 @pytest.fixture

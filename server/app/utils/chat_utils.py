@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from core import settings
+from app.core import settings
 
 
 def system_message_current_datetime() -> str:

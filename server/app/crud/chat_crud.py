@@ -3,8 +3,8 @@ import pickle
 
 from google.genai.types import Content
 
-from core import settings
-from schemas import ChatMessage
+from app.core import settings
+from app.schemas import ChatMessage
 
 
 def get_chat_crud():

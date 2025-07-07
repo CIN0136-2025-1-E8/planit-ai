@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends, Form
 
-from core import settings
-from crud import get_chat_crud
-from schemas import ChatMessage, ChatRole
-from services import get_google_ai_service
-from utils import system_message_current_datetime
+from app.core import settings
+from app.crud import get_chat_crud
+from app.schemas import ChatMessage, ChatRole
+from app.services import get_google_ai_service
+from app.utils import system_message_current_datetime
 
 chat_router = APIRouter(
     prefix="/chat",
