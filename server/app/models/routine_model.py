@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, Text, Boolean, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
-from core.db import Base
+from app.core.db import Base
 
 
 class Routine(Base):
