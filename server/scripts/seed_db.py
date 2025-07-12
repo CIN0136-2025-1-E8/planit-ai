@@ -7,8 +7,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from app.core.db import SessionLocal, engine, Base
-from app.models.user_model import User
-from app.crud.user import get_password_hash
+from app.core.security import hash_password
+from app.models import User
 
 
 def add_initial_user():
@@ -31,7 +31,7 @@ def add_initial_user():
             name="Usuário de Teste Planit",
             nickname="Testador",
             email="teste@planit.ai",
-            hashed_password=get_password_hash("senhaforte123"),
+            hashed_password=hash_password("senhaforte123"),
             is_active=True
         )
 
