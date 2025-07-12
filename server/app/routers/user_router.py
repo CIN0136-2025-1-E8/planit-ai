@@ -3,14 +3,14 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 from app.dependencies import get_db
 from app.crud.user import user_crud
-from app.schemas.user_schema import UserCreate, UserUpdate, User
+from app.schemas.user_schema import UserCreate, UserUpdate, UserData
 
 user_router = APIRouter(
     prefix="/users",
     tags=["Users"],
 )
 
-@user_router.post("/", response_model=User, status_code=status.HTTP_201_CREATED)
+@user_router.post("/", response_model=UserData, status_code=status.HTTP_201_CREATED)
 def create_new_user(
     user_in: UserCreate,
     db: Session = Depends(get_db)
@@ -24,7 +24,7 @@ def create_new_user(
     user = user_crud.create(db=db, obj_in=user_in)
     return user
 
-@user_router.get("/", response_model=list[User])
+@user_router.get("/", response_model=list[UserData])
 def read_all_users(
     skip: int = 0,
     limit: int = 100,
@@ -33,7 +33,7 @@ def read_all_users(
     users = user_crud.get_multi(db, skip=skip, limit=limit)
     return users
 
-@user_router.get("/{user_uuid}", response_model=User)
+@user_router.get("/{user_uuid}", response_model=UserData)
 def read_user_by_uuid(
     user_uuid: str,
     db: Session = Depends(get_db)
@@ -46,7 +46,7 @@ def read_user_by_uuid(
         )
     return user
 
-@user_router.put("/{user_uuid}", response_model=User)
+@user_router.put("/{user_uuid}", response_model=UserData)
 def update_existing_user(
     user_uuid: str, 
     user_update: UserUpdate,

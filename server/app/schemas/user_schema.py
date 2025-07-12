@@ -22,13 +22,13 @@ class UserUpdate(BaseModel):
 
 class User(UserBase):
     uuid: str
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UserData(UserBase):
+    uuid: str
     courses: list[CourseSummary]
     events: list[Event]
     routines: list[Routine]
     files: list[FileRecord]
-    model_config = ConfigDict(from_attributes=True)
-
-
-class UserProfile(UserBase):
-    uuid: str
     model_config = ConfigDict(from_attributes=True)
