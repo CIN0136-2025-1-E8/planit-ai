@@ -4,16 +4,13 @@ from sqlalchemy import select
 from app.core.security import hash_password, verify_password
 from app.crud.base import CRUDBase
 from app.models.user_model import User
-from app.schemas.user_schema import UserCreate, UserUpdate
+from app.schemas import UserCreate, UserCreateInDB, UserUpdate
 
-class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
+class CRUDUser(CRUDBase[User, UserCreateInDB, UserUpdate]):
     def create(self, db: Session, *, obj_in: UserCreate) -> User:
-        obj_in_data = obj_in.model_dump()
-        hashed_password = hash_password(obj_in_data["password"])
-        obj_in_data["hashed_password"] = hashed_password
-        obj_in_data.pop("password")
-        obj_in_data["is_active"] = True
-        db_obj = super().create(db, obj_in=obj_in_data)
+        hashed_password = hash_password(obj_in.password)
+        new_obj_in = UserCreateInDB(hashed_password=hashed_password, **obj_in.model_dump())
+        db_obj = super().create(db, obj_in=new_obj_in)
         return db_obj
 
     def get_by_email(self, db: Session, email: str) -> User | None:

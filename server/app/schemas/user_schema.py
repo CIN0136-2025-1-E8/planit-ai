@@ -13,6 +13,11 @@ class UserCreate(UserBase):
     password: str
 
 
+class UserCreateInDB(UserBase):
+    hashed_password: str
+    is_active: bool = True
+
+
 class UserUpdate(BaseModel):
     name: str | None = None
     nickname: str | None = None
