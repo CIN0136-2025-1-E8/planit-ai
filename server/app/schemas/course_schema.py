@@ -12,7 +12,7 @@ class CourseBase(BaseModel):
         description="The semester in which the course is offered, like 'Fall 2025', '2025.2' or '2025/2'.")
     archived: bool = Field(
         default=False,
-        description="")
+        description="Used by the application for internal control. Preserve default value.")
 
 
 class CourseCreate(CourseBase):

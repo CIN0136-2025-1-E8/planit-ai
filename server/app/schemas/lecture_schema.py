@@ -11,7 +11,9 @@ class LectureBase(BaseModel):
     summary: str | None = Field(
         default=None,
         description="A brief summary of the lecture's content.")
-    present: bool | None = None
+    present: bool | None = Field(
+        default=None,
+        description="Used by the application for internal control. Preserve default value.")
 
 
 class LectureCreate(LectureBase):

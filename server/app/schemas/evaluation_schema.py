@@ -20,7 +20,9 @@ class EvaluationBase(BaseModel):
         description="The start date and time for the evaluation in ISO 8601 format.")
     end_datetime: str = Field(
         description="The end date and time for the evaluation in ISO 8601 format, which is typically the deadline.")
-    present: bool | None = None
+    present: bool | None = Field(
+        default=None,
+        description="Used by the application for internal control. Preserve default value.")
 
 
 class EvaluationCreate(EvaluationBase):
