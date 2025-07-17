@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core import settings
 from app.core.db import Base, engine
 from app.crud import chat_crud, course_crud, files_crud
-from app.routers import chat_router, course_router, files_router, user_router
+from app.routers import chat_router, course_router, files_router, user_router, events_router
 
 
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
@@ -29,6 +29,7 @@ app.include_router(chat_router)
 app.include_router(course_router)
 app.include_router(files_router)
 app.include_router(user_router)
+app.include_router(events_router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
