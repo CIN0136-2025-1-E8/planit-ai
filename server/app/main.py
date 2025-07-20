@@ -11,8 +11,8 @@ from app.core.db import Base, engine
 from app.crud import chat_crud, course_crud, files_crud
 from app.routers import chat_router, course_router, files_router, user_router, events_router
 
-
-os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+if settings.is_feature_enabled("FILE_UPLOAD"):
+    os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 Base.metadata.create_all(bind=engine)
 
 @asynccontextmanager
@@ -21,13 +21,15 @@ async def lifespan(app: FastAPI):
     chat_crud.write_llm_context_to_file()
     chat_crud.write_chat_history_to_file()
     course_crud.write_courses_to_file()
-    files_crud.write_file_list_to_file()
+    if settings.is_feature_enabled("FILE_UPLOAD"):
+        files_crud.write_file_list_to_file()
 
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(chat_router)
 app.include_router(course_router)
-app.include_router(files_router)
+if settings.is_feature_enabled("FILE_UPLOAD"):
+    app.include_router(files_router)
 app.include_router(user_router)
 app.include_router(events_router)
 app.add_middleware(
