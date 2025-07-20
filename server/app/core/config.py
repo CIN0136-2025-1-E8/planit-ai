@@ -64,8 +64,18 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",
         env_file_encoding='utf-8',
-        extra='ignore'
+        extra='allow'
     )
+
+    def is_feature_enabled(self, name: str) -> bool:
+        if self.model_extra is None:
+            return False
+        flag_key = f"FEATURE_{name.upper()}"
+        flag_value = self.model_extra.get(flag_key.lower())
+        if flag_value is None:
+            return False
+
+        return str(flag_value).lower() in ("true", "1")
 
 
 settings = Settings()
