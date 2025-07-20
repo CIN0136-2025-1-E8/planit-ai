@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
-from schemas import Event, Routine, FileRecord, CourseSummary
+from app.schemas import Event, Routine, FileRecord, CourseSummary
 
 
 class UserBase(BaseModel):
