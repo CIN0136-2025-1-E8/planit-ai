@@ -44,9 +44,10 @@ async def create_course(
     except Exception:
         raise HTTPException(status_code=500, detail="Internal Server Error")
     system_message = settings.SYSTEM_MESSAGE_MARKER_START + course.model_dump_json() + settings.SYSTEM_MESSAGE_MARKER_END
-    course_crud.create_with_children(db=db, obj_in=course, owner_uuid=current_user.uuid)
+    created_course = course_crud.create_with_children(db=db, obj_in=course, owner_uuid=current_user.uuid)
     chat_crud.append_llm_context([Content(role="user", parts=[Part(text=system_message)])])
     chat_crud.append_llm_context([Content(role="model", parts=[Part(text="Certo. Lembrarei disso.")])])
+    return created_course
 
 
 def validate_files(files: list[UploadFile]) -> None:
