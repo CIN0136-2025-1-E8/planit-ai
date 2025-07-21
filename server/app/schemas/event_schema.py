@@ -9,7 +9,7 @@ class EventBase(BaseModel):
 
 
 class EventCreate(EventBase):
-    pass
+    owner_uuid: str
 
 
 class EventUpdate(BaseModel):

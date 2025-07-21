@@ -16,7 +16,7 @@ class CourseBase(BaseModel):
 
 
 class CourseCreate(CourseBase):
-    pass
+    owner_uuid: str
 
 
 class CourseUpdate(BaseModel):

@@ -23,7 +23,7 @@ class RoutineBase(BaseModel):
 
 
 class RoutineCreate(RoutineBase):
-    pass
+    owner_uuid: str
 
 
 class RoutineUpdate(BaseModel):
