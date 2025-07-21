@@ -39,3 +39,9 @@ class CoursesList(BaseModel):
 class CourseSummary(CourseBase):
     uuid: str
     model_config = ConfigDict(from_attributes=True)
+
+
+class CourseDeleteResponse(CourseSummary):
+    deleted_lectures: int | None = None
+    deleted_evaluations: int | None = None
+    model_config = ConfigDict(from_attributes=True)

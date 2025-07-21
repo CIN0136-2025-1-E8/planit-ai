@@ -1,5 +1,6 @@
 from .chat_schemas import ChatRole, ChatMessage
-from .course_schema import Course, CourseBase, CoursesList, CourseCreate, CourseUpdate, CourseSummary
+from .course_schema import Course, CourseBase, CoursesList, CourseCreate, CourseUpdate, CourseSummary, \
+    CourseDeleteResponse
 from .evaluation_schema import EvaluationTypes, Evaluation, EvaluationBase, EvaluationCreate, EvaluationUpdate
 from .event_schema import Event, EventBase, EventCreate, EventUpdate
 from .files_schema import FileRecord
