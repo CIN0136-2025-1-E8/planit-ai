@@ -11,6 +11,7 @@ class Lecture(Base):
     title = Column(String, nullable=False)
     start_datetime = Column(String, nullable=False)
     end_datetime = Column(String, nullable=False)
+    summary = Column(String, nullable=True)
     present = Column(Boolean, nullable=False, default=False)
 
     course_uuid = Column(String, ForeignKey("courses.uuid"), index=True, nullable=False)
