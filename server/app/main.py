@@ -20,7 +20,6 @@ async def lifespan(app: FastAPI):
     yield
     chat_crud.write_llm_context_to_file()
     chat_crud.write_chat_history_to_file()
-    course_crud.write_courses_to_file()
     if settings.is_feature_enabled("FILE_UPLOAD"):
         files_crud.write_file_list_to_file()
 

@@ -1,36 +1,32 @@
-import os
-import pickle
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
-from app.core import settings
-from app.schemas import Course
+from app.crud import CRUDBase
+from app.models import Course as CourseModel
+from app.schemas import Course, CourseCreate, CourseUpdate
 
 
 def get_course_crud():
     return course_crud
 
 
-class CRUDCourse:
-    def __init__(self, courses_file_path: str = settings.DEBUG_COURSES_FILE_PATH):
-        self.courses: list[Course] = []
-        self.read_courses_from_file(courses_file_path)
+class CRUDCourse(CRUDBase[CourseModel, CourseCreate, CourseUpdate]):
+    def create_with_children(self, db: Session, *, obj_in: Course, owner_uuid: str) -> CourseModel:
+        from app.models import Evaluation, Lecture
+        db_obj = self.model(**obj_in.model_dump(exclude={"evaluations", "lectures"}), owner_uuid=owner_uuid)
+        db_obj.evaluations = [Evaluation(**evaluation.model_dump(mode='json'), course_uuid=obj_in.uuid)
+                              for evaluation in obj_in.evaluations]
+        db_obj.lectures = [Lecture(**lecture.model_dump(), course_uuid=obj_in.uuid)
+                           for lecture in obj_in.lectures]
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
 
-    def read_courses_from_file(self, file_path: str = settings.DEBUG_COURSES_FILE_PATH) -> None:
-        if os.path.exists(file_path):
-            with open(file_path, 'rb') as file:
-                self.courses = pickle.load(file)
-        return
-
-    def write_courses_to_file(self, file_path: str = settings.DEBUG_COURSES_FILE_PATH) -> None:
-        with open(file_path, "wb") as f:
-            # noinspection PyTypeChecker
-            pickle.dump(self.courses, f)
-        return
-
-    def get_courses(self) -> list[Course] | None:
-        return self.courses
-
-    def append_course(self, course: Course) -> None:
-        self.courses.append(course)
+    def get_all_by_owner_uuid(self, db: Session, *, owner_uuid: str) -> list[CourseModel]:
+        query = select(self.model).filter(self.model.owner_uuid == owner_uuid)
+        result = db.execute(query).scalars().all()
+        return list(result)
 
 
-course_crud = CRUDCourse()
+course_crud = CRUDCourse(CourseModel)

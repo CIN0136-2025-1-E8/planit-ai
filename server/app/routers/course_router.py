@@ -3,10 +3,14 @@ import uuid
 from fastapi import APIRouter, HTTPException, Form, UploadFile, Depends
 from google.genai.types import Content, Part
 from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
 from starlette import status
 
 from app.core.config import settings
+from app.core.security import get_current_user
 from app.crud import get_chat_crud, get_course_crud
+from app.dependencies import get_db
+from app.models import User
 from app.schemas import Course, CourseBase, Lecture, LectureBase, Evaluation, EvaluationBase
 from app.services import get_google_ai_service
 
@@ -18,8 +22,11 @@ course_router = APIRouter(
 
 
 @course_router.get("/list")
-async def get_courses(course_crud=Depends(get_course_crud)):
-    return course_crud.get_courses()
+async def get_courses(
+        course_crud=Depends(get_course_crud),
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)):
+    return course_crud.get_all_by_owner_uuid(db=db, owner_uuid=current_user.uuid)
 
 
 @course_router.post("/create", status_code=status.HTTP_201_CREATED)
@@ -27,7 +34,9 @@ async def create_course(
         files: list[UploadFile],
         message: str | None = Form(None),
         chat_crud=Depends(get_chat_crud),
-        course_crud=Depends(get_course_crud)):
+        course_crud=Depends(get_course_crud),
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)):
     validate_files(files)
     try:
         course: Course = await create_course_iterative(
@@ -35,7 +44,7 @@ async def create_course(
     except Exception:
         raise HTTPException(status_code=500, detail="Internal Server Error")
     system_message = settings.SYSTEM_MESSAGE_MARKER_START + course.model_dump_json() + settings.SYSTEM_MESSAGE_MARKER_END
-    course_crud.append_course(course)
+    course_crud.create_with_children(db=db, obj_in=course, owner_uuid=current_user.uuid)
     chat_crud.append_llm_context([Content(role="user", parts=[Part(text=system_message)])])
     chat_crud.append_llm_context([Content(role="model", parts=[Part(text="Certo. Lembrarei disso.")])])
 
