@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from uuid import UUID
+from datetime import date, timedelta
+from collections import defaultdict
 
 from app.dependencies import get_db
 from app.crud.event import event_crud
-from app.schemas.event_schema import EventCreate, EventUpdate, Event
+from app.schemas.event_schema import EventCreate, EventUpdate, Event, EventsByDay
 from app.crud.user import user_crud
 
 events_router = APIRouter(
@@ -27,13 +29,17 @@ def create_new_event(
     event = event_crud.create(db=db, obj_in=event_in, owner_uuid=owner_uuid)
     return event
 
-@events_router.get("/", response_model=list[Event])
-def read_all_events_by_owner(
-    owner_uuid: str,
-    skip: int = 0,
-    limit: int = 100,
+@events_router.get("/", response_model=EventsByDay)
+def get_events_for_week
+    owner_uuid: str = Query(..., description="UUID do proprietário dos eventos."),
+    start_date: date = Query(..., description="Data de início (formato YYYY-MM-DD) para buscar eventos pelos próximos 7 dias."),
     db: Session = Depends(get_db)
 ):
+    """
+    Retorna os eventos de um usuário para os 7 dias seguintes (incluindo a data de início),
+    agrupados por dia.
+    """
+    # 1. Verifica se o owner_uuid corresponde a um usuário existente
     owner = user_crud.get(db, obj_uuid=owner_uuid)
     if not owner:
         raise HTTPException(
@@ -41,13 +47,36 @@ def read_all_events_by_owner(
             detail=f"User with UUID {owner_uuid} not found."
         )
 
-    events = event_crud.get_events_by_owner(db, owner_uuid=owner_uuid, skip=skip, limit=limit)
-    return events
+    # 2. Chama o CRUD para obter todos os eventos no período de 7 dias
+    all_events = event_crud.get_events_by_owner(
+        db,
+        owner_uuid=owner_uuid,
+        start_date=start_date # Passa apenas a data de início para o CRUD
+    )
+
+    # 3. Agrupa os eventos por dia
+    events_grouped_by_day = defaultdict(list)
+    
+    # Preenche o dicionário com os 7 dias, garantindo que todos apareçam no output, mesmo vazios
+    for i in range(7):
+        current_day = start_date + timedelta(days=i)
+        events_grouped_by_day[current_day.isoformat()] = []
+
+    for event in all_events:
+        event_day_str = event.start_datetime.date().isoformat()
+        
+        if start_date <= event.start_datetime.date() <= (start_date + timedelta(days=6)):
+            events_grouped_by_day[event_day_str].append(event)
+            
+    # Ordena o dicionário pelo nome da chave (que são as datas) para uma resposta ordenada
+    ordered_events = dict(sorted(events_grouped_by_day.items()))
+
+    return EventsByDay(daily_events=ordered_events)
 
 @events_router.get("/{event_uuid}", response_model=Event)
 def read_event_by_uuid(
     event_uuid: str,
-    owner_uuid: str,
+    owner_uuid: str = Query(..., description="UUID do proprietário do evento."),
     db: Session = Depends(get_db)
 ):
     event = event_crud.get_event(db, uuid=event_uuid)
@@ -66,7 +95,7 @@ def read_event_by_uuid(
 @events_router.put("/{event_uuid}", response_model=Event)
 def update_existing_event(
     event_uuid: str,
-    owner_uuid: str,
+    owner_uuid: str = Query(..., description="UUID do proprietário do evento."),
     event_update: EventUpdate,
     db: Session = Depends(get_db)
 ):
@@ -88,7 +117,7 @@ def update_existing_event(
 @events_router.delete("/{event_uuid}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_existing_event(
     event_uuid: str,
-    owner_uuid: str,
+    owner_uuid: str = Query(..., description="UUID do proprietário do evento."),
     db: Session = Depends(get_db)
 ):
     db_event = event_crud.get_event(db, uuid=event_uuid)
