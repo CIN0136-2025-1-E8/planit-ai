@@ -1,6 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from datetime import datetime, date
-from uuid import UUID
+from datetime import datetime
 
 
 class EventBase(BaseModel):
