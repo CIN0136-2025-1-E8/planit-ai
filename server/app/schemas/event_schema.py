@@ -1,5 +1,5 @@
-from pydantic import BaseModel, ConfigDict
-from datetime import datetime
+from pydantic import BaseModel, ConfigDict, field_validator
+from datetime import datetime, timedelta
 
 
 class EventBase(BaseModel):
@@ -10,7 +10,11 @@ class EventBase(BaseModel):
 
 
 class EventCreate(EventBase):
-    pass
+    @field_validator('start_datetime', 'end_datetime')
+    def validate_datetimes_are_utc(cls, v: datetime) -> datetime:  # noqa: PyMethodParameters
+        if v.tzinfo is None or v.utcoffset() != timedelta(0):
+            raise ValueError("Datetime must be in UTC (use 'Z' or '+00:00' offset)")
+        return v
 
 
 class EventCreateInDB(EventBase):

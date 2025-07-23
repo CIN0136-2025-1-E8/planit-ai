@@ -1,7 +1,7 @@
 from typing import Any, Union
 from sqlalchemy.orm import Session
 from sqlalchemy import select, and_
-from datetime import datetime, date, timedelta
+from datetime import datetime
 
 from app.crud.base import CRUDBase
 from app.models import Event
@@ -17,31 +17,44 @@ class CRUDEvent(CRUDBase[Event, EventCreateInDB, EventUpdate]):
             self,
             db: Session,
             owner_uuid: str,
-            start_date: date | None = None,
+            start_utc: datetime | None = None,
+            end_utc: datetime | None = None,
             skip: int = 0,
             limit: int = 100
     ) -> list[Event]:
-        """
-        Obtém todos os eventos associados a um usuário específico,
-        para os 7 próximos dias (incluindo a start_date fornecida),
-        com opções de paginação.
+        """Retrieves events for a specific owner within an optional datetime range.
+
+        The method filters events based on their start time. The time range is
+        inclusive of the start time and exclusive of the end time.
+
+        Args:
+            db (Session): The database session.
+            owner_uuid (str): The UUID of the event owner.
+            start_utc (datetime | None): The UTC datetime for the start of the
+                range (inclusive).
+            end_utc (datetime | None): The UTC datetime for the end of the
+                range (exclusive).
+            skip (int): The number of events to skip for pagination.
+            limit (int): The maximum number of events to return.
+
+        Returns:
+            list[Event]: A list of Event objects matching the criteria,
+                ordered by their start time.
         """
         filters = [self.model.owner_uuid == owner_uuid]
+        if start_utc: filters.append(self.model.start_datetime >= start_utc)
+        if end_utc: filters.append(self.model.start_datetime < end_utc)
 
-        if start_date:
-            # Calcular a data de fim (7 dias a partir de start_date, incluindo-a)
-            # Para incluir o dia inteiro, o end_datetime final seria o último milissegundo do 7º dia
-            calculated_end_date = start_date + timedelta(days=6)
+        query = (
+            select(self.model)
+            .filter(and_(*filters))
+            .order_by(self.model.start_datetime)
+            .offset(skip)
+            .limit(limit)
+        )
 
-            # Converter datas para strings no formato ISO 8601 para comparação com o DB
-            start_datetime_str = datetime.combine(start_date, datetime.min.time()).isoformat()  # Início do dia
-            end_datetime_str = datetime.combine(calculated_end_date, datetime.max.time()).isoformat()  # Fim do 7º dia
-
-            filters.append(self.model.end_datetime >= start_datetime_str)
-            filters.append(self.model.start_datetime <= end_datetime_str)
-
-        query = select(self.model).filter(and_(*filters)).offset(skip).limit(limit)
-        return list(db.execute(query).scalars().all())
+        results = list(db.execute(query).scalars().all())
+        return results
 
     def update(self, db: Session, *, db_obj: Event, obj_in: Union[EventUpdate, dict[str, Any]]) -> Event:
         if isinstance(obj_in, dict):
