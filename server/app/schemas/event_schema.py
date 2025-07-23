@@ -14,6 +14,10 @@ class EventCreate(EventBase):
     pass
 
 
+class EventCreateInDB(EventBase):
+    owner_uuid: str
+
+
 class EventUpdate(BaseModel):
     title: str | None = None
     description: str | None = None
