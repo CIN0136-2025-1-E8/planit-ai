@@ -23,6 +23,11 @@ class RoutineBase(BaseModel):
 
 
 class RoutineCreate(RoutineBase):
+    # O owner_uuid não está aqui. Ele será passado como um Query/Path Parameter no endpoint.
+    pass
+
+
+class RoutineCreateInDB(RoutineBase): # Novo schema: Usado no CRUD para inserir no DB
     owner_uuid: str
 
 
@@ -37,4 +42,5 @@ class RoutineUpdate(BaseModel):
 
 class Routine(RoutineBase):
     uuid: str
+    owner_uuid: str
     model_config = ConfigDict(from_attributes=True)
