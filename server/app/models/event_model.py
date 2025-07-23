@@ -1,5 +1,6 @@
 from sqlalchemy import Column, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
+import uuid
 
 from app.core.db import Base
 
@@ -7,7 +8,7 @@ from app.core.db import Base
 class Event(Base):
     __tablename__ = 'events'
 
-    uuid = Column(String, primary_key=True)
+    uuid = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     title = Column(String, nullable=False)
     description = Column(Text, nullable=True)
     start_datetime = Column(String, nullable=False)
