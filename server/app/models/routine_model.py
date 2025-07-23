@@ -2,6 +2,7 @@ import uuid
 
 from sqlalchemy import Column, String, Text, Boolean, Integer, ForeignKey
 from sqlalchemy.orm import relationship
+import uuid
 
 from app.core.db import Base
 
