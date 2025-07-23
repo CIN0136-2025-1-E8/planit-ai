@@ -1,57 +1,53 @@
-from sqlalchemy.orm import Session
-from app.models import Test, Assessment  # Make sure these models exist
-from app.schemas import TestCreate, TestUpdate, AssessmentCreate, AssessmentUpdate  # Make sure these schemas exist
+import os
+import pickle
 
-# Test CRUD
-def create_test(db: Session, test: TestCreate):
-    db_test = Test(**test.dict())
-    db.add(db_test)
-    db.commit()
-    db.refresh(db_test)
-    return db_test
+from app.schemas import Evaluation, EvaluationUpdate
 
-def get_test(db: Session, test_id: int):
-    return db.query(Test).filter(Test.id == test_id).first()
+def get_evaluation_crud():
+    return evaluation_crud
 
-def update_test(db: Session, test_id: int, test: TestUpdate):
-    db_test = db.query(Test).filter(Test.id == test_id).first()
-    if db_test:
-        for key, value in test.dict(exclude_unset=True).items():
-            setattr(db_test, key, value)
-        db.commit()
-        db.refresh(db_test)
-    return db_test
+class CRUDEvaluation:
+    def __init__(self, evaluation_file_path: str = "evaluation_history.pkl"):
+        self.evaluation_history: list[Evaluation] = []
+        self.read_evaluation_history_from_file(evaluation_file_path)
+        self.evaluation_file_path = evaluation_file_path
 
-def delete_test(db: Session, test_id: int):
-    db_test = db.query(Test).filter(Test.id == test_id).first()
-    if db_test:
-        db.delete(db_test)
-        db.commit()
-    return db_test
+    def read_evaluation_history_from_file(self, file_path: str = None) -> None:
+        if file_path is None:
+            file_path = self.evaluation_file_path
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as file:
+                self.evaluation_history = pickle.load(file)
+        return
 
-# Assessment CRUD
-def create_assessment(db: Session, assessment: AssessmentCreate):
-    db_assessment = Assessment(**assessment.dict())
-    db.add(db_assessment)
-    db.commit()
-    db.refresh(db_assessment)
-    return db_assessment
+    def write_evaluation_history_to_file(self, file_path: str = None) -> None:
+        if file_path is None:
+            file_path = self.evaluation_file_path
+        with open(file_path, "wb") as f:
+            pickle.dump(self.evaluation_history, f)
+        return
 
-def get_assessment(db: Session, assessment_id: int):
-    return db.query(Assessment).filter(Assessment.id == assessment_id).first()
+    def get_evaluation_history(self) -> list[Evaluation] | None:
+        return self.evaluation_history
 
-def update_assessment(db: Session, assessment_id: int, assessment: AssessmentUpdate):
-    db_assessment = db.query(Assessment).filter(Assessment.id == assessment_id).first()
-    if db_assessment:
-        for key, value in assessment.dict(exclude_unset=True).items():
-            setattr(db_assessment, key, value)
-        db.commit()
-        db.refresh(db_assessment)
-    return db_assessment
+    def append_evaluation_history(self, evaluation: Evaluation) -> None:
+        self.evaluation_history.append(evaluation)
+        self.write_evaluation_history_to_file()
+        return
 
-def delete_assessment(db: Session, assessment_id: int):
-    db_assessment = db.query(Assessment).filter(Assessment.id == assessment_id).first()
-    if db_assessment:
-        db.delete(db_assessment)
-        db.commit()
-    return db_assessment
+    def update_evaluation(self, index: int, update_data: EvaluationUpdate) -> None:
+        if 0 <= index < len(self.evaluation_history):
+            evaluation = self.evaluation_history[index]
+            update_dict = update_data.dict(exclude_unset=True)
+            for key, value in update_dict.items():
+                setattr(evaluation, key, value)
+            self.write_evaluation_history_to_file()
+        return
+
+    def delete_evaluation(self, index: int) -> None:
+        if 0 <= index < len(self.evaluation_history):
+            del self.evaluation_history[index]
+            self.write_evaluation_history_to_file()
+        return
+
+evaluation_crud = CRUDEvaluation()
