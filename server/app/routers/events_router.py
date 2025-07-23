@@ -8,7 +8,7 @@ from app.dependencies import get_db
 from app.core.security import get_current_user
 from app.crud.event import event_crud
 from app.models import User
-from app.schemas.event_schema import EventCreate, EventUpdate, Event, EventsByDay
+from app.schemas.event_schema import EventCreate, EventCreateInDB, EventUpdate, Event, EventsByDay
 
 events_router = APIRouter(
     prefix="/events",
@@ -23,7 +23,8 @@ def create_new_event(
 ):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-    event = event_crud.create(db=db, obj_in=event_in, owner_uuid=user.uuid)
+    event_create: EventCreateInDB = EventCreateInDB(**event_in.model_dump(), owner_uuid=user.uuid)
+    event = event_crud.create(db=db, obj_in=event_create)
     return event
 
 @events_router.get("/", response_model=EventsByDay)
@@ -80,7 +81,7 @@ def read_event_by_uuid(
 ):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-    event = event_crud.get_event(db, uuid=event_uuid)
+    event = event_crud.get(db, obj_uuid=event_uuid)
     if event is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -97,7 +98,7 @@ def update_existing_event(
 ):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-    db_event = event_crud.get_event(db, uuid=event_uuid)
+    db_event = event_crud.get(db, obj_uuid=event_uuid)
     if db_event is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -115,12 +116,10 @@ def delete_existing_event(
 ):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-    db_event = event_crud.get_event(db, uuid=event_uuid)
-    if db_event is None:
+    event = event_crud.remove(db, obj_uuid=event_uuid)
+    if not event:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Event not found"
         )
-
-    event_crud.remove(db, uuid=event_uuid)
     return {"message": "Event deleted successfully"}

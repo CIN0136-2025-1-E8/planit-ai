@@ -5,25 +5,9 @@ from datetime import datetime, date, timedelta
 
 from app.crud.base import CRUDBase
 from app.models.event_model import Event
-from app.schemas.event_schema import EventCreate, EventUpdate
+from app.schemas.event_schema import EventCreateInDB, EventUpdate
 
-class CRUDEvent(CRUDBase[Event, EventCreate, EventUpdate]):
-    def create(self, db: Session, *, obj_in: EventCreate, owner_uuid: str) -> Event:
-        obj_in_data = obj_in.model_dump()
-        db_obj = self.model(
-            **obj_in_data,
-            owner_uuid=owner_uuid
-        )
-        db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
-        return db_obj
-
-    def get_event(self, db: Session, uuid: str) -> Event | None:
-        query = select(self.model).filter(self.model.uuid == uuid)
-        result = db.execute(query).scalars().first()
-        return result
-
+class CRUDEvent(CRUDBase[Event, EventCreateInDB, EventUpdate]):
     def get_events_by_owner(
         self,
         db: Session,
@@ -66,6 +50,4 @@ class CRUDEvent(CRUDBase[Event, EventCreate, EventUpdate]):
             update_data['end_datetime'] = update_data['end_datetime'].isoformat()
         return super().update(db, db_obj=db_obj, obj_in=update_data)
 
-    def remove(self, db: Session, *, uuid: str) -> Event | None:
-        return super().remove(db, id=uuid)
 event_crud = CRUDEvent(Event)
