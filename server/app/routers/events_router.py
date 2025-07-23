@@ -95,8 +95,8 @@ def read_event_by_uuid(
 @events_router.put("/{event_uuid}", response_model=Event)
 def update_existing_event(
     event_uuid: str,
-    owner_uuid: str = Query(..., description="UUID do proprietário do evento."),
     event_update: EventUpdate,
+    owner_uuid: str = Query(..., description="UUID do proprietário do evento."),
     db: Session = Depends(get_db)
 ):
     db_event = event_crud.get_event(db, uuid=event_uuid)
