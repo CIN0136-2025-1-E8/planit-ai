@@ -6,7 +6,7 @@ from collections import defaultdict
 
 from app.dependencies import get_db
 from app.core.security import get_current_user
-from app.crud.event import event_crud
+from app.crud.event_crud import event_crud
 from app.models import User
 from app.schemas.event_schema import EventCreate, EventCreateInDB, EventUpdate, Event, EventsByDay
 
