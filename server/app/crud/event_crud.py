@@ -7,6 +7,11 @@ from app.crud.base import CRUDBase
 from app.models.event_model import Event
 from app.schemas.event_schema import EventCreateInDB, EventUpdate
 
+
+def get_event_crud():
+    return event_crud
+
+
 class CRUDEvent(CRUDBase[Event, EventCreateInDB, EventUpdate]):
     def get_events_by_owner(
         self,
