@@ -6,7 +6,7 @@ from collections import defaultdict
 
 from app.dependencies import get_db
 from app.core.security import get_current_user
-from app.crud.event_crud import event_crud
+from app.crud.event_crud import get_event_crud, CRUDEvent
 from app.models import User
 from app.schemas.event_schema import EventCreate, EventCreateInDB, EventUpdate, Event, EventsByDay
 
@@ -18,6 +18,7 @@ events_router = APIRouter(
 @events_router.post("/", response_model=Event, status_code=status.HTTP_201_CREATED)
 def create_new_event(
     event_in: EventCreate,
+    event_crud: CRUDEvent = Depends(get_event_crud),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -30,6 +31,7 @@ def create_new_event(
 @events_router.get("/", response_model=EventsByDay)
 def get_events_for_week(
     start_date: date = Query(..., description="Data de início (formato YYYY-MM-DD) para buscar eventos pelos próximos 7 dias."),
+    event_crud: CRUDEvent = Depends(get_event_crud),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -76,6 +78,7 @@ def get_events_for_week(
 @events_router.get("/{event_uuid}", response_model=Event)
 def read_event_by_uuid(
     event_uuid: str,
+    event_crud: CRUDEvent = Depends(get_event_crud),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -93,6 +96,7 @@ def read_event_by_uuid(
 def update_existing_event(
     event_uuid: str,
     event_update: EventUpdate,
+    event_crud: CRUDEvent = Depends(get_event_crud),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -111,6 +115,7 @@ def update_existing_event(
 @events_router.delete("/{event_uuid}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_existing_event(
     event_uuid: str,
+    event_crud: CRUDEvent = Depends(get_event_crud),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
