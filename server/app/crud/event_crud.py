@@ -4,8 +4,8 @@ from sqlalchemy import select, and_
 from datetime import datetime, date, timedelta
 
 from app.crud.base import CRUDBase
-from app.models.event_model import Event
-from app.schemas.event_schema import EventCreateInDB, EventUpdate
+from app.models import Event
+from app.schemas import EventCreateInDB, EventUpdate
 
 
 def get_event_crud():
