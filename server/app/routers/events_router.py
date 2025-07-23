@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from uuid import UUID
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from collections import defaultdict
 
 from app.dependencies import get_db
@@ -63,9 +63,16 @@ def get_events_for_week(
         events_grouped_by_day[current_day.isoformat()] = []
 
     for event in all_events:
-        event_day_str = event.start_datetime.date().isoformat()
+        try:
+            # Assumimos que a string está em formato ISO 8601
+            event_datetime_obj = datetime.fromisoformat(event.start_datetime)
+            event_day_str = event_datetime_obj.date().isoformat()
+        except ValueError:
+            # Se a string não estiver em formato ISO 8601, lide com o erro
+            print(f"ATENÇÃO: Formato de data inválido no DB para evento {event.uuid}: {event.start_datetime}")
+            continue
         
-        if start_date <= event.start_datetime.date() <= (start_date + timedelta(days=6)):
+        if start_date <= event_datetime_obj.date() <= (start_date + timedelta(days=6)):
             events_grouped_by_day[event_day_str].append(event)
             
     # Ordena o dicionário pelo nome da chave (que são as datas) para uma resposta ordenada
