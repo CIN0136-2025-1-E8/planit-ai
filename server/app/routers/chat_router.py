@@ -4,7 +4,6 @@ from app.core import settings
 from app.crud import get_chat_crud
 from app.schemas import ChatMessage, ChatRole
 from app.services import get_google_ai_service
-from app.utils import system_message_current_datetime
 
 chat_router = APIRouter(
     prefix="/chat",
@@ -26,7 +25,7 @@ async def send_chat_message(message: str = Form(),
     try:
         response, new_content = await ai_service.send_message(
             instruction=settings.CHAT_SYSTEM_INSTRUCTIONS,
-            message="".join([system_message_current_datetime(), message]),
+            message=message,
             llm_context=llm_context)
     except Exception:
         raise HTTPException(status_code=500, detail="Internal Server Error")

@@ -3,6 +3,7 @@ from google.genai.types import Content, Part, Blob, GenerateContentConfig
 from pydantic import BaseModel
 
 from app.core import settings
+from .llm_tools import tools
 
 
 def get_google_ai_service():
@@ -27,7 +28,8 @@ class GoogleAIService:
             model=settings.GOOGLE_ADVANCED_MODEL,
             contents=contents,
             config=GenerateContentConfig(
-                system_instruction=instruction))).text
+                system_instruction=instruction,
+                tools=tools))).text
         model_content: Content = Content(role="model", parts=[Part(text=response)])
         return response, [user_content, model_content]
 
@@ -45,6 +47,7 @@ class GoogleAIService:
             contents=content,
             config=GenerateContentConfig(
                 system_instruction=instruction,
+                tools=tools,
                 response_mime_type="application/json",
                 response_schema=schema))).text
         return schema.model_validate_json(response)
