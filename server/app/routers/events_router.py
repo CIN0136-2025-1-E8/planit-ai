@@ -30,7 +30,7 @@ def create_new_event(
     return event
 
 @events_router.get("/", response_model=EventsByDay)
-def get_events_for_week
+def get_events_for_week(
     owner_uuid: str = Query(..., description="UUID do proprietário dos eventos."),
     start_date: date = Query(..., description="Data de início (formato YYYY-MM-DD) para buscar eventos pelos próximos 7 dias."),
     db: Session = Depends(get_db)
