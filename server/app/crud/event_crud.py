@@ -14,12 +14,12 @@ def get_event_crud():
 
 class CRUDEvent(CRUDBase[Event, EventCreateInDB, EventUpdate]):
     def get_events_by_owner(
-        self,
-        db: Session,
-        owner_uuid: str,
-        start_date: date | None = None,
-        skip: int = 0,
-        limit: int = 100
+            self,
+            db: Session,
+            owner_uuid: str,
+            start_date: date | None = None,
+            skip: int = 0,
+            limit: int = 100
     ) -> list[Event]:
         """
         Obtém todos os eventos associados a um usuário específico,
@@ -32,14 +32,14 @@ class CRUDEvent(CRUDBase[Event, EventCreateInDB, EventUpdate]):
             # Calcular a data de fim (7 dias a partir de start_date, incluindo-a)
             # Para incluir o dia inteiro, o end_datetime final seria o último milissegundo do 7º dia
             calculated_end_date = start_date + timedelta(days=6)
-            
+
             # Converter datas para strings no formato ISO 8601 para comparação com o DB
-            start_datetime_str = datetime.combine(start_date, datetime.min.time()).isoformat() # Início do dia
-            end_datetime_str = datetime.combine(calculated_end_date, datetime.max.time()).isoformat() # Fim do 7º dia
+            start_datetime_str = datetime.combine(start_date, datetime.min.time()).isoformat()  # Início do dia
+            end_datetime_str = datetime.combine(calculated_end_date, datetime.max.time()).isoformat()  # Fim do 7º dia
 
             filters.append(self.model.end_datetime >= start_datetime_str)
             filters.append(self.model.start_datetime <= end_datetime_str)
-            
+
         query = select(self.model).filter(and_(*filters)).offset(skip).limit(limit)
         return list(db.execute(query).scalars().all())
 
@@ -54,5 +54,6 @@ class CRUDEvent(CRUDBase[Event, EventCreateInDB, EventUpdate]):
         if 'end_datetime' in update_data and update_data['end_datetime'] is not None:
             update_data['end_datetime'] = update_data['end_datetime'].isoformat()
         return super().update(db, db_obj=db_obj, obj_in=update_data)
+
 
 event_crud = CRUDEvent(Event)
