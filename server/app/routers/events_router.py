@@ -1,7 +1,8 @@
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from datetime import date, timedelta, datetime
-from collections import defaultdict
+from datetime import date, timedelta, datetime, time
 
 from app.core.security import get_current_user
 from app.crud import get_event_crud, CRUDEvent
@@ -32,51 +33,60 @@ def create_new_event(
 
 @events_router.get("/", response_model=EventsByDay)
 def get_events_for_week(
-        start_date: date = Query(...,
-                                 description="Data de início (formato YYYY-MM-DD) para buscar eventos pelos próximos 7 dias."),
+        start_date: date = Query(
+            ...,
+            description="The start date for the 7-day period (format YYYY-MM-DD)."
+        ),
+        timezone: str = Query(
+            ...,
+            description="The client's IANA timezone name (e.g., 'America/Sao_Paulo', 'Europe/Paris')."
+        ),
         event_crud: CRUDEvent = Depends(get_event_crud),
         user: User = Depends(get_current_user),
         db: Session = Depends(get_db)
 ):
     """
-    Retorna os eventos de um usuário para os 7 dias seguintes (incluindo a data de início),
-    agrupados por dia.
+    Returns a user's events for the next 7 days, interpreted according to the client's timezone.
     """
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
-    # 2. Chama o CRUD para obter todos os eventos no período de 7 dias
+    try:
+        client_tz = ZoneInfo(timezone)
+    except ZoneInfoNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid timezone identifier: '{timezone}'"
+        )
+
+    start_of_period_local = datetime.combine(start_date, time.min, tzinfo=client_tz)
+
+    end_date = start_date + timedelta(days=7)
+    end_of_period_local = datetime.combine(end_date, time.min, tzinfo=client_tz)
+
+    start_utc = start_of_period_local.astimezone(ZoneInfo("UTC"))
+    end_utc = end_of_period_local.astimezone(ZoneInfo("UTC"))
+
     all_events = event_crud.get_events_by_owner(
         db,
         owner_uuid=user.uuid,
-        start_date=start_date  # Passa apenas a data de início para o CRUD
+        start_utc=start_utc,
+        end_utc=end_utc,
+        limit=1000
     )
 
-    # 3. Agrupa os eventos por dia
-    events_grouped_by_day = defaultdict(list)
-
-    # Preenche o dicionário com os 7 dias, garantindo que todos apareçam no output, mesmo vazios
-    for i in range(7):
-        current_day = start_date + timedelta(days=i)
-        events_grouped_by_day[current_day.isoformat()] = []
+    events_grouped_by_day = {
+        (start_date + timedelta(days=i)).isoformat(): [] for i in range(7)
+    }
 
     for event in all_events:
-        try:
-            # Assumimos que a string está em formato ISO 8601
-            event_datetime_obj = datetime.fromisoformat(event.start_datetime)
-            event_day_str = event_datetime_obj.date().isoformat()
-        except ValueError:
-            # Se a string não estiver em formato ISO 8601, lide com o erro
-            print(f"ATENÇÃO: Formato de data inválido no DB para evento {event.uuid}: {event.start_datetime}")
-            continue
+        local_datetime = event.start_datetime.astimezone(client_tz)
+        event_day_str = local_datetime.date().isoformat()
 
-        if start_date <= event_datetime_obj.date() <= (start_date + timedelta(days=6)):
+        if event_day_str in events_grouped_by_day:
             events_grouped_by_day[event_day_str].append(event)
 
-    # Ordena o dicionário pelo nome da chave (que são as datas) para uma resposta ordenada
-    ordered_events = dict(sorted(events_grouped_by_day.items()))
-
-    return EventsByDay(daily_events=ordered_events)
+    return EventsByDay(daily_events=events_grouped_by_day)
 
 
 @events_router.get("/{event_uuid}", response_model=Event)
