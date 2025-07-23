@@ -52,7 +52,7 @@ class CRUDEvent(CRUDBase[Event, EventCreate, EventUpdate]):
             filters.append(self.model.start_datetime <= end_datetime_str)
             
         query = select(self.model).filter(and_(*filters)).offset(skip).limit(limit)
-        return db.execute(query).scalars().all()
+        return list(db.execute(query).scalars().all())
 
     def update(self, db: Session, *, db_obj: Event, obj_in: Union[EventUpdate, dict[str, Any]]) -> Event:
         if isinstance(obj_in, dict):
