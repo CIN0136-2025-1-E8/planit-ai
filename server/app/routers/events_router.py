@@ -5,9 +5,10 @@ from datetime import date, timedelta, datetime
 from collections import defaultdict
 
 from app.dependencies import get_db
+from app.core.security import get_current_user
 from app.crud.event import event_crud
+from app.models import User
 from app.schemas.event_schema import EventCreate, EventUpdate, Event, EventsByDay
-from app.crud.user import user_crud
 
 events_router = APIRouter(
     prefix="/events",
@@ -17,40 +18,31 @@ events_router = APIRouter(
 @events_router.post("/", response_model=Event, status_code=status.HTTP_201_CREATED)
 def create_new_event(
     event_in: EventCreate,
-    owner_uuid: str,
+    user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    owner = user_crud.get(db, obj_uuid=owner_uuid)
-    if not owner:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"User with UUID {owner_uuid} not found."
-        )
-    event = event_crud.create(db=db, obj_in=event_in, owner_uuid=owner_uuid)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    event = event_crud.create(db=db, obj_in=event_in, owner_uuid=user.uuid)
     return event
 
 @events_router.get("/", response_model=EventsByDay)
 def get_events_for_week(
-    owner_uuid: str = Query(..., description="UUID do proprietário dos eventos."),
     start_date: date = Query(..., description="Data de início (formato YYYY-MM-DD) para buscar eventos pelos próximos 7 dias."),
+    user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Retorna os eventos de um usuário para os 7 dias seguintes (incluindo a data de início),
     agrupados por dia.
     """
-    # 1. Verifica se o owner_uuid corresponde a um usuário existente
-    owner = user_crud.get(db, obj_uuid=owner_uuid)
-    if not owner:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"User with UUID {owner_uuid} not found."
-        )
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
     # 2. Chama o CRUD para obter todos os eventos no período de 7 dias
     all_events = event_crud.get_events_by_owner(
         db,
-        owner_uuid=owner_uuid,
+        owner_uuid=user.uuid,
         start_date=start_date # Passa apenas a data de início para o CRUD
     )
 
@@ -83,19 +75,16 @@ def get_events_for_week(
 @events_router.get("/{event_uuid}", response_model=Event)
 def read_event_by_uuid(
     event_uuid: str,
-    owner_uuid: str = Query(..., description="UUID do proprietário do evento."),
+    user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     event = event_crud.get_event(db, uuid=event_uuid)
     if event is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Event not found"
-        )
-    if event.owner_uuid != owner_uuid:
-         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to access this event."
         )
     return event
 
@@ -103,19 +92,16 @@ def read_event_by_uuid(
 def update_existing_event(
     event_uuid: str,
     event_update: EventUpdate,
-    owner_uuid: str = Query(..., description="UUID do proprietário do evento."),
+    user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     db_event = event_crud.get_event(db, uuid=event_uuid)
     if db_event is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Event not found"
-        )
-    if db_event.owner_uuid != owner_uuid:
-         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to update this event."
         )
 
     updated_event = event_crud.update(db=db, db_obj=db_event, obj_in=event_update)
@@ -124,19 +110,16 @@ def update_existing_event(
 @events_router.delete("/{event_uuid}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_existing_event(
     event_uuid: str,
-    owner_uuid: str = Query(..., description="UUID do proprietário do evento."),
+    user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     db_event = event_crud.get_event(db, uuid=event_uuid)
     if db_event is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Event not found"
-        )
-    if db_event.owner_uuid != owner_uuid:
-         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to delete this event."
         )
 
     event_crud.remove(db, uuid=event_uuid)
