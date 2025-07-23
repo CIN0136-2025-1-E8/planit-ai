@@ -1,14 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from uuid import UUID
 from datetime import date, timedelta, datetime
 from collections import defaultdict
 
-from app.dependencies import get_db
 from app.core.security import get_current_user
-from app.crud.event_crud import get_event_crud, CRUDEvent
+from app.crud import get_event_crud, CRUDEvent
+from app.dependencies import get_db
 from app.models import User
-from app.schemas.event_schema import EventCreate, EventCreateInDB, EventUpdate, Event, EventsByDay
+from app.schemas import EventCreate, EventCreateInDB, EventUpdate, Event, EventsByDay
 
 events_router = APIRouter(
     prefix="/events",
