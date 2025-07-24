@@ -16,6 +16,8 @@ import {
   Chat as ChatIcon,
   Description as FileIcon,
 } from "@mui/icons-material"
+//calendario
+import Schedule from './calendar/Calendar'
 //sessoes da sidebar
 import ChatContainer from "./sidebar/chat/ChatContainer"
 import SubjectsSection from "./sidebar/subjects/SubjectsSection"
@@ -59,17 +61,21 @@ export default function PlanitPage() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{ display: "flex", height: "100vh", bgcolor: "background.default" }}>
-        {/*sidebar com o chat*/}
+      <Box sx={{ display: "flex", width: "100vw", height: "100vh", margin: 0, padding: 0, position: "fixed", left: 0, top: 0 }}>
+        {/* Sidebar flush left, always full height */}
         <Paper
           elevation={0}
           sx={{
             width: 320,
-            height: "100vh", // Garante altura total da tela
+            height: "100vh",
             bgcolor: "#f0f0f0",
             display: "flex",
             flexDirection: "column",
             borderRadius: 0,
+            boxShadow: "none",
+            margin: 0,
+            padding: 0,
+            position: "relative"
           }}
         >
           {/* Icones do topo da sidebar */}
@@ -104,11 +110,10 @@ export default function PlanitPage() {
             {activeSection === "subjects" && <SubjectsSection />}
           </Box>
         </Paper>
-
-   
-            
-          
-        
+        {/* Main content area with blue background, fills remaining space, no borders */}
+        <Box sx={{ flex: 1, height: "100vh", bgcolor: "#040032", margin: 0, padding: 0, border: 0 }}>
+          <Schedule />
+        </Box>
       </Box>
     </ThemeProvider>
   )

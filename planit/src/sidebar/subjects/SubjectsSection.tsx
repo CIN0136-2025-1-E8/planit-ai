@@ -68,6 +68,8 @@ async function fetchSubjects(): Promise<Subject[]> {
   return await res.json();
 }
 
+const MOCK_USER_UUID = "11e75ac9-aa93-45ba-8637-8eb16ddedcb3";
+
 async function addSubject(title: string, file: File): Promise<any> {
   const formData = new FormData();
   formData.append("message", title); // nome da materia
