@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 
 from app.dependencies import get_db
-from app.crud.routine import routine_crud, CRUDRoutine, get_routine_crud
+from app.crud.routine_crud import routine_crud, CRUDRoutine, get_routine_crud
 from app.schemas.routine_schema import RoutineCreate, RoutineCreateInDB, RoutineUpdate, Routine
 from app.core.security import get_current_user
 from app.models import User
