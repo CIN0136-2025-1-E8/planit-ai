@@ -13,7 +13,7 @@ from app.dependencies import get_db
 from app.models import User
 from app.schemas import Course, CourseBase, CourseUpdate, CourseDeleteResponse, Lecture, LectureBase, Evaluation, \
     EvaluationBase
-from app.services import get_google_ai_service
+from app.services import get_google_ai_service, GoogleAIService
 
 course_router = APIRouter(
     prefix="/course",
@@ -37,11 +37,12 @@ async def create_course(
         chat_crud=Depends(get_chat_crud),
         course_crud=Depends(get_course_crud),
         db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)):
+        current_user: User = Depends(get_current_user),
+        ai_service: GoogleAIService = Depends(get_google_ai_service)):
     validate_files(files)
     try:
         course: Course = await create_course_iterative(
-            files=[(await file.read(), file.content_type) for file in files], message=message)
+            files=[(await file.read(), file.content_type) for file in files], message=message, ai_service=ai_service)
     except Exception:
         raise HTTPException(status_code=500, detail="Internal Server Error")
     system_message = settings.SYSTEM_MESSAGE_MARKER_START + course.model_dump_json() + settings.SYSTEM_MESSAGE_MARKER_END
@@ -98,7 +99,7 @@ class EvaluationsCreate(BaseModel):
 
 async def create_course_iterative(files: list[tuple[bytes, str]],
                                   message: str | None = None,
-                                  ai_service=get_google_ai_service()) -> Course:
+                                  ai_service: GoogleAIService = Depends(get_google_ai_service)) -> Course:
     course_base: CourseBase = await ai_service.generate_structured_output(
         instruction="Fill all fields in Brazillian Portuguese.",
         schema=CourseBase,
