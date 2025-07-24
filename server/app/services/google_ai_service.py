@@ -37,22 +37,27 @@ class GoogleAIService:
         return response, [user_content, model_content]
 
     async def generate_structured_output(self,
-                                         instruction: str,
                                          schema: type[BaseModel],
                                          files: list[tuple[bytes, str]],
+                                         instruction: str | None = None,
                                          message: str | None = None
                                          ) -> BaseModel:
         content: Content = await create_content_from_files(role="user", files=files)
         if message:
             content.parts.append(Part(text=message))
         response: str = (await self.client.aio.models.generate_content(
-            model=settings.GOOGLE_ADVANCED_MODEL,
+            model="gemini-2.5-flash-lite",
             contents=content,
             config=GenerateContentConfig(
                 system_instruction=instruction,
-                tools=tools,
                 response_mime_type="application/json",
                 response_schema=schema))).text
+        try:
+            start_index = response.index('{')
+            end_index = response.rindex('}')
+            response = response[start_index:end_index + 1]
+        except ValueError:
+            raise ValueError("Invalid JSON format: Couldn't find starting or ending braces.")
         return schema.model_validate_json(response)
 
 
