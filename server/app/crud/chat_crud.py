@@ -1,61 +1,44 @@
-import os
-import pickle
+from sqlalchemy.orm import Session
+from sqlalchemy import select, asc
+import uuid
 
-from google.genai.types import Content
-
-from app.core import settings
-from app.schemas import ChatMessage
-
+from app.models import ChatMessage, User
+from app.schemas import ChatMessage as ChatMessageSchema, ChatRole
 
 def get_chat_crud():
-    return chat_crud
-
+    return CRUDChat()
 
 class CRUDChat:
-    def __init__(self,
-                 llm_context_file_path: str = settings.DEBUG_LLM_CONTEXT_FILE_PATH,
-                 chat_history_file_path: str = settings.DEBUG_CHAT_HISTORY_FILE_PATH):
-        self.llm_context: list[Content] = []
-        self.read_llm_context_from_file(llm_context_file_path)
-        self.chat_history: list[ChatMessage] = []
-        self.read_chat_history_from_file(chat_history_file_path)
+    def get_chat_history(self, db: Session, user: User) -> list[ChatMessageSchema]:
+        query = (
+            select(ChatMessage)
+            .where(ChatMessage.owner_uuid == user.uuid)
+            .order_by(asc(ChatMessage.order))
+        )
+        results = db.execute(query).scalars().all()
+        return [ChatMessageSchema(role=ChatRole(msg.role), text=msg.content) for msg in results]
 
-    def read_llm_context_from_file(self, file_path: str = settings.DEBUG_LLM_CONTEXT_FILE_PATH) -> None:
-        if os.path.exists(file_path):
-            with open(file_path, 'rb') as file:
-                self.llm_context = pickle.load(file)
-        return
+    def append_chat_history(self, db: Session, user: User, chat_message: ChatMessageSchema) -> None:
+        # Descobre o próximo valor de 'order' para o usuário
+        last_order = db.query(ChatMessage.order).filter(ChatMessage.owner_uuid == user.uuid).order_by(ChatMessage.order.desc()).first()
+        next_order = (last_order[0] + 1) if last_order else 1
+        db_msg = ChatMessage(
+            uuid=str(uuid.uuid4()),
+            order=next_order,
+            role=chat_message.role.value,
+            content=chat_message.text,
+            owner_uuid=user.uuid
+        )
+        db.add(db_msg)
+        db.commit()
 
-    def write_llm_context_to_file(self, file_path: str = settings.DEBUG_LLM_CONTEXT_FILE_PATH) -> None:
-        with open(file_path, "wb") as f:
-            # noinspection PyTypeChecker
-            pickle.dump(self.llm_context, f)
-        return
+    def delete_chat_history(self, db: Session, user: User) -> None:
+        db.query(ChatMessage).filter(ChatMessage.owner_uuid == user.uuid).delete()
+        db.commit()
 
-    def get_llm_context(self) -> list[Content] | None:
-        return self.llm_context
+    def remove_message(self, db: Session, user: User, message_uuid: str) -> None:
+        db.query(ChatMessage).filter(ChatMessage.owner_uuid == user.uuid, ChatMessage.uuid == message_uuid).delete()
+        db.commit()
 
-    def append_llm_context(self, new_content: list[Content]) -> None:
-        self.llm_context.extend(new_content)
-        return
-
-    def read_chat_history_from_file(self, file_path: str = settings.DEBUG_CHAT_HISTORY_FILE_PATH) -> None:
-        if os.path.exists(file_path):
-            with open(file_path, 'rb') as file:
-                self.chat_history = pickle.load(file)
-        return
-
-    def write_chat_history_to_file(self, file_path: str = settings.DEBUG_CHAT_HISTORY_FILE_PATH) -> None:
-        with open(file_path, "wb") as f:
-            # noinspection PyTypeChecker
-            pickle.dump(self.chat_history, f)
-        return
-
-    def get_chat_history(self) -> list[ChatMessage] | None:
-        return self.chat_history
-
-    def append_chat_history(self, chat_message: ChatMessage) -> None:
-        self.chat_history.append(chat_message)
-
-
-chat_crud = CRUDChat()
+    def clear_history(self, db: Session, user: User) -> None:
+        self.delete_chat_history(db, user)
