@@ -1,0 +1,82 @@
+import uuid
+from enum import Enum
+
+from pydantic import BaseModel, Field
+from sqlalchemy import Column, String, Boolean, ForeignKey, Text
+from sqlalchemy.orm import declarative_base, relationship
+
+TestBase = declarative_base()
+
+
+class MockEvaluationTypes(Enum):
+    ASSIGNMENT = "assignment"
+
+
+class MockLectureSchema(BaseModel):
+    uuid: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str = "Test Lecture"
+    start_datetime: str = "2025-07-23T14:00:00Z"
+    end_datetime: str = "2025-07-23T15:00:00Z"
+
+
+class MockEvaluationSchema(BaseModel):
+    uuid: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    type: MockEvaluationTypes = MockEvaluationTypes.ASSIGNMENT
+    title: str = "Test Evaluation"
+    start_datetime: str = "2025-07-23T09:00:00Z"
+    end_datetime: str = "2025-07-28T23:59:59Z"
+
+
+class MockCourseSchema(BaseModel):
+    uuid: str
+    title: str
+    semester: str | None = None
+    archived: bool = False
+    lectures: list[MockLectureSchema] = []
+    evaluations: list[MockEvaluationSchema] = []
+
+    class Config:
+        from_attributes = True
+
+
+class MockUser(TestBase):
+    __tablename__ = "users"
+    uuid = Column(String, primary_key=True)
+    courses = relationship("MockCourse", back_populates="owner")
+
+
+class MockEvaluation(TestBase):
+    __tablename__ = "evaluations"
+    uuid = Column(String, primary_key=True)
+    title = Column(String)
+    type = Column(String)
+    start_datetime = Column(String)
+    end_datetime = Column(String)
+    present = Column(Boolean, nullable=True)
+    course_uuid = Column(String, ForeignKey("courses.uuid"))
+    course = relationship("MockCourse", back_populates="evaluations")
+
+
+class MockLecture(TestBase):
+    __tablename__ = "lectures"
+    uuid = Column(String, primary_key=True)
+    title = Column(String)
+    summary = Column(Text, nullable=True)
+    start_datetime = Column(String)
+    end_datetime = Column(String)
+    present = Column(Boolean, nullable=True)
+    course_uuid = Column(String, ForeignKey("courses.uuid"))
+    course = relationship("MockCourse", back_populates="lectures")
+
+
+class MockCourse(TestBase):
+    __tablename__ = "courses"
+    uuid = Column(String, primary_key=True)
+    title = Column(String)
+    description = Column(Text, nullable=True)
+    semester = Column(String)
+    archived = Column(Boolean, default=False)
+    owner_uuid = Column(String, ForeignKey("users.uuid"))
+    owner = relationship("MockUser", back_populates="courses")
+    evaluations = relationship("MockEvaluation", back_populates="course", cascade="all, delete-orphan")
+    lectures = relationship("MockLecture", back_populates="course", cascade="all, delete-orphan")
