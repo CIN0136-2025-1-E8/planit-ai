@@ -11,10 +11,13 @@ def get_google_ai_service():
 
 
 class GoogleAIService:
-    def __init__(self, api_key: str):
-        if not api_key:
-            raise ValueError("Google API key not configured.")
-        self.client = genai.Client(api_key=api_key)
+    def __init__(self, api_key: str, client=None):
+        if client:
+            self.client = client
+        else:
+            if not api_key:
+                raise ValueError("Google API key not configured.")
+            self.client = genai.Client(api_key=api_key)
 
     async def send_message(self,
                            instruction: str,
