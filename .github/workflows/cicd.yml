@@ -1,0 +1,59 @@
+name: Continuous Integration Tests
+
+on:
+  push:
+    branches:
+      - main
+      - developer
+  pull_request:
+    branches:
+      - main
+      - developer
+
+jobs:
+  backend-ci:
+    name: Backend CI Tests
+    if: "github.event_name == 'pull_request' || github.event_name == 'push'"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./server
+    env:
+      DATABASE_URL: "sqlite:///:memory:"
+      GOOGLE_API_KEY: "dummy_key"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13.5'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        run: pytest
+
+  frontend-ci:
+    name: Frontend CI Tests
+    if: "github.event_name == 'pull_request' || github.event_name == 'push'"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./planit
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
