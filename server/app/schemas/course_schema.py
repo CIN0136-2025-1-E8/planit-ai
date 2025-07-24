@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field
 
-from .evaluation_schema import Evaluation
-from .lecture_schema import Lecture
+from .evaluation_schema import Evaluation, EvaluationBase
+from .lecture_schema import Lecture, LectureBase
 
 
 class CourseBase(BaseModel):
@@ -10,9 +10,6 @@ class CourseBase(BaseModel):
     semester: str | None = Field(
         default=None,
         description="The semester in which the course is offered, like 'Fall 2025', '2025.2' or '2025/2'.")
-    archived: bool = Field(
-        default=False,
-        description="Used by the application for internal control. Preserve default value.")
 
 
 class CourseCreate(CourseBase):
@@ -25,19 +22,22 @@ class CourseUpdate(BaseModel):
     archived: bool | None = None
 
 
+class CourseGenerate(CourseBase):
+    lectures: list[LectureBase] = []
+    evaluations: list[EvaluationBase] = []
+
+
 class Course(CourseBase):
     uuid: str
+    archived: bool = False
     lectures: list[Lecture] = []
     evaluations: list[Evaluation] = []
     model_config = ConfigDict(from_attributes=True)
 
 
-class CoursesList(BaseModel):
-    courses: list[Course]
-
-
 class CourseSummary(CourseBase):
     uuid: str
+    archived: bool = False
     model_config = ConfigDict(from_attributes=True)
 
 
