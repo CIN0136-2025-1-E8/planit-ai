@@ -12,11 +12,24 @@ class MockEvaluationTypes(Enum):
     ASSIGNMENT = "assignment"
 
 
+class MockLectureCreate(BaseModel):
+    title: str = "AI Generated Lecture"
+    start_datetime: str = "2025-08-01T10:00:00"
+    end_datetime: str = "2025-08-01T12:00:00"
+
+
 class MockLectureSchema(BaseModel):
     uuid: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: str = "Test Lecture"
     start_datetime: str = "2025-07-23T14:00:00Z"
     end_datetime: str = "2025-07-23T15:00:00Z"
+
+
+class MockEvaluationCreate(BaseModel):
+    title: str = "AI Generated Evaluation"
+    type: MockEvaluationTypes = MockEvaluationTypes.ASSIGNMENT
+    start_datetime: str = "2025-08-01T12:00:00"
+    end_datetime: str = "2025-08-08T23:59:59"
 
 
 class MockEvaluationSchema(BaseModel):
@@ -25,6 +38,13 @@ class MockEvaluationSchema(BaseModel):
     title: str = "Test Evaluation"
     start_datetime: str = "2025-07-23T09:00:00Z"
     end_datetime: str = "2025-07-28T23:59:59Z"
+
+
+class MockCourseGenerate(BaseModel):
+    title: str = "New Course"
+    semester: str = "2025.2"
+    lectures: list[MockLectureCreate] = [MockLectureCreate()]
+    evaluations: list[MockEvaluationCreate] = [MockEvaluationCreate()]
 
 
 class MockCourseSchema(BaseModel):
