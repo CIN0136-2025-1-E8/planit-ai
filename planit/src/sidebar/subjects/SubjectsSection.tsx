@@ -58,16 +58,18 @@ const subjectColors: Record<string, string> = {
 };
 
 async function fetchSubjects(): Promise<Subject[]> {
-  
-  const res = await fetch("http://localhost:8000/course/list");
+  const res = await fetch(`http://localhost:8000/course/list?owner_uuid=${MOCK_USER_UUID}`);
   if (!res.ok) throw new Error("Erro ao buscar matérias");
   return await res.json();
 }
+
+const MOCK_USER_UUID = "11e75ac9-aa93-45ba-8637-8eb16ddedcb3";
 
 async function addSubject(title: string, file: File): Promise<any> {
   const formData = new FormData();
   formData.append("message", title); // nome da materia
   formData.append("files", file);   // arquivo
+  formData.append("owner_uuid", MOCK_USER_UUID); // Ensure subject is created for the same user as events
   const res = await fetch("http://localhost:8000/course/create", {
     method: "POST",
     body: formData,
