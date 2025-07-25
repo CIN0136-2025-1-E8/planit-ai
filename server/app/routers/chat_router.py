@@ -41,7 +41,7 @@ async def delete_chat_history(
     chat_crud.delete_chat_history(db=db, user_uuid=user.uuid)
 
 
-@chat_router.post("/send_message", response_model=str)
+@chat_router.post("/message", response_model=str)
 async def send_chat_message(
         message: str = Form(),
         chat_crud=Depends(get_chat_crud),
