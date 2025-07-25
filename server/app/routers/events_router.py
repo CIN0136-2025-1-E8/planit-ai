@@ -89,7 +89,7 @@ def get_events_for_week(
     return EventsByDay(daily_events=events_grouped_by_day)
 
 
-@events_router.get("/", response_model=Event)
+@events_router.get("/{event_uuid}", response_model=Event)
 def read_event_by_uuid(
         event_uuid: str,
         event_crud: CRUDEvent = Depends(get_event_crud),
@@ -109,7 +109,7 @@ def read_event_by_uuid(
     return event
 
 
-@events_router.put("/", response_model=Event)
+@events_router.put("/{event_uuid}", response_model=Event)
 def update_existing_event(
         event_uuid: str,
         event_update: EventUpdate,
@@ -131,7 +131,7 @@ def update_existing_event(
     return updated_event
 
 
-@events_router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
+@events_router.delete("/{event_uuid}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_existing_event(
         event_uuid: str,
         event_crud: CRUDEvent = Depends(get_event_crud),
