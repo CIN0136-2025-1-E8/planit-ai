@@ -12,10 +12,6 @@ class Settings(BaseSettings):
     DEBUG_CHAT_HISTORY_FILE_PATH: Path = BASE_DIR / ".venv/chat_history.pkl"
     DEBUG_LLM_CONTEXT_FILE_PATH: Path = BASE_DIR / ".venv/llm_context.pkl"
     DEBUG_COURSES_FILE_PATH: Path = BASE_DIR / ".venv/courses.pkl"
-    DEBUG_FILE_LIST_FILE_PATH: Path = BASE_DIR / ".venv/file_list.pkl"
-
-    UPLOAD_DIR: Path = BASE_DIR / ".venv" / "uploads"
-    FILE_UPLOAD_SIZE_LIMIT_BYTES: int = 10 * 1024 * 1024  # 10MB
 
     GOOGLE_API_KEY: Optional[SecretStr] = None
     GOOGLE_BASIC_MODEL: str = "gemma-3-27b-it"
