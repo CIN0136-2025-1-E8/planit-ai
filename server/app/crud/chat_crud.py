@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.models import ChatMessage, User
 from app.schemas import ChatMessage as ChatMessageSchema
-from core.db import Base
+from app.core.db import Base
 
 ModelType = TypeVar("ModelType", bound=Base)
 

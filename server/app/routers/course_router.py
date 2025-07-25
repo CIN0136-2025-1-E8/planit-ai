@@ -44,16 +44,18 @@ async def create_course(
         ai_service: GoogleAIService = Depends(get_google_ai_service)):
     validate_files(files)
     try:
-        client_tz = ZoneInfo(timezone)
-        course_generated = await ai_service.generate_structured_output(
-            files=[(await file.read(), file.content_type) for file in files],
-            schema=CourseGenerate,
-            message=message,
-        )
+        if timezone: ZoneInfo(timezone)
     except ZoneInfoNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid timezone identifier: '{timezone}'"
+        )
+
+    try:
+        course_generated = await ai_service.generate_structured_output(
+            files=[(await file.read(), file.content_type) for file in files],
+            schema=CourseGenerate,
+            message=message,
         )
     except Exception:
         raise HTTPException(
@@ -61,13 +63,14 @@ async def create_course(
             detail="Error while parsing course information"
         )
 
-    for lecture in course_generated.lectures:
-        lecture.start_datetime = to_utc_iso(lecture.start_datetime, client_tz)
-        lecture.end_datetime = to_utc_iso(lecture.end_datetime, client_tz)
-
-    for evaluation in course_generated.evaluations:
-        evaluation.start_datetime = to_utc_iso(evaluation.start_datetime, client_tz)
-        evaluation.end_datetime = to_utc_iso(evaluation.end_datetime, client_tz)
+    if timezone:
+        client_tz = ZoneInfo(timezone)
+        for lecture in course_generated.lectures:
+            lecture.start_datetime = to_utc_iso(lecture.start_datetime, client_tz)
+            lecture.end_datetime = to_utc_iso(lecture.end_datetime, client_tz)
+        for evaluation in course_generated.evaluations:
+            evaluation.start_datetime = to_utc_iso(evaluation.start_datetime, client_tz)
+            evaluation.end_datetime = to_utc_iso(evaluation.end_datetime, client_tz)
 
     system_message = settings.SYSTEM_MESSAGE_MARKER_START + course_generated.model_dump_json() + settings.SYSTEM_MESSAGE_MARKER_END
     course: Course = Course(
