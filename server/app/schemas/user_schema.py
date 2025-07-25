@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
-from app.schemas import Event, Routine, FileRecord, CourseSummary
+from app.schemas import Event, Routine, CourseSummary
 
 
 class UserBase(BaseModel):
@@ -35,5 +35,4 @@ class UserData(UserBase):
     courses: list[CourseSummary]
     events: list[Event]
     routines: list[Routine]
-    files: list[FileRecord]
     model_config = ConfigDict(from_attributes=True)
