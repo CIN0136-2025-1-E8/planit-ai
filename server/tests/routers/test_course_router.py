@@ -82,9 +82,9 @@ def test_list_courses(client, mock_course_crud, mock_current_user):
 async def test_create_course_success(client, mock_course_crud, mock_chat_crud, mock_ai_service, mock_current_user):
     file_content = b"pdf content"
     files = [("files", ("mock.pdf", BytesIO(file_content), "application/pdf"))]
-    message = "Mock message."
+    form_data = {"message": "Mock message.", "timezone": "America/Sao_Paulo"}
 
-    response = client.post("/course/create", files=files, data={"message": message})
+    response = client.post("/course/create", files=files, data=form_data)
 
     assert response.status_code == 201, f"Response text: {response.text}"
     assert response.json()["title"] == "New Course"
@@ -99,8 +99,21 @@ async def test_create_course_success(client, mock_course_crud, mock_chat_crud, m
     assert len(created_course_obj.lectures) == 1
     assert len(created_course_obj.evaluations) == 1
     assert created_course_obj.lectures[0].title == "AI Generated Lecture"
+    assert created_course_obj.lectures[0].start_datetime == "2025-08-01T13:00:00Z"
 
     assert mock_chat_crud.append_llm_context.call_count == 2
+
+
+@pytest.mark.asyncio
+async def test_create_course_invalid_timezone(client):
+    file_content = b"pdf content"
+    files = [("files", ("mock.pdf", BytesIO(file_content), "application/pdf"))]
+    form_data = {"timezone": "Invalid/Timezone"}
+
+    response = client.post("/course/create", files=files, data=form_data)
+
+    assert response.status_code == 400
+    assert "Invalid timezone identifier" in response.json()["detail"]
 
 
 @pytest.mark.asyncio

@@ -1,4 +1,5 @@
 import uuid
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from fastapi import APIRouter, HTTPException, Form, UploadFile, Depends
 from google.genai.types import Content, Part
@@ -12,6 +13,7 @@ from app.dependencies import get_db
 from app.models import User
 from app.schemas import Course, CourseUpdate, CourseGenerate, CourseDeleteResponse, Lecture, Evaluation
 from app.services import get_google_ai_service, GoogleAIService
+from app.utils.time import to_utc_iso
 
 course_router = APIRouter(
     prefix="/course",
@@ -32,6 +34,7 @@ async def get_courses(
 async def create_course(
         files: list[UploadFile],
         message: str | None = Form(None),
+        timezone: str | None = Form(None),
         chat_crud=Depends(get_chat_crud),
         course_crud=Depends(get_course_crud),
         db: Session = Depends(get_db),
@@ -39,16 +42,30 @@ async def create_course(
         ai_service: GoogleAIService = Depends(get_google_ai_service)):
     validate_files(files)
     try:
+        client_tz = ZoneInfo(timezone)
         course_generated = await ai_service.generate_structured_output(
             files=[(await file.read(), file.content_type) for file in files],
             schema=CourseGenerate,
             message=message,
+        )
+    except ZoneInfoNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid timezone identifier: '{timezone}'"
         )
     except Exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error while parsing course information"
         )
+
+    for lecture in course_generated.lectures:
+        lecture.start_datetime = to_utc_iso(lecture.start_datetime, client_tz)
+        lecture.end_datetime = to_utc_iso(lecture.end_datetime, client_tz)
+
+    for evaluation in course_generated.evaluations:
+        evaluation.start_datetime = to_utc_iso(evaluation.start_datetime, client_tz)
+        evaluation.end_datetime = to_utc_iso(evaluation.end_datetime, client_tz)
 
     system_message = settings.SYSTEM_MESSAGE_MARKER_START + course_generated.model_dump_json() + settings.SYSTEM_MESSAGE_MARKER_END
     course: Course = Course(
