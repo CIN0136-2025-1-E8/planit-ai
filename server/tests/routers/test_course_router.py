@@ -9,7 +9,9 @@ from app.core.security import get_current_user
 from app.crud import get_course_crud, get_chat_crud
 from app.dependencies import get_db
 from app.main import app
+from app.schemas import ChatRole
 from app.services import get_google_ai_service
+from core import settings
 from mock_models import MockCourseGenerate, MockCourse, MockUser
 
 
@@ -101,7 +103,16 @@ async def test_create_course_success(client, mock_course_crud, mock_chat_crud, m
     assert created_course_obj.lectures[0].title == "AI Generated Lecture"
     assert created_course_obj.lectures[0].start_datetime == "2025-08-01T13:00:00Z"
 
-    assert mock_chat_crud.append_llm_context.call_count == 2
+    user_call_args = mock_chat_crud.append_chat_history.call_args_list[0].kwargs
+    assert user_call_args['user_uuid'] == mock_current_user.uuid
+    assert user_call_args['obj_in'].role == ChatRole.USER
+    assert '"New Course" adicionado' in user_call_args['obj_in'].text
+    assert settings.SYSTEM_MESSAGE_MARKER_START in user_call_args['obj_in'].content
+
+    model_call_args = mock_chat_crud.append_chat_history.call_args_list[1].kwargs
+    assert model_call_args['obj_in'].role == ChatRole.MODEL
+    assert model_call_args['obj_in'].text == "Certo. Lembrarei disso."
+    assert mock_chat_crud.append_chat_history.call_count == 2
 
 
 @pytest.mark.asyncio

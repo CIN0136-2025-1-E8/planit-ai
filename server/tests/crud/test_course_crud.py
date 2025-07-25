@@ -31,7 +31,12 @@ def mock_models(monkeypatch):
 
 @pytest.fixture(scope="function")
 def test_user(test_db_session: Session) -> MockUser:
-    user = MockUser(uuid=str(uuid.uuid4()))
+    user = MockUser(
+        uuid=str(uuid.uuid4()),
+        name="Test User",
+        email="test@example.com",
+        hashed_password="fake_password"
+    )
     test_db_session.add(user)
     test_db_session.commit()
     test_db_session.refresh(user)

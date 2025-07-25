@@ -1,3 +1,4 @@
+import json
 import uuid
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
@@ -11,7 +12,8 @@ from app.core.security import get_current_user
 from app.crud import get_chat_crud, get_course_crud
 from app.dependencies import get_db
 from app.models import User
-from app.schemas import Course, CourseUpdate, CourseGenerate, CourseDeleteResponse, Lecture, Evaluation
+from app.schemas import Course, CourseUpdate, CourseGenerate, CourseDeleteResponse, Lecture, Evaluation, ChatMessage, \
+    ChatRole
 from app.services import get_google_ai_service, GoogleAIService
 from app.utils.time import to_utc_iso
 
@@ -78,8 +80,19 @@ async def create_course(
                      for evaluation in course_generated.evaluations]
     )
     created_course = course_crud.create_with_children(db=db, obj_in=course, owner_uuid=current_user.uuid)
-    chat_crud.append_llm_context([Content(role="user", parts=[Part(text=system_message)])])
-    chat_crud.append_llm_context([Content(role="model", parts=[Part(text="Certo. Lembrarei disso.")])])
+    user_message: ChatMessage = ChatMessage(
+        role=ChatRole.USER,
+        text=f"\"{created_course.title}\" adicionado.",
+        content=json.dumps([Content(role="user", parts=[Part(text=system_message)]).model_dump()])
+    )
+    model_response: str = "Certo. Lembrarei disso."
+    model_message: ChatMessage = ChatMessage(
+        role=ChatRole.MODEL,
+        text=model_response,
+        content=json.dumps([Content(role="model", parts=[Part(text=model_response)]).model_dump()])
+    )
+    chat_crud.append_chat_history(db=db, user_uuid=current_user.uuid, obj_in=user_message)
+    chat_crud.append_chat_history(db=db, user_uuid=current_user.uuid, obj_in=model_message)
     return created_course
 
 

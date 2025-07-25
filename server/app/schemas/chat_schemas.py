@@ -1,6 +1,6 @@
 from enum import Enum
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class ChatRole(Enum):
@@ -8,6 +8,11 @@ class ChatRole(Enum):
     MODEL = "model"
 
 
-class ChatMessage(BaseModel):
+class ChatMessageBase(BaseModel):
     role: ChatRole
     text: str
+
+
+class ChatMessage(ChatMessageBase):
+    content: str
+    model_config = ConfigDict(from_attributes=True)
