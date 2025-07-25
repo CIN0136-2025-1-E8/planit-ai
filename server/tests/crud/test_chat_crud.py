@@ -1,108 +1,116 @@
-import os
-import pickle
+import uuid
 
 import pytest
-from google.genai.types import Content, Part
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, Session
 
-from app.crud import CRUDChat
-from app.schemas import ChatMessage, ChatRole
-
-
-@pytest.fixture
-def mock_paths(tmp_path):
-    context_path = tmp_path / "test_context.pkl"
-    history_path = tmp_path / "test_history.pkl"
-    return str(context_path), str(history_path)
+from app.crud.chat_crud import chat_crud
+from mock_models import TestBase, MockUser, MockChatMessage, MockChatMessageSchema, MockChatRole
 
 
-@pytest.fixture
-def crud_chat(mock_paths):
-    context_path, history_path = mock_paths
-    return CRUDChat(llm_context_file_path=context_path, chat_history_file_path=history_path)
+@pytest.fixture(scope="function")
+def test_db_session() -> Session:
+    engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
+    TestBase.metadata.create_all(bind=engine)
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+        TestBase.metadata.drop_all(bind=engine)
 
 
-def test_initialization_with_no_files(crud_chat):
-    assert crud_chat.llm_context == []
-    assert crud_chat.chat_history == []
+@pytest.fixture(scope="function")
+def mock_chat_model(monkeypatch):
+    monkeypatch.setattr(chat_crud, 'model', MockChatMessage)
 
 
-def test_read_llm_context_from_existing_file(mock_paths):
-    context_path, history_path = mock_paths
-    mock_context_data = [Content(role="user", parts=[Part(text="Mock message.")])]
-    with open(context_path, "wb") as f:
-        # noinspection PyTypeChecker
-        pickle.dump(mock_context_data, f)
-
-    crud = CRUDChat(llm_context_file_path=context_path, chat_history_file_path=history_path)
-
-    assert crud.get_llm_context() == mock_context_data
-
-
-def test_write_llm_context(crud_chat, mock_paths):
-    context_path, _ = mock_paths
-    mock_context_data = [Content(role="user", parts=[Part(text="Mock message.")])]
-    crud_chat.llm_context = mock_context_data
-
-    crud_chat.write_llm_context_to_file(file_path=context_path)
-
-    assert os.path.exists(context_path)
-    with open(context_path, "rb") as f:
-        assert pickle.load(f) == mock_context_data
+@pytest.fixture(scope="function")
+def test_user(test_db_session: Session) -> MockUser:
+    user = MockUser(
+        uuid=str(uuid.uuid4()),
+        name="Test User",
+        email="test@example.com",
+        hashed_password="fake_password"
+    )
+    test_db_session.add(user)
+    test_db_session.commit()
+    test_db_session.refresh(user)
+    return user
 
 
-def test_get_llm_context(crud_chat):
-    new_content = [Content(role="user", parts=[Part(text="Mock content.")])]
-    crud_chat.llm_context = new_content
+def test_get_chat_history(test_db_session: Session, test_user: MockUser, mock_chat_model):
+    msg1 = MockChatMessage(uuid=str(uuid.uuid4()), role="user", text="Hello", order=0, owner_uuid=test_user.uuid)
+    msg2 = MockChatMessage(uuid=str(uuid.uuid4()), role="model", text="Hi there!", order=1, owner_uuid=test_user.uuid)
+    test_db_session.add_all([msg1, msg2])
+    test_db_session.commit()
 
-    assert crud_chat.get_llm_context() == new_content
+    history = chat_crud.get_chat_history(db=test_db_session, user_uuid=test_user.uuid)
 
-
-def test_append_llm_context(crud_chat):
-    new_content = [Content(role="user", parts=[Part(text="Mock message.")])]
-
-    crud_chat.append_llm_context(new_content)
-    assert crud_chat.get_llm_context() == [new_content[0]]
-
-    crud_chat.append_llm_context(new_content)
-    assert crud_chat.get_llm_context() == [new_content[0], new_content[0]]
+    assert len(history) == 2
+    assert history[0].text == "Hello"
+    assert history[1].role == "model"
+    assert history[1].order == 1
 
 
-def test_read_chat_history_from_existing_file(mock_paths):
-    context_path, history_path = mock_paths
-    mock_history_data = [ChatMessage(role=ChatRole.MODEL, text="Mock response.")]
-    with open(history_path, "wb") as f:
-        # noinspection PyTypeChecker
-        pickle.dump(mock_history_data, f)
+def test_get_empty_chat_history(test_db_session: Session, test_user: MockUser, mock_chat_model):
+    history = chat_crud.get_chat_history(db=test_db_session, user_uuid=test_user.uuid)
 
-    crud = CRUDChat(llm_context_file_path=context_path, chat_history_file_path=history_path)
-
-    assert crud.get_chat_history() == mock_history_data
+    assert history == []
 
 
-def test_write_chat_history(crud_chat, mock_paths):
-    _, history_path = mock_paths
-    mock_history_data = ChatMessage(role=ChatRole.MODEL, text="Mock response.")
-    crud_chat.chat_history = [mock_history_data]
+def test_append_chat_history(test_db_session: Session, test_user: MockUser, mock_chat_model):
+    new_message = MockChatMessageSchema(role=MockChatRole.USER, text="First message")
 
-    crud_chat.write_chat_history_to_file(file_path=history_path)
+    chat_crud.append_chat_history(db=test_db_session, user_uuid=test_user.uuid, obj_in=new_message)
 
-    assert os.path.exists(history_path)
-    with open(history_path, "rb") as f:
-        assert pickle.load(f) == [mock_history_data]
+    db_user = test_db_session.get(MockUser, test_user.uuid)
+    assert len(db_user.chat_history) == 1
+    assert db_user.chat_history[0].text == "First message"
+    assert db_user.chat_history[0].order == 0
+
+    second_message = MockChatMessageSchema(role=MockChatRole.MODEL, text="Second message")
+    chat_crud.append_chat_history(db=test_db_session, user_uuid=test_user.uuid, obj_in=second_message)
+
+    test_db_session.refresh(db_user)
+    assert len(db_user.chat_history) == 2
+    assert db_user.chat_history[1].text == "Second message"
+    assert db_user.chat_history[1].order == 1
 
 
-def test_get_chat_history(crud_chat):
-    new_message = ChatMessage(role=ChatRole.USER, text="Mock message.")
-    crud_chat.chat_history = [new_message]
+def test_delete_chat_history(test_db_session: Session, test_user: MockUser, mock_chat_model):
+    msg1 = MockChatMessage(uuid=str(uuid.uuid4()), role="user", text="To be deleted 1", order=0, owner_uuid=test_user.uuid)
+    msg2 = MockChatMessage(uuid=str(uuid.uuid4()), role="model", text="To be deleted 2", order=1, owner_uuid=test_user.uuid)
+    test_db_session.add_all([msg1, msg2])
+    test_db_session.commit()
+    assert len(test_user.chat_history) == 2
 
-    assert crud_chat.get_chat_history() == [new_message]
+    num_deleted = chat_crud.delete_chat_history(db=test_db_session, user_uuid=test_user.uuid)
+
+    test_db_session.refresh(test_user)
+    assert num_deleted == 2
+    assert len(test_user.chat_history) == 0
+    assert test_db_session.query(MockChatMessage).count() == 0
 
 
-def test_append_chat_history(crud_chat):
-    new_message = ChatMessage(role=ChatRole.USER, text="Mock message.")
+def test_delete_chat_history_isolates_users(test_db_session: Session, test_user: MockUser, mock_chat_model):
+    user2 = MockUser(
+        uuid=str(uuid.uuid4()),
+        name="Other User",
+        email="other@example.com",
+        hashed_password="another_password"
+    )
+    test_db_session.add(user2)
+    msg1 = MockChatMessage(uuid=str(uuid.uuid4()), role="user", text="user1 message", order=0, owner_uuid=test_user.uuid)
+    msg2 = MockChatMessage(uuid=str(uuid.uuid4()), role="model", text="user2 message", order=0, owner_uuid=user2.uuid)
+    test_db_session.add_all([msg1, msg2])
+    test_db_session.commit()
+    assert test_db_session.query(MockChatMessage).count() == 2
 
-    crud_chat.append_chat_history(new_message)
-    assert crud_chat.get_chat_history() == [new_message]
+    num_deleted = chat_crud.delete_chat_history(db=test_db_session, user_uuid=test_user.uuid)
 
-    crud_chat.append_chat_history(new_message)
-    assert crud_chat.get_chat_history() == [new_message, new_message]
+    assert num_deleted == 1
+    assert test_db_session.query(MockChatMessage).count() == 1
+    remaining_message = test_db_session.query(MockChatMessage).one()
+    assert remaining_message.owner_uuid == user2.uuid

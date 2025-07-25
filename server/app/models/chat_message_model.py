@@ -10,6 +10,7 @@ class ChatMessage(Base):
     uuid = Column(String, primary_key=True)
     order = Column(Integer, nullable=False)
     role = Column(String, nullable=False)
+    text = Column(Text, nullable=False)
     content = Column(Text, nullable=False)
 
     owner_uuid = Column(String, ForeignKey("users.uuid"), index=True, nullable=False)

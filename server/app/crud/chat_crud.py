@@ -1,44 +1,44 @@
-from sqlalchemy.orm import Session
-from sqlalchemy import select, asc
 import uuid
+from typing import Type, TypeVar
+
+from sqlalchemy.orm import Session
 
 from app.models import ChatMessage, User
-from app.schemas import ChatMessage as ChatMessageSchema, ChatRole
+from app.schemas import ChatMessage as ChatMessageSchema
+from core.db import Base
+
+ModelType = TypeVar("ModelType", bound=Base)
+
 
 def get_chat_crud():
-    return CRUDChat()
+    return chat_crud
+
 
 class CRUDChat:
-    def get_chat_history(self, db: Session, user: User) -> list[ChatMessageSchema]:
-        query = (
-            select(ChatMessage)
-            .where(ChatMessage.owner_uuid == user.uuid)
-            .order_by(asc(ChatMessage.order))
-        )
-        results = db.execute(query).scalars().all()
-        return [ChatMessageSchema(role=ChatRole(msg.role), text=msg.content) for msg in results]
+    def __init__(self, model: Type[ModelType]):
+        self.model = model
 
-    def append_chat_history(self, db: Session, user: User, chat_message: ChatMessageSchema) -> None:
-        # Descobre o próximo valor de 'order' para o usuário
-        last_order = db.query(ChatMessage.order).filter(ChatMessage.owner_uuid == user.uuid).order_by(ChatMessage.order.desc()).first()
-        next_order = (last_order[0] + 1) if last_order else 1
-        db_msg = ChatMessage(
+    # noinspection PyMethodMayBeStatic
+    def get_chat_history(self, db: Session, user_uuid: str) -> list[ChatMessage]:
+        user = db.get(User, user_uuid)
+        return user.chat_history
+
+    def append_chat_history(self, db: Session, user_uuid: str, obj_in: ChatMessageSchema) -> None:
+        user = db.get(User, user_uuid)
+        next_order = len(user.chat_history)
+        db_msg = self.model(
+            **obj_in.model_dump(mode='json'),
             uuid=str(uuid.uuid4()),
             order=next_order,
-            role=chat_message.role.value,
-            content=chat_message.text,
             owner_uuid=user.uuid
         )
         db.add(db_msg)
         db.commit()
 
-    def delete_chat_history(self, db: Session, user: User) -> None:
-        db.query(ChatMessage).filter(ChatMessage.owner_uuid == user.uuid).delete()
+    def delete_chat_history(self, db: Session, user_uuid: str) -> int:
+        num_deleted = db.query(self.model).filter(self.model.owner_uuid.is_(user_uuid)).delete()
         db.commit()
+        return num_deleted
 
-    def remove_message(self, db: Session, user: User, message_uuid: str) -> None:
-        db.query(ChatMessage).filter(ChatMessage.owner_uuid == user.uuid, ChatMessage.uuid == message_uuid).delete()
-        db.commit()
 
-    def clear_history(self, db: Session, user: User) -> None:
-        self.delete_chat_history(db, user)
+chat_crud = CRUDChat(ChatMessage)
