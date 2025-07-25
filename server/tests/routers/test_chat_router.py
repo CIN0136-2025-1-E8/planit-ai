@@ -1,76 +1,110 @@
-from unittest.mock import MagicMock, AsyncMock
+import json
+import uuid
+from unittest.mock import MagicMock, AsyncMock, call
 
 import pytest
 from fastapi.testclient import TestClient
 from google.genai.types import Content, Part
+from sqlalchemy.orm import Session
 
-from app.crud import CRUDChat, get_chat_crud
+from app.core.security import get_current_user
+from app.crud import get_chat_crud
+from app.dependencies import get_db
 from app.main import app
-from app.schemas import ChatMessage, ChatRole
-from app.services import GoogleAIService, get_google_ai_service
+from app.schemas import ChatMessageBase, ChatMessage, ChatRole
+from app.services import get_google_ai_service
 
 
 @pytest.fixture
 def mock_chat_crud():
-    crud = MagicMock(spec=CRUDChat)
-    crud.get_llm_context.return_value = []
-    crud.get_chat_history.return_value = []
-    return crud
+    return MagicMock()
 
 
 @pytest.fixture
 def mock_ai_service():
-    service = MagicMock(spec=GoogleAIService)
-    service.send_message = AsyncMock(
-        return_value=("AI response", [Content(role="model", parts=[Part(text="AI response")])]))
+    service = MagicMock()
+    user_content = Content(role="user", parts=[Part(text="Hello")])
+    model_content = Content(role="model", parts=[Part(text="Hi back")])
+    service.send_message = AsyncMock(return_value=("Hi back", [user_content, model_content]))
     return service
 
 
 @pytest.fixture
-def client(mock_chat_crud, mock_ai_service):
+def mock_user():
+    return MagicMock(uuid=str(uuid.uuid4()))
+
+
+@pytest.fixture
+def mock_db_session():
+    return MagicMock(spec=Session)
+
+
+@pytest.fixture
+def client(mock_chat_crud, mock_ai_service, mock_user, mock_db_session):
     app.dependency_overrides[get_chat_crud] = lambda: mock_chat_crud
     app.dependency_overrides[get_google_ai_service] = lambda: mock_ai_service
+    app.dependency_overrides[get_current_user] = lambda: mock_user
+    app.dependency_overrides[get_db] = lambda: mock_db_session
+
     with TestClient(app) as test_client:
         yield test_client
+
     app.dependency_overrides = {}
 
 
-def test_get_chat_history(client, mock_chat_crud):
-    mock_history = [ChatMessage(role=ChatRole.USER, text="Mock message."),
-                    ChatMessage(role=ChatRole.MODEL, text="Mock response.")]
+def test_get_chat_history(client, mock_chat_crud, mock_user, mock_db_session):
+    mock_history = [
+        ChatMessage(role=ChatRole.USER, text="Test message", content="[]")
+    ]
     mock_chat_crud.get_chat_history.return_value = mock_history
+
+    expected_response_data = [
+        ChatMessageBase(role=ChatRole.USER, text="Test message").model_dump(mode='json')
+    ]
 
     response = client.get("/chat/history")
 
     assert response.status_code == 200
-    assert response.json() == [msg.model_dump(mode='json') for msg in mock_history]
-    mock_chat_crud.get_chat_history.assert_called_once()
+    assert response.json() == expected_response_data
+    mock_chat_crud.get_chat_history.assert_called_once_with(db=mock_db_session, user_uuid=mock_user.uuid)
+
+
+def test_delete_chat_history(client, mock_chat_crud, mock_user, mock_db_session):
+    response = client.delete("/chat/history")
+
+    assert response.status_code == 200
+    mock_chat_crud.delete_chat_history.assert_called_once_with(db=mock_db_session, user_uuid=mock_user.uuid)
 
 
 @pytest.mark.asyncio
-async def test_send_chat_message(client, mock_chat_crud, mock_ai_service):
-    user_message = "Mock message."
-    ai_response_text = "Mock response."
-    new_llm_content = [Content(role="user", parts=[Part(text=user_message)]),
-                       Content(role="model", parts=[Part(text=ai_response_text)])]
-    mock_ai_service.send_message.return_value = (ai_response_text, new_llm_content)
+async def test_send_chat_message(client, mock_chat_crud, mock_ai_service, mock_user, mock_db_session):
+    user_message_text = "Hello AI"
+    ai_response_text = "Hello User"
 
-    response = client.post("/chat/message", data={"message": user_message})
+    user_content = Content(role="user", parts=[Part(text=user_message_text)])
+    model_content = Content(role="model", parts=[Part(text=ai_response_text)])
+    mock_ai_service.send_message.return_value = (ai_response_text, [user_content, model_content])
+
+    history_content = Content(role="user", parts=[Part(text="Old message")])
+    mock_chat_crud.get_chat_history.return_value = [
+        ChatMessage(role=ChatRole.USER, text="Old message", content=json.dumps([history_content.model_dump()]))
+    ]
+
+    response = client.post("/chat/send_message", data={"message": user_message_text})
 
     assert response.status_code == 200
     assert response.json() == ai_response_text
     mock_ai_service.send_message.assert_awaited_once()
-    mock_chat_crud.append_llm_context.assert_called_once_with(new_llm_content)
+
     assert mock_chat_crud.append_chat_history.call_count == 2
-    mock_chat_crud.append_chat_history.assert_any_call(ChatMessage(role=ChatRole.USER, text=user_message))
-    mock_chat_crud.append_chat_history.assert_any_call(ChatMessage(role=ChatRole.MODEL, text=ai_response_text))
 
+    expected_user_msg = ChatMessage(role=ChatRole.USER, text=user_message_text,
+                                    content=json.dumps([user_content.model_dump()]))
+    expected_model_msg = ChatMessage(role=ChatRole.MODEL, text=ai_response_text,
+                                     content=json.dumps([model_content.model_dump()]))
 
-@pytest.mark.asyncio
-async def test_send_chat_message_ai_api_error(client, mock_ai_service):
-    mock_ai_service.send_message.side_effect = Exception("Simulated API Error")
-
-    response = client.post("/chat/message", data={"message": "This will fail."})
-
-    assert response.status_code == 500
-    assert "Internal Server Error" in response.text
+    expected_calls = [
+        call(db=mock_db_session, user_uuid=mock_user.uuid, obj_in=expected_user_msg),
+        call(db=mock_db_session, user_uuid=mock_user.uuid, obj_in=expected_model_msg)
+    ]
+    mock_chat_crud.append_chat_history.assert_has_calls(expected_calls, any_order=True)

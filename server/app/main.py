@@ -5,7 +5,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.db import Base, engine
-from app.crud import chat_crud, course_crud
 from app.routers import chat_router, course_router, user_router, events_router
 
 Base.metadata.create_all(bind=engine)
@@ -13,8 +12,6 @@ Base.metadata.create_all(bind=engine)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     yield
-    chat_crud.write_llm_context_to_file()
-    chat_crud.write_chat_history_to_file()
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(chat_router)
