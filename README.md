@@ -3,60 +3,145 @@
 
 Combinando praticidade e inteligência artificial, o Planit AI ajuda alunos a planejarem seus estudos de forma **eficiente**, otimizando o tempo e melhorando a **produtividade** ao longo do semestre.
 
-## 📦 Dependências principais
+## ▶️ Executando o Projeto com Docker
 
-O projeto utiliza as seguintes bibliotecas Python:
+### ⬇️ Clonando o Repositório
 
-- `fastapi~=0.115.12` — Framework web moderno e rápido
-- `uvicorn~=0.34.3` — Servidor ASGI leve e eficiente
-- `pydantic~=2.11.5` — Validação de dados com tipos
-- `pydantic-settings~=2.9.1` — Gerenciamento de configurações com `.env`
-- `SQLAlchemy~=2.0.41` — ORM para banco de dados
-- `google-genai~=1.19.0` — Integração com modelos da Google Generative AI
+Primeiro, clone o repositório para a sua máquina local usando o seguinte comando:
 
-## ✅ Requisitos
+    git clone https://github.com/CIN0136-2025-1-E8/planit-ai.git
+    cd planit-ai
 
-Antes de começar, você precisa ter instalado:
+### ✅ Pré-requisitos
 
-- [Python 3.10+](https://www.python.org/downloads/)
-- [pip](https://pip.pypa.io/)
-- [Git](https://git-scm.com/)  
- 
-Requisitos para rodar o projeto com **Vite**:
+- Docker e Docker Compose, ou Podman e Podman Compose instalados. O comando `docker-compose` pode ser substituído por 
+`podman-compose`.
 
-1. **Node.js**
-   - Versão recomendada: `>= 18.0.0`
-   - Verifique com: `node -v`
+### ⚙️ Configuração Inicial
 
-2. **Gerenciador de pacotes**
-   - É necessário ter um dos seguintes instalados:
-     - `npm` (vem com o Node.js) - recomendado
-     - `yarn`
-     - `pnpm`
+Antes de iniciar os serviços, é crucial configurar as variáveis de ambiente.
 
-## 🔧 Instalação
+1. **Crie o arquivo de ambiente:**
 
-1. **Clone o repositório:**
-```
-git clone https://github.com/CIN0136-2025-1-E8/planit-ai.git
-cd planit-ai\planit
-npm install
-```
+    Navegue até o diretório `server/` e faça uma cópia do arquivo `.env.example`:
 
-2. (Recomendado) Crie um ambiente virtual:
-```
-python -m venv venv
-source venv/bin/activate      # Linux / macOS
-venv\Scripts\activate         # Windows
-```
+        cp server/.env.example server/.env
 
-3. Instale as dependências:
-```
-pip install -r requirements.txt
-```
-4. Configure as variáveis de ambiente (com base no arquivo .env.example)
-- copie o arquivo .env.example e nomeie-o ".env"
-- adicione a chave da API onde requisitado
+2. **Defina a Chave da API do Google:**
+
+    Abra o arquivo `server/.env` que você acabou de criar e insira sua chave da API do Google no campo `GOOGLE_API_KEY`.
+
+        # server/.env
+        DEBUG=True
+        GOOGLE_API_KEY="SUA_CHAVE_DE_API_VAI_AQUI"
+        DATABASE_URL=postgresql://testuser:testpassword@db/testdb
+        #DATABASE_URL=postgresql://testuser:testpassword@localhost:5432/testdb
+        POSTGRES_USER=testuser
+        POSTGRES_PASSWORD=testpassword
+        POSTGRES_DB=testdb
+
+    ⚠️ **Importante:** O arquivo `.env` contém informações sensíveis e **NUNCA** deve ser enviado para o controle de 
+    versão (ex: Git). Ele já está incluído no `.dockerignore` e no `.gitignore` para prevenir commits acidentais.
+
+### 🚀 Executando os Serviços
+
+Com a configuração concluída, você pode iniciar todos os contêineres (backend, frontend e banco de dados) de uma vez.
+
+#### Iniciar todos os serviços
+
+Para construir as imagens e iniciar os contêineres, execute o seguinte comando na raiz do projeto:
+
+    docker-compose up --build
+
+#### Executar em modo "daemon"
+
+Para que os contêineres rodem em segundo plano (modo _daemon_), adicione a flag `-d`:
+
+    docker-compose up --build -d
+
+#### Visualizando os logs
+
+Se os serviços estiverem rodando em modo _daemon_, você pode visualizar os logs em tempo real para depuração. Para ver 
+os logs de todos os serviços, use:
+
+    docker-compose logs -f
+
+Para ver o log de um serviço específico (por exemplo, `backend`):
+
+    docker-compose logs -f backend
+
+#### Desligar os serviços
+
+Para parar e remover os contêineres e redes criados, execute:
+
+    docker-compose down
+
+Para parar os serviços e **remover também os volumes** (como os dados do banco de dados), use a flag `-v`:
+
+    docker-compose down -v
+
+### ✨ Recarregamento Automático (Hot Reload)
+
+Tanto o backend quanto o frontend estão configurados para recarregamento automático, agilizando o desenvolvimento 
+através do espelhamento dos diretórios locais para dentro dos contêineres.
+
+- **Backend:** O diretório local `./server/app` é montado dentro do contêiner. O servidor Uvicorn, configurado com a 
+flag `--reload`, monitora este diretório e reinicia automaticamente a cada alteração no código.
+
+- **Frontend:** De forma similar, o diretório local `./planit` é montado dentro do contêiner do frontend. O servidor de 
+desenvolvimento do Vite monitora este diretório e, quando um arquivo é salvo, as mudanças são refletidas 
+instantaneamente no navegador, sem a necessidade de recarregar a página manualmente.
+
+### 🐞 Depurando o Backend Fora do Contêiner
+
+Para uma depuração mais aprofundada do backend (usando breakpoints com um IDE, por exemplo), pode ser mais fácil 
+executá-lo diretamente na sua máquina local, fora do contêiner.
+
+Nesse cenário, o banco de dados e o frontend ainda rodarão via Docker. Siga estes passos:
+
+1. **Altere a URL do Banco de Dados:**
+
+    No arquivo `server/.env`, comente a linha `DATABASE_URL` que aponta para `db` e descomente a linha que aponta para 
+    `localhost`. Isso fará com que sua aplicação local se conecte ao banco de dados que está rodando no contêiner.
+
+        # server/.env
+        
+        # Comente esta linha:
+        # DATABASE_URL=postgresql://testuser:testpassword@db/testdb
+        
+        # E descomente esta:
+        DATABASE_URL=postgresql://testuser:testpassword@localhost:5432/testdb
+        
+2. **Inicie os outros serviços via Docker:**
+    
+   Execute o `docker-compose` para iniciar apenas o banco de dados (`db`) e o frontend.
+    
+        docker-compose up -d --build db frontend
+
+3. **Configure o ambiente virtual e execute o backend localmente:**
+
+    Navegue até a pasta do servidor, crie um ambiente virtual, ative-o e instale as dependências.
+
+        # Navegue até a pasta do servidor
+        cd server
+        
+        # Crie o ambiente virtual
+        python -m venv .venv
+        
+        # Ative o ambiente virtual (Linux/macOS)
+        source .venv/bin/activate
+        
+        # Ative o ambiente virtual (Windows)
+        # .\.venv\Scripts\activate
+        
+        # Instale as dependências
+        pip install -r requirements.txt
+
+Agora, você pode iniciar o servidor backend a partir do seu ambiente de desenvolvimento local (por exemplo, com o 
+comando `uvicorn app.main:app`) e ele se conectará ao banco de dados no contêiner. Lembre-se de remover a flag 
+`--reload` se estiver usando as ferramentas de depuração do seu IDE.
+
+[Python 3.11](https://www.python.org/downloads/) é a versão mínima para este projeto.
 
 ## 👨‍💻 Equipe do Projeto
 [Isabella Mendes](https://github.com/isabellamdsr)  
@@ -64,6 +149,7 @@ pip install -r requirements.txt
 [Luan Romero](https://github.com/luanromerolcc)  
 [Guimel Filipe](https://github.com/filipeguimel)  
 [Leandro Junior](https://github.com/LeandroJrMarques)  
-[Maia Ferreira]  
+[Maia Ferreira](https://github.com/maia-cin)  
 [Thiago Alves](https://github.com/ThAlvesM)  
-[Denilson França](https://github.com/altinctrl) 
+[Denilson França](https://github.com/altinctrl)  
+[Luiz Veloso](https://github.com/luiz-veloso)  
