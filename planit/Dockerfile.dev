@@ -1,0 +1,9 @@
+# This file is NOT to be used for production, only for development.
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
