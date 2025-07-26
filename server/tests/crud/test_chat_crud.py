@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
 from app.crud.chat_crud import chat_crud
-from mock_models import TestBase, MockUser, MockChatMessage, MockChatMessageSchema, MockChatRole
+from tests.mock_models import TestBase, MockUser, MockChatMessage, MockChatMessageSchema, MockChatRole
 
 
 @pytest.fixture(scope="function")

@@ -5,14 +5,14 @@ import pytest
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
+from app.core import settings
 from app.core.security import get_current_user
 from app.crud import get_course_crud, get_chat_crud
 from app.dependencies import get_db
 from app.main import app
 from app.schemas import ChatRole
 from app.services import get_google_ai_service
-from core import settings
-from mock_models import MockCourseGenerate, MockCourse, MockUser
+from tests.mock_models import MockCourseGenerate, MockCourse, MockUser
 
 
 def override_get_db():
