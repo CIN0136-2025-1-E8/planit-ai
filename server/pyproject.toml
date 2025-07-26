@@ -1,0 +1,44 @@
+[project]
+name = "planit-ai-server"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "SQLAlchemy~=2.0.41",
+    "fastapi~=0.116.1",
+    "google-genai~=1.19.0",
+    "passlib[bcrypt]~=1.7.4",
+    "psycopg2-binary~=2.9.10",
+    "pydantic-settings~=2.9.1",
+    "pydantic~=2.11.5",
+    "python-multipart~=0.0.20",
+    "starlette~=0.47.2",
+    "uvicorn~=0.34.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "coverage~=7.10.0",
+    "pytest-asyncio~=1.0.0",
+    "pytest-mock~=3.14.1",
+    "pytest~=8.4.1",
+]
+
+[tool.coverage.run]
+omit = [
+    "*/.venv/*",
+    "*/test_*",
+    "*/__init__.py",
+    "tests/*",
+    "scripts/*",
+    "/app/lib/*",
+]
+
+[tool.coverage.report]
+omit = [
+    "*/.venv/*",
+    "*/test_*",
+    "*/__init__.py",
+    "tests/*",
+    "scripts/*",
+    "/app/lib/*",
+]

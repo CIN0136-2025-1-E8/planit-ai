@@ -30,8 +30,8 @@ venv.bak/
 examples/
 scripts/
 tests/
-.coveragerc
 .dockerignore
 .env.example
 .gitignore
+pyproject.toml
 README.md
