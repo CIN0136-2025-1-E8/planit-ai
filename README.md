@@ -135,7 +135,7 @@ Nesse cenário, o banco de dados e o frontend ainda rodarão via Docker. Siga es
         # .\.venv\Scripts\activate
         
         # Instale as dependências
-        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
 
 Agora, você pode iniciar o servidor backend a partir do seu ambiente de desenvolvimento local (por exemplo, com o 
 comando `uvicorn app.main:app`) e ele se conectará ao banco de dados no contêiner. Lembre-se de remover a flag 
