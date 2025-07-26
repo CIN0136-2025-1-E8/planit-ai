@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
 from app.crud.course_crud import course_crud
-from mock_models import TestBase, MockCourse, MockEvaluation, MockLecture, MockUser, \
+from tests.mock_models import TestBase, MockCourse, MockEvaluation, MockLecture, MockUser, \
     MockCourseSchema, MockEvaluationSchema, MockLectureSchema
 
 
