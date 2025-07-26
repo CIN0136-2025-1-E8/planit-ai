@@ -90,7 +90,7 @@ async def test_send_chat_message(client, mock_chat_crud, mock_ai_service, mock_u
         ChatMessage(role=ChatRole.USER, text="Old message", content=json.dumps([history_content.model_dump()]))
     ]
 
-    response = client.post("/chat/send_message", data={"message": user_message_text})
+    response = client.post("/chat/message", data={"message": user_message_text})
 
     assert response.status_code == 200
     assert response.json() == ai_response_text

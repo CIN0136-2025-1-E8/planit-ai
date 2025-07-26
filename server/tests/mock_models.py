@@ -1,11 +1,12 @@
 import uuid
 from enum import Enum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from sqlalchemy import Column, String, Boolean, ForeignKey, Text, Integer
 from sqlalchemy.orm import declarative_base, relationship
 
 TestBase = declarative_base()
+TestBase.__test__ = False
 
 
 class MockChatRole(Enum):
@@ -76,9 +77,7 @@ class MockCourseSchema(BaseModel):
     archived: bool = False
     lectures: list[MockLectureSchema] = []
     evaluations: list[MockEvaluationSchema] = []
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class MockUser(TestBase):
