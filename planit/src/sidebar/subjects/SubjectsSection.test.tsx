@@ -3,11 +3,13 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import SubjectsSection from "./SubjectsSection";
 import '@testing-library/jest-dom';
 
+const mockFile = new File(["dummy"], "file.pdf", {type: "application/pdf"});
+
 // Mock do AddSubjectDialog para evitar testar o componente interno aqui
 jest.mock("./AddSubjectDialog", () => (props: any) => (
   props.open ? (
     <div data-testid="add-subject-dialog">
-      <button onClick={() => props.onSubmit && props.onSubmit("Test Subject", new File(["dummy"], "file.pdf", { type: "application/pdf" }))}>
+      <button onClick={() => props.onSubmit && props.onSubmit("Test Subject", mockFile)}>
         Mock Add
       </button>
       <button onClick={props.onClose}>Close</button>
