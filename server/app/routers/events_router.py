@@ -16,6 +16,57 @@ events_router = APIRouter(
 )
 
 
+@events_router.get("/", response_model=Event)
+def get_event(
+        event_uuid: str = Form(),
+        event_crud: CRUDEvent = Depends(get_event_crud),
+        user: User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+):
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+    event = event_crud.get(db, obj_uuid=event_uuid)
+    if event is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Event not found"
+        )
+
+    return event
+
+
+@events_router.put("/", response_model=Event)
+def update_event(
+        event_uuid: str = Form(),
+        new_title: str | None = Form(None),
+        new_description: str | None = Form(None),
+        new_start_datetime: datetime | None = Form(None),
+        new_end_datetime: datetime | None = Form(None),
+        event_crud: CRUDEvent = Depends(get_event_crud),
+        user: User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+):
+    event_new_data: EventUpdate = EventUpdate(
+        title=new_title,
+        description=new_description,
+        start_datetime=new_start_datetime,
+        end_datetime=new_end_datetime,
+    )
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+    db_event = event_crud.get(db, obj_uuid=event_uuid)
+    if db_event is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Event not found"
+        )
+
+    updated_event = event_crud.update(db=db, db_obj=db_event, obj_in=event_new_data)
+    return updated_event
+
+
 @events_router.post("/", response_model=Event)
 def create_event(
         title: str = Form(),
@@ -37,6 +88,26 @@ def create_event(
 
     event_create: EventCreateInDB = EventCreateInDB(**event_in.model_dump(), owner_uuid=user.uuid)
     event = event_crud.create(db=db, obj_in=event_create)
+    return event
+
+
+@events_router.delete("/", response_model=Event)
+def delete_event(
+        event_uuid: str = Form(),
+        event_crud: CRUDEvent = Depends(get_event_crud),
+        user: User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+):
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+    event = event_crud.remove(db, obj_uuid=event_uuid)
+    if not event:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Event not found"
+        )
+
     return event
 
 
@@ -96,74 +167,3 @@ def get_events_for_week(
             events_grouped_by_day[event_day_str].append(event)
 
     return EventsByDay(daily_events=events_grouped_by_day)
-
-
-@events_router.get("/", response_model=Event)
-def get_event(
-        event_uuid: str = Form(),
-        event_crud: CRUDEvent = Depends(get_event_crud),
-        user: User = Depends(get_current_user),
-        db: Session = Depends(get_db),
-):
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
-    event = event_crud.get(db, obj_uuid=event_uuid)
-    if event is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Event not found"
-        )
-
-    return event
-
-
-@events_router.put("/", response_model=Event)
-def update_event(
-        event_uuid: str = Form(),
-        new_title: str | None = Form(None),
-        new_description: str | None = Form(None),
-        new_start_datetime: datetime | None = Form(None),
-        new_end_datetime: datetime | None = Form(None),
-        event_crud: CRUDEvent = Depends(get_event_crud),
-        user: User = Depends(get_current_user),
-        db: Session = Depends(get_db),
-):
-    event_new_data: EventUpdate = EventUpdate(
-        title=new_title,
-        description=new_description,
-        start_datetime=new_start_datetime,
-        end_datetime=new_end_datetime,
-    )
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
-    db_event = event_crud.get(db, obj_uuid=event_uuid)
-    if db_event is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Event not found"
-        )
-
-    updated_event = event_crud.update(db=db, db_obj=db_event, obj_in=event_new_data)
-    return updated_event
-
-
-@events_router.delete("/", response_model=Event)
-def delete_event(
-        event_uuid: str = Form(),
-        event_crud: CRUDEvent = Depends(get_event_crud),
-        user: User = Depends(get_current_user),
-        db: Session = Depends(get_db),
-):
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
-    event = event_crud.remove(db, obj_uuid=event_uuid)
-    if not event:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Event not found"
-        )
-
-    return event
