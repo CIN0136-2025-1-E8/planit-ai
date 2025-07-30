@@ -24,6 +24,40 @@ course_router = APIRouter(
 )
 
 
+@course_router.put("/")
+async def update_course(
+        course_uuid: str = Form(),
+        new_title: str | None = Form(None),
+        new_semester: str | None = Form(None),
+        new_archived: bool | None = Form(None),
+        course_crud=Depends(get_course_crud),
+        db: Session = Depends(get_db),
+):
+    course_new_data = CourseUpdate(
+        title=new_title,
+        semester=new_semester,
+        archived=new_archived,
+    )
+    course = course_crud.get(db=db, obj_uuid=course_uuid)
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+    updated_course = course_crud.update(db=db, db_obj=course, obj_in=course_new_data)
+    return updated_course
+
+
+@course_router.delete("/")
+async def delete_course(
+        course_uuid: str = Form(),
+        course_crud=Depends(get_course_crud),
+        db: Session = Depends(get_db),
+):
+    removed_course = course_crud.remove(db=db, obj_uuid=course_uuid)
+    response = CourseDeleteResponse.model_validate(removed_course)
+    response.deleted_lectures = len(removed_course.lectures)
+    response.deleted_evaluations = len(removed_course.evaluations)
+    return response
+
+
 @course_router.get("/list")
 async def list_courses(
         course_crud=Depends(get_course_crud),
@@ -99,40 +133,6 @@ async def create_course_ai(
     chat_crud.append_chat_history(db=db, user_uuid=current_user.uuid, obj_in=user_message)
     chat_crud.append_chat_history(db=db, user_uuid=current_user.uuid, obj_in=model_message)
     return created_course
-
-
-@course_router.put("/")
-async def update_course(
-        course_uuid: str = Form(),
-        new_title: str | None = Form(None),
-        new_semester: str | None = Form(None),
-        new_archived: bool | None = Form(None),
-        course_crud=Depends(get_course_crud),
-        db: Session = Depends(get_db),
-):
-    course_new_data = CourseUpdate(
-        title=new_title,
-        semester=new_semester,
-        archived=new_archived,
-    )
-    course = course_crud.get(db=db, obj_uuid=course_uuid)
-    if not course:
-        raise HTTPException(status_code=404, detail="Course not found")
-    updated_course = course_crud.update(db=db, db_obj=course, obj_in=course_new_data)
-    return updated_course
-
-
-@course_router.delete("/")
-async def delete_course(
-        course_uuid: str = Form(),
-        course_crud=Depends(get_course_crud),
-        db: Session = Depends(get_db),
-):
-    removed_course = course_crud.remove(db=db, obj_uuid=course_uuid)
-    response = CourseDeleteResponse.model_validate(removed_course)
-    response.deleted_lectures = len(removed_course.lectures)
-    response.deleted_evaluations = len(removed_course.evaluations)
-    return response
 
 
 def validate_files(files: list[UploadFile]) -> None:
