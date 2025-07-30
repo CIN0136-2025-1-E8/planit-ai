@@ -1,8 +1,8 @@
+from datetime import date, timedelta, datetime, time
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, Form
 from sqlalchemy.orm import Session
-from datetime import date, timedelta, datetime, time
 
 from app.core.security import get_current_user
 from app.crud import get_event_crud, CRUDEvent
@@ -11,18 +11,27 @@ from app.models import User
 from app.schemas import EventCreate, EventCreateInDB, EventUpdate, Event, EventsByDay
 
 events_router = APIRouter(
-    prefix="/events",
-    tags=["Events"],
+    prefix="/event",
+    tags=["Event"],
 )
 
 
-@events_router.post("/", response_model=Event, status_code=status.HTTP_201_CREATED)
-def create_new_event(
-        event_in: EventCreate,
+@events_router.post("/", response_model=Event)
+def create_event(
+        title: str = Form(),
+        description: str | None = Form(None),
+        start_datetime: datetime = Form(),
+        end_datetime: datetime = Form(),
         event_crud: CRUDEvent = Depends(get_event_crud),
         user: User = Depends(get_current_user),
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
 ):
+    event_in: EventCreate = EventCreate(
+        title=title,
+        description=description,
+        start_datetime=start_datetime,
+        end_datetime=end_datetime,
+    )
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
@@ -31,7 +40,7 @@ def create_new_event(
     return event
 
 
-@events_router.get("/", response_model=EventsByDay)
+@events_router.get("/week", response_model=EventsByDay)
 def get_events_for_week(
         start_date: date = Query(
             ...,
@@ -43,7 +52,7 @@ def get_events_for_week(
         ),
         event_crud: CRUDEvent = Depends(get_event_crud),
         user: User = Depends(get_current_user),
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
 ):
     """
     Returns a user's events for the next 7 days, interpreted according to the client's timezone.
@@ -89,12 +98,12 @@ def get_events_for_week(
     return EventsByDay(daily_events=events_grouped_by_day)
 
 
-@events_router.get("/{event_uuid}", response_model=Event)
-def read_event_by_uuid(
-        event_uuid: str,
+@events_router.get("/", response_model=Event)
+def get_event(
+        event_uuid: str = Form(),
         event_crud: CRUDEvent = Depends(get_event_crud),
         user: User = Depends(get_current_user),
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
 ):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
@@ -109,14 +118,23 @@ def read_event_by_uuid(
     return event
 
 
-@events_router.put("/{event_uuid}", response_model=Event)
-def update_existing_event(
-        event_uuid: str,
-        event_update: EventUpdate,
+@events_router.put("/", response_model=Event)
+def update_event(
+        event_uuid: str = Form(),
+        new_title: str | None = Form(None),
+        new_description: str | None = Form(None),
+        new_start_datetime: datetime | None = Form(None),
+        new_end_datetime: datetime | None = Form(None),
         event_crud: CRUDEvent = Depends(get_event_crud),
         user: User = Depends(get_current_user),
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
 ):
+    event_new_data: EventUpdate = EventUpdate(
+        title=new_title,
+        description=new_description,
+        start_datetime=new_start_datetime,
+        end_datetime=new_end_datetime,
+    )
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
@@ -127,16 +145,16 @@ def update_existing_event(
             detail="Event not found"
         )
 
-    updated_event = event_crud.update(db=db, db_obj=db_event, obj_in=event_update)
+    updated_event = event_crud.update(db=db, db_obj=db_event, obj_in=event_new_data)
     return updated_event
 
 
-@events_router.delete("/{event_uuid}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_existing_event(
-        event_uuid: str,
+@events_router.delete("/", response_model=Event)
+def delete_event(
+        event_uuid: str = Form(),
         event_crud: CRUDEvent = Depends(get_event_crud),
         user: User = Depends(get_current_user),
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
 ):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
@@ -148,4 +166,4 @@ def delete_existing_event(
             detail="Event not found"
         )
 
-    return {"message": "Event deleted successfully"}
+    return event

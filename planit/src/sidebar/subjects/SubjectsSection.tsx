@@ -68,7 +68,7 @@ async function addSubject(title: string, file: File): Promise<any> {
   const formData = new FormData();
   formData.append("message", title); // nome da materia
   formData.append("files", file);   // arquivo
-  const res = await fetch("http://localhost:8000/course/create", {
+  const res = await fetch("http://localhost:8000/course/ai", {
     method: "POST",
     body: formData,
   });

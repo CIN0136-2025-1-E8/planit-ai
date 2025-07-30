@@ -1,20 +1,32 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Form
 from sqlalchemy.orm import Session
-from uuid import UUID
-from app.dependencies import get_db
+
+from app.core.security import get_current_user
 from app.crud.user import user_crud
-from app.schemas.user_schema import UserCreate, UserUpdate, UserData
+from app.dependencies import get_db
+from app.models import User
+from app.schemas import UserCreate, UserUpdate, UserData
 
 user_router = APIRouter(
-    prefix="/users",
-    tags=["Users"],
+    prefix="/user",
+    tags=["User"],
 )
 
-@user_router.post("/", response_model=UserData, status_code=status.HTTP_201_CREATED)
-def create_new_user(
-    user_in: UserCreate,
-    db: Session = Depends(get_db)
+
+@user_router.post("/", response_model=UserData)
+def create_user(
+        name: str = Form(),
+        nickname: str | None = Form(None),
+        email: str = Form(),
+        password: str = Form(),
+        db: Session = Depends(get_db),
 ):
+    user_in: UserCreate = UserCreate(
+        name=name,
+        nickname=nickname,
+        email=email,
+        password=password,
+    )
     db_user = user_crud.get_by_email(db, email=user_in.email)
     if db_user:
         raise HTTPException(
@@ -24,21 +36,13 @@ def create_new_user(
     user = user_crud.create(db=db, obj_in=user_in)
     return user
 
-@user_router.get("/", response_model=list[UserData])
-def read_all_users(
-    skip: int = 0,
-    limit: int = 100,
-    db: Session = Depends(get_db)
-):
-    users = user_crud.get_multi(db, skip=skip, limit=limit)
-    return users
 
-@user_router.get("/{user_uuid}", response_model=UserData)
-def read_user_by_uuid(
-    user_uuid: str,
-    db: Session = Depends(get_db)
+@user_router.get("/", response_model=UserData)
+def get_user(
+        user: User = Depends(get_current_user),
+        db: Session = Depends(get_db),
 ):
-    user = user_crud.get(db, obj_uuid=user_uuid)
+    user = user_crud.get(db, obj_uuid=user.uuid)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -46,30 +50,41 @@ def read_user_by_uuid(
         )
     return user
 
-@user_router.put("/{user_uuid}", response_model=UserData)
-def update_existing_user(
-    user_uuid: str, 
-    user_update: UserUpdate,
-    db: Session = Depends(get_db)
+
+@user_router.put("/", response_model=UserData)
+def update_user(
+        new_name: str | None = Form(None),
+        new_nickname: str | None = Form(None),
+        new_email: str | None = Form(None),
+        new_password: str | None = Form(None),
+        user: User = Depends(get_current_user),
+        db: Session = Depends(get_db),
 ):
-    db_user = user_crud.get(db, obj_uuid=user_uuid)
+    user_new_data: UserUpdate = UserUpdate(
+        name=new_name,
+        nickname=new_nickname,
+        email=new_email,
+        password=new_password,
+    )
+    db_user = user_crud.get(db, obj_uuid=user.uuid)
     if db_user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found"
         )
-    updated_user = user_crud.update(db=db, db_obj=db_user, obj_in=user_update)
+    updated_user = user_crud.update(db=db, db_obj=db_user, obj_in=user_new_data)
     return updated_user
 
-@user_router.delete("/{user_uuid}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_existing_user(
-    user_uuid: str,
-    db: Session = Depends(get_db)
+
+@user_router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
+def delete_user(
+        user: User = Depends(get_current_user),
+        db: Session = Depends(get_db),
 ):
-    user = user_crud.remove(db, obj_uuid=user_uuid)
+    user = user_crud.remove(db, obj_uuid=user.uuid)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found"
         )
-    return {"message": "User deleted successfully"}
+    return
