@@ -13,30 +13,6 @@ user_router = APIRouter(
 )
 
 
-@user_router.post("/", response_model=UserData)
-def create_user(
-        name: str = Form(),
-        nickname: str | None = Form(None),
-        email: str = Form(),
-        password: str = Form(),
-        db: Session = Depends(get_db),
-):
-    user_in: UserCreate = UserCreate(
-        name=name,
-        nickname=nickname,
-        email=email,
-        password=password,
-    )
-    db_user = user_crud.get_by_email(db, email=user_in.email)
-    if db_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered"
-        )
-    user = user_crud.create(db=db, obj_in=user_in)
-    return user
-
-
 @user_router.get("/", response_model=UserData)
 def get_user(
         user: User = Depends(get_current_user),
@@ -74,6 +50,30 @@ def update_user(
         )
     updated_user = user_crud.update(db=db, db_obj=db_user, obj_in=user_new_data)
     return updated_user
+
+
+@user_router.post("/", response_model=UserData)
+def create_user(
+        name: str = Form(),
+        nickname: str | None = Form(None),
+        email: str = Form(),
+        password: str = Form(),
+        db: Session = Depends(get_db),
+):
+    user_in: UserCreate = UserCreate(
+        name=name,
+        nickname=nickname,
+        email=email,
+        password=password,
+    )
+    db_user = user_crud.get_by_email(db, email=user_in.email)
+    if db_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered"
+        )
+    user = user_crud.create(db=db, obj_in=user_in)
+    return user
 
 
 @user_router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
