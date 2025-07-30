@@ -2,6 +2,7 @@ import datetime
 
 from sqlalchemy.orm import Session
 
+from app.core import settings
 from app.core.security import get_current_user
 from app.crud import get_course_crud
 from app.dependencies import get_db
@@ -57,4 +58,7 @@ async def list_full_courses() -> dict:
         return {"error": f"An error occurred while listing full courses: {e}."}
 
 
-tools = [get_current_utc_time, list_course_summaries, list_full_courses]
+if settings.is_feature_enabled("LLM_TOOLS_V2"):
+    tools = [get_current_utc_time, list_course_summaries, list_full_courses]
+else:
+    tools = [get_current_utc_time]
