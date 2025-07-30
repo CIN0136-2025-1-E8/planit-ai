@@ -19,21 +19,22 @@ from app.utils.time import to_utc_iso
 
 course_router = APIRouter(
     prefix="/course",
-    tags=["course"],
+    tags=["Course"],
     responses={404: {"description": "Not found"}},
 )
 
 
 @course_router.get("/list")
-async def get_courses(
+async def list_courses(
         course_crud=Depends(get_course_crud),
         db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)):
+        current_user: User = Depends(get_current_user),
+):
     return course_crud.get_all_by_owner_uuid(db=db, owner_uuid=current_user.uuid)
 
 
-@course_router.post("/create", status_code=status.HTTP_201_CREATED)
-async def create_course(
+@course_router.post("/ai")
+async def create_course_ai(
         files: list[UploadFile],
         message: str | None = Form(None),
         timezone: str | None = Form(None),
@@ -41,7 +42,8 @@ async def create_course(
         course_crud=Depends(get_course_crud),
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user),
-        ai_service: GoogleAIService = Depends(get_google_ai_service)):
+        ai_service: GoogleAIService = Depends(get_google_ai_service),
+):
     validate_files(files)
     try:
         if timezone: ZoneInfo(timezone)
@@ -99,12 +101,20 @@ async def create_course(
     return created_course
 
 
-@course_router.put("/update", status_code=status.HTTP_200_OK)
+@course_router.put("/")
 async def update_course(
-        course_new_data: CourseUpdate,
-        course_uuid: str,
+        course_uuid: str = Form(),
+        new_title: str | None = Form(None),
+        new_semester: str | None = Form(None),
+        new_archived: bool | None = Form(None),
         course_crud=Depends(get_course_crud),
-        db: Session = Depends(get_db)):
+        db: Session = Depends(get_db),
+):
+    course_new_data = CourseUpdate(
+        title=new_title,
+        semester=new_semester,
+        archived=new_archived,
+    )
     course = course_crud.get(db=db, obj_uuid=course_uuid)
     if not course:
         raise HTTPException(status_code=404, detail="Course not found")
@@ -112,11 +122,12 @@ async def update_course(
     return updated_course
 
 
-@course_router.delete("/delete", status_code=status.HTTP_200_OK)
+@course_router.delete("/")
 async def delete_course(
-        course_uuid: str,
+        course_uuid: str = Form(),
         course_crud=Depends(get_course_crud),
-        db: Session = Depends(get_db)):
+        db: Session = Depends(get_db),
+):
     removed_course = course_crud.remove(db=db, obj_uuid=course_uuid)
     response = CourseDeleteResponse.model_validate(removed_course)
     response.deleted_lectures = len(removed_course.lectures)

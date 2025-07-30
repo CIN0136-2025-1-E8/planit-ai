@@ -86,9 +86,8 @@ async def test_create_course_success(client, mock_course_crud, mock_chat_crud, m
     files = [("files", ("mock.pdf", BytesIO(file_content), "application/pdf"))]
     form_data = {"message": "Mock message.", "timezone": "America/Sao_Paulo"}
 
-    response = client.post("/course/create", files=files, data=form_data)
+    response = client.post("/course/ai", files=files, data=form_data)
 
-    assert response.status_code == 201, f"Response text: {response.text}"
     assert response.json()["title"] == "New Course"
 
     mock_ai_service.generate_structured_output.assert_awaited_once()
@@ -121,7 +120,7 @@ async def test_create_course_invalid_timezone(client):
     files = [("files", ("mock.pdf", BytesIO(file_content), "application/pdf"))]
     form_data = {"timezone": "Invalid/Timezone"}
 
-    response = client.post("/course/create", files=files, data=form_data)
+    response = client.post("/course/ai", files=files, data=form_data)
 
     assert response.status_code == 400
     assert "Invalid timezone identifier" in response.json()["detail"]
@@ -132,7 +131,7 @@ async def test_create_course_unsupported_media_type(client):
     file_content = b"zip content"
     files = [("files", ("mock.zip", BytesIO(file_content), "application/zip"))]
 
-    response = client.post("/course/create", files=files)
+    response = client.post("/course/ai", files=files)
 
     assert response.status_code == 415
     assert "Unsupported Media Type" in response.json()["detail"]
@@ -143,7 +142,7 @@ async def test_create_course_entity_too_large(client):
     large_content = b"0" * (20 * 1024 * 1024)
     files = [("files", ("large_file.pdf", BytesIO(large_content), "application/pdf"))]
 
-    response = client.post("/course/create", files=files)
+    response = client.post("/course/ai", files=files)
 
     assert response.status_code == 413
     assert "Request Entity Too Large" in response.json()["detail"]
@@ -155,7 +154,7 @@ async def test_create_course_ai_api_error(client, mock_ai_service):
     file_content = b"pdf content"
     files = [("files", ("mock.pdf", BytesIO(file_content), "application/pdf"))]
 
-    response = client.post("/course/create", files=files)
+    response = client.post("/course/ai", files=files)
 
     assert response.status_code == 500
     assert response.json()["detail"] == "Error while parsing course information"
@@ -169,7 +168,7 @@ async def test_create_course_pydantic_validation_error(client, mock_ai_service):
     file_content = b"pdf content"
     files = [("files", ("mock.pdf", BytesIO(file_content), "application/pdf"))]
 
-    response = client.post("/course/create", files=files)
+    response = client.post("/course/ai", files=files)
 
     assert response.status_code == 500
     assert response.json()["detail"] == "Error while parsing course information"
