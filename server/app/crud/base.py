@@ -38,13 +38,12 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     # noinspection PyMethodMayBeStatic
     def update(self, db: Session, *, db_obj: ModelType, obj_in: Union[UpdateSchemaType, dict[str, Any]]) -> ModelType:
-        obj_data = db_obj.__dict__
         if isinstance(obj_in, dict):
             update_data = obj_in
         else:
             update_data = obj_in.model_dump(exclude_unset=True)
-        for field in obj_data:
-            if field in update_data:
+        for field in update_data:
+            if field in update_data and update_data[field]:
                 setattr(db_obj, field, update_data[field])
         db.add(db_obj)
         db.commit()
