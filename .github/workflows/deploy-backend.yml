@@ -1,0 +1,74 @@
+name: Deploy Backend to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  REGION: ${{ vars.GCP_REGION }}
+  SERVICE_NAME: ${{ vars.GCP_SERVICE_NAME }}
+  REPO_NAME: ${{ vars.ARTIFACT_REGISTRY_REPO }}
+  DB_SECRET_NAME: ${{ vars.DB_SECRET_NAME }}
+  DB_CONNECTION_NAME: ${{ vars.GCP_SQL_INSTANCE_CONNECTION_NAME }}
+  WIF_PROVIDER: ${{ secrets.GCP_WIF_PROVIDER }}
+  SERVICE_ACCOUNT: ${{ secrets.GCP_SA_EMAIL }}
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy Backend
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }} -f ./backend/Dockerfile .
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: 'google-github-actions/deploy-cloudrun@v2'
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          region: ${{ env.REGION }}
+          image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          flags: |
+            --ingress=internal
+            --service-account=${{ env.SERVICE_ACCOUNT }}
+            --add-cloudsql-instances=${{ env.DB_CONNECTION_NAME }}
+            --memory=512Mi
+            --cpu=1
+            --concurrency=40
+            --timeout=300s
+            --no-startup-cpu-boost
+          secrets:
+            - name: DATABASE_URL
+              value: ${{ env.DB_SECRET_NAME }}:latest
+
+      - name: Output Cloud Run URL
+        run: echo "Successfully deployed to ${{ steps.deploy.outputs.url }}"

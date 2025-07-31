@@ -1,0 +1,14 @@
+# This file is used for production.
+
+server/.idea/
+server/.vscode/
+server/examples/
+server/scripts/
+server/tests/
+server/.dockerignore
+server/.env.example
+server/.gitignore
+server/Dockerfile.dev
+server/pyproject.toml
+server/requirements-dev.txt
+server/README.md
