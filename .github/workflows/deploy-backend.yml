@@ -66,9 +66,8 @@ jobs:
             --concurrency=40
             --timeout=300s
             --no-startup-cpu-boost
-          secrets:
-            - name: DATABASE_URL
-              value: ${{ env.DB_SECRET_NAME }}:latest
+          secrets: |
+            DATABASE_URL=${{ env.DB_SECRET_NAME }}:latest
 
       - name: Output Cloud Run URL
         run: echo "Successfully deployed to ${{ steps.deploy.outputs.url }}"
