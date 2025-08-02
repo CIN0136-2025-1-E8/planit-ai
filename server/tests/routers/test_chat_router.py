@@ -62,7 +62,7 @@ def test_get_chat_history(client, mock_chat_crud, mock_user, mock_db_session):
         ChatMessageBase(role=ChatRole.USER, text="Test message").model_dump(mode='json')
     ]
 
-    response = client.get("/chat/history")
+    response = client.get("/api/chat/history")
 
     assert response.status_code == 200
     assert response.json() == expected_response_data
@@ -70,7 +70,7 @@ def test_get_chat_history(client, mock_chat_crud, mock_user, mock_db_session):
 
 
 def test_delete_chat_history(client, mock_chat_crud, mock_user, mock_db_session):
-    response = client.delete("/chat/history")
+    response = client.delete("/api/chat/history")
 
     assert response.status_code == 200
     mock_chat_crud.delete_chat_history.assert_called_once_with(db=mock_db_session, user_uuid=mock_user.uuid)
@@ -90,7 +90,7 @@ async def test_send_chat_message(client, mock_chat_crud, mock_ai_service, mock_u
         ChatMessage(role=ChatRole.USER, text="Old message", content=json.dumps([history_content.model_dump()]))
     ]
 
-    response = client.post("/chat/message", data={"message": user_message_text})
+    response = client.post("/api/chat/message", data={"message": user_message_text})
 
     assert response.status_code == 200
     assert response.json() == ai_response_text

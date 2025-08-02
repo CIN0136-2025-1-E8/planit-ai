@@ -14,10 +14,10 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(user_router)
-app.include_router(chat_router)
-app.include_router(course_router)
-app.include_router(events_router)
+app.include_router(user_router, prefix="/api")
+app.include_router(chat_router, prefix="/api")
+app.include_router(course_router, prefix="/api")
+app.include_router(events_router, prefix="/api")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
