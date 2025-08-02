@@ -69,7 +69,7 @@ jobs:
             --no-cpu-boost
           secrets: |
             DATABASE_URL=${{ env.DB_SECRET_NAME }}:latest
-            GOOGLE_API_KEY=${{ env.GEMINI_SECRET_NAME }}
+            GOOGLE_API_KEY=${{ env.GEMINI_SECRET_NAME }}:latest
 
       - name: Output Cloud Run URL
         run: echo "Successfully deployed to ${{ steps.deploy.outputs.url }}"
