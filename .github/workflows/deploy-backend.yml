@@ -15,6 +15,7 @@ env:
   REGION: ${{ vars.GCP_REGION }}
   SERVICE_NAME: ${{ vars.GCP_SERVICE_NAME }}
   REPO_NAME: ${{ vars.ARTIFACT_REGISTRY_REPO }}
+  GEMINI_SECRET_NAME: ${{ vars.GEMINI_SECRET_NAME }}
   DB_SECRET_NAME: ${{ vars.DB_SECRET_NAME }}
   DB_CONNECTION_NAME: ${{ vars.GCP_SQL_INSTANCE_CONNECTION_NAME }}
   WIF_PROVIDER: ${{ secrets.GCP_WIF_PROVIDER }}
@@ -68,6 +69,7 @@ jobs:
             --no-cpu-boost
           secrets: |
             DATABASE_URL=${{ env.DB_SECRET_NAME }}:latest
+            GOOGLE_API_KEY=${{ env.GEMINI_SECRET_NAME }}
 
       - name: Output Cloud Run URL
         run: echo "Successfully deployed to ${{ steps.deploy.outputs.url }}"
