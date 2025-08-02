@@ -15,7 +15,8 @@ env:
   PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
   REGION: ${{ vars.GCP_REGION }}
   SERVICE_NAME: ${{ vars.GCP_SERVICE_NAME }}
-  FIREBASE_SERVICE_KEY: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}'
+  WIF_PROVIDER: ${{ secrets.GCP_WIF_PROVIDER }}
+  SERVICE_ACCOUNT: ${{ secrets.GCP_SA_EMAIL }}
 
 jobs:
   build-and-deploy:
@@ -28,6 +29,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.SERVICE_ACCOUNT }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -51,6 +59,5 @@ jobs:
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ env.FIREBASE_SERVICE_KEY }}'
           channelId: live
           projectId: ${{ env.PROJECT_ID }}
