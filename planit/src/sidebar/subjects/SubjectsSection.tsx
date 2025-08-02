@@ -12,6 +12,8 @@ import {
 import { ExpandLess, ExpandMore, Delete, Add } from "@mui/icons-material";
 import AddSubjectDialog from "./AddSubjectDialog";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+
 // Subject and file types
 type Subject = {
   id: string;
@@ -61,7 +63,7 @@ const subjectColors: Record<string, string> = {
 
 async function fetchSubjects(): Promise<Subject[]> {
   
-  const res = await fetch("http://localhost:8000/course/list");
+  const res = await fetch(`${API_BASE_URL}/course/list`);
   if (!res.ok) throw new Error("Erro ao buscar matérias");
   return await res.json();
 }
@@ -70,7 +72,7 @@ async function addSubject(title: string, file: File): Promise<any> {
   const formData = new FormData();
   formData.append("message", title); // nome da materia
   formData.append("files", file);   // arquivo
-  const res = await fetch("http://localhost:8000/course/ai", {
+  const res = await fetch(`${API_BASE_URL}/course/ai`, {
     method: "POST",
     body: formData,
   });
@@ -79,7 +81,7 @@ async function addSubject(title: string, file: File): Promise<any> {
 }
 
 async function deleteSubject(id: string) {
-  const res = await fetch(`http://localhost:8000/subjects/${id}`, {
+  const res = await fetch(`${API_BASE_URL}/subjects/${id}`, {
     method: "DELETE",
   });
   if (!res.ok) throw new Error("Erro ao remover matéria");
