@@ -56,8 +56,4 @@ jobs:
           sed -i 's/__REGION__/${{ env.REGION }}/g' firebase.json
 
       - name: Deploy to Firebase Hosting
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          channelId: live
-          projectId: ${{ env.PROJECT_ID }}
+        run: npx firebase-tools deploy --only hosting --project ${{ env.PROJECT_ID }} --force
