@@ -1,6 +1,7 @@
-import type React from "react"
+// import type React from "react"
 import logo from './assets/logo.png'; 
-import { useState, useEffect } from "react"
+// import { useState, useEffect } from "react"
+import { useState } from "react"
 import {
   Box,
   Paper,
@@ -52,7 +53,8 @@ const theme = createTheme({
 })
 
 export default function PlanitPage() {
-  const [activeSection, setActiveSection] = useState<"profile" | "events" | "chat" | "subjects">("chat");
+  // const [activeSection, setActiveSection] = useState<"profile" | "events" | "chat" | "subjects">("chat");
+  const [activeSection, setActiveSection] = useState<"chat" | "subjects">("chat");
 
   return (
     <ThemeProvider theme={theme}>
@@ -97,8 +99,8 @@ export default function PlanitPage() {
             }}
           >
             {activeSection === "chat" && <ChatContainer />}
-            {activeSection === "profile" && <ProfileSection />} 
-            {activeSection === "events" && <CalendarSection />}
+            {/*{activeSection === "profile" && <ProfileSection />} */}
+            {/*{activeSection === "events" && <CalendarSection />}*/}
             {activeSection === "subjects" && <SubjectsSection />}
           </Box>
         </Paper>

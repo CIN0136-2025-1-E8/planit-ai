@@ -1,4 +1,4 @@
-import React from "react";
+// import React from "react";
 import { useState, useEffect, useRef } from "react";
 import ChatSection from "./ChatSection";
 import type { Message } from "./types";
@@ -8,7 +8,8 @@ export default function ChatContainer() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  // const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   // Fetch chat history on mount
   useEffect(() => {
@@ -17,7 +18,8 @@ export default function ChatContainer() {
         setMessages(
           history.map((msg, idx) => ({
             id: String(idx),
-            role: msg.role === "model" ? "assistant" : "user",
+            // role: msg.role === "model" ? "assistant" : "user",
+            role: (msg.role as "model" | "user") === "model" ? "assistant" : "user",
             content: msg.text,
           }))
         )

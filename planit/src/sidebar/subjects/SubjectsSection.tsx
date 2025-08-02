@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+// import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Paper,
@@ -7,7 +8,8 @@ import {
   IconButton,
 
 } from "@mui/material";
-import { ExpandLess, ExpandMore, Delete, Add, Description } from "@mui/icons-material";
+// import { ExpandLess, ExpandMore, Delete, Add, Description } from "@mui/icons-material";
+import { ExpandLess, ExpandMore, Delete, Add } from "@mui/icons-material";
 import AddSubjectDialog from "./AddSubjectDialog";
 
 // Subject and file types
@@ -86,7 +88,7 @@ async function deleteSubject(id: string) {
 export default function SubjectsSection() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newSubject, setNewSubject] = useState("");
+  // const [newSubject, setNewSubject] = useState("");
   const [adding, setAdding] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
 

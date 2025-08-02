@@ -1,4 +1,4 @@
-import React from "react";
+// import React from "react";
 import { Box, Paper, Typography, TextField, IconButton } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 
@@ -12,7 +12,8 @@ type ChatSectionProps = {
   messages: Message[];
   input: string;
   isLoading: boolean;
-  messagesEndRef: React.RefObject<HTMLDivElement>;
+  // messagesEndRef: React.RefObject<HTMLDivElement>;
+  messagesEndRef: React.RefObject<HTMLDivElement | null>;
   handleSubmit: (e: React.FormEvent) => void;
   setInput: React.Dispatch<React.SetStateAction<string>>;
 };
