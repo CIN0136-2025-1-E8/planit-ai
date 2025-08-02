@@ -65,7 +65,7 @@ jobs:
             --cpu=1
             --concurrency=40
             --timeout=300s
-            --no-startup-cpu-boost
+            --no-cpu-boost
           secrets: |
             DATABASE_URL=${{ env.DB_SECRET_NAME }}:latest
 
