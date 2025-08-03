@@ -59,7 +59,8 @@ jobs:
           region: ${{ env.REGION }}
           image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
           flags: |
-            --ingress=internal
+            --ingress=all
+            --no-allow-unauthenticated
             --service-account=${{ env.SERVICE_ACCOUNT }}
             --add-cloudsql-instances=${{ env.DB_CONNECTION_NAME }}
             --memory=512Mi
