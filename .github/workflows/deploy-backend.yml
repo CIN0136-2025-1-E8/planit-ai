@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'backend/**'
+      - 'server/**'
       - '.github/workflows/deploy-backend.yml'
 
   workflow_dispatch:
@@ -60,7 +60,7 @@ jobs:
           image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
           flags: |
             --ingress=all
-            --no-allow-unauthenticated
+            --allow-unauthenticated
             --service-account=${{ env.SERVICE_ACCOUNT }}
             --add-cloudsql-instances=${{ env.DB_CONNECTION_NAME }}
             --memory=512Mi
