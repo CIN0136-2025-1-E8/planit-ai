@@ -1,25 +1,10 @@
-import datetime
-
 from sqlalchemy.orm import Session
 
-from app.core import settings
 from app.core.security import get_current_user
 from app.crud import get_course_crud
 from app.dependencies import get_db
 from app.models import User
 from app.schemas import Course, CourseSummary
-
-
-def get_current_utc_time() -> dict:
-    """Gets the current time in UTC.
-
-    Returns:
-        A dictionary containing the current UTC time in ISO 8601 format.
-        Example: {"utc_time": "2023-10-27T10:00:00.123456"}
-    """
-    utc_now = datetime.datetime.now(datetime.timezone.utc)
-    iso_format_time = utc_now.isoformat()
-    return {"utc_time": iso_format_time}
 
 
 async def list_courses() -> dict:
@@ -42,7 +27,7 @@ async def list_courses() -> dict:
         return {"error": f"An error occurred while listing course summaries.: {e}."}
 
 
-async def list_full_courses() -> dict:
+async def list_courses_and_details() -> dict:
     """
     Lista todas as informações de cada curso do usuário atual, incluindo aulas e avaliações.
 
@@ -60,8 +45,7 @@ async def list_full_courses() -> dict:
         return {"error": f"An error occurred while listing full courses: {e}."}
 
 
-tools = [
-    get_current_utc_time,
+course_tools = [
     list_courses,
-    list_full_courses,
+    list_courses_and_details,
 ]

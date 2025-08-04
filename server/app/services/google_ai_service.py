@@ -7,7 +7,7 @@ from google.genai.types import Content, Part, Blob, GenerateContentConfig, Funct
 from pydantic import BaseModel
 
 from app.core import settings
-from .llm_tools import tools
+from app.llm_tools import tools
 
 
 def get_google_ai_service():

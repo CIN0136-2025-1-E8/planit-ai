@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -7,15 +6,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent
-    PROJECT_NAME: str = "PlanIt AI"
-    DEBUG: bool = False
-
-    GOOGLE_API_KEY: Optional[SecretStr] = None
-    GOOGLE_BASIC_MODEL: str = "gemma-3-27b-it"
-    GOOGLE_ADVANCED_MODEL: str = "gemini-2.0-flash"
-
-    SYSTEM_MESSAGE_MARKER_START: str = "[PlanIt AI - System Message - START]: "
-    SYSTEM_MESSAGE_MARKER_END: str = " :[PlanIt AI - System Message - END]\n"
+    DATABASE_URL: str | None = None
+    GOOGLE_API_KEY: SecretStr | None = None
 
     CHAT_SYSTEM_INSTRUCTIONS: str = (
         "## Language and Formatting\n"
@@ -45,28 +37,28 @@ class Settings(BaseSettings):
         "---\n"
         "## Timezone Awareness\n"
         "You have access to the current time in UTC via the `get_current_utc_time` tool. You must always convert this "
-        "to the user's local timezone (America/Sao_Paulo, UTC-3) when presenting it.\n"
+        "to the user's local timezone (America/Recife, UTC-3) when presenting it.\n"
     )
 
-    SUPPORTED_FILE_TYPES: list[str] = ["application/pdf",
-                                       "application/x-javascript",
-                                       "text/javascript",
-                                       "application/x-python",
-                                       "text/x-python",
-                                       "text/plain",
-                                       "text/html",
-                                       "text/css",
-                                       "text/md",
-                                       "text/csv",
-                                       "text/xml",
-                                       "text/rtf",
-                                       "image/png",
-                                       "image/jpeg",
-                                       "image/webp",
-                                       "image/heic",
-                                       "image/heif"]
-
-    DATABASE_URL: Optional[str] = None
+    SUPPORTED_FILE_TYPES: list[str] = [
+        "application/pdf",
+        "application/x-javascript",
+        "text/javascript",
+        "application/x-python",
+        "text/x-python",
+        "text/plain",
+        "text/html",
+        "text/css",
+        "text/md",
+        "text/csv",
+        "text/xml",
+        "text/rtf",
+        "image/png",
+        "image/jpeg",
+        "image/webp",
+        "image/heic",
+        "image/heif",
+    ]
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",
