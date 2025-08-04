@@ -5,12 +5,10 @@ import pytest
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
-from app.core import settings
 from app.core.security import get_current_user
-from app.crud import get_course_crud, get_chat_crud
+from app.crud import get_course_crud
 from app.dependencies import get_db
 from app.main import app
-from app.schemas import ChatRole
 from app.services import get_google_ai_service
 from tests.mock_models import MockCourseGenerate, MockCourse, MockUser
 
@@ -35,13 +33,6 @@ def mock_course_crud():
 
 
 @pytest.fixture
-def mock_chat_crud():
-    crud = MagicMock()
-    crud.append_llm_context = MagicMock()
-    return crud
-
-
-@pytest.fixture
 def mock_ai_service():
     service = MagicMock()
     service.generate_structured_output = AsyncMock(
@@ -56,10 +47,9 @@ def mock_current_user():
 
 
 @pytest.fixture
-def client(mock_course_crud, mock_chat_crud, mock_ai_service, mock_current_user):
+def client(mock_course_crud, mock_ai_service, mock_current_user):
     app.dependency_overrides[get_db] = override_get_db
     app.dependency_overrides[get_course_crud] = lambda: mock_course_crud
-    app.dependency_overrides[get_chat_crud] = lambda: mock_chat_crud
     app.dependency_overrides[get_google_ai_service] = lambda: mock_ai_service
     app.dependency_overrides[get_current_user] = lambda: mock_current_user
 
@@ -81,7 +71,7 @@ def test_list_courses(client, mock_course_crud, mock_current_user):
 
 
 @pytest.mark.asyncio
-async def test_create_course_success(client, mock_course_crud, mock_chat_crud, mock_ai_service, mock_current_user):
+async def test_create_course_success(client, mock_course_crud, mock_ai_service, mock_current_user):
     file_content = b"pdf content"
     files = [("files", ("mock.pdf", BytesIO(file_content), "application/pdf"))]
     form_data = {"message": "Mock message.", "timezone": "America/Sao_Paulo"}
@@ -101,17 +91,6 @@ async def test_create_course_success(client, mock_course_crud, mock_chat_crud, m
     assert len(created_course_obj.evaluations) == 1
     assert created_course_obj.lectures[0].title == "AI Generated Lecture"
     assert created_course_obj.lectures[0].start_datetime == "2025-08-01T13:00:00Z"
-
-    user_call_args = mock_chat_crud.append_chat_history.call_args_list[0].kwargs
-    assert user_call_args['user_uuid'] == mock_current_user.uuid
-    assert user_call_args['obj_in'].role == ChatRole.USER
-    assert '"New Course" adicionado' in user_call_args['obj_in'].text
-    assert settings.SYSTEM_MESSAGE_MARKER_START in user_call_args['obj_in'].content
-
-    model_call_args = mock_chat_crud.append_chat_history.call_args_list[1].kwargs
-    assert model_call_args['obj_in'].role == ChatRole.MODEL
-    assert model_call_args['obj_in'].text == "Certo. Lembrarei disso."
-    assert mock_chat_crud.append_chat_history.call_count == 2
 
 
 @pytest.mark.asyncio
