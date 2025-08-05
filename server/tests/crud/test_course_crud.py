@@ -106,14 +106,13 @@ def test_update_course(test_db_session: Session, test_user: MockUser):
         db=test_db_session, obj_in=course_in, owner_uuid=test_user.uuid
     )
 
-    update_data = {"title": "New Title", "archived": True}
+    update_data = {"title": "New Title"}
     updated_course = course_crud.update(
         db=test_db_session, db_obj=db_course, obj_in=update_data
     )
 
     test_db_session.refresh(updated_course)
     assert updated_course.title == "New Title"
-    assert updated_course.archived is True
     assert updated_course.semester == "2025.1"  # Assert non-updated field remains the same
 
 

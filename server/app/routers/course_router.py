@@ -26,14 +26,12 @@ async def update_course(
         course_uuid: str = Form(),
         new_title: str | None = Form(None),
         new_semester: str | None = Form(None),
-        new_archived: bool | None = Form(None),
         course_crud=Depends(get_course_crud),
         db: Session = Depends(get_db),
 ):
     course_new_data = CourseUpdate(
         title=new_title,
         semester=new_semester,
-        archived=new_archived,
     )
     course = course_crud.get(db=db, obj_uuid=course_uuid)
     if not course:

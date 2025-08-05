@@ -75,7 +75,6 @@ class MockCourseSchema(BaseModel):
     uuid: str
     title: str
     semester: str | None = None
-    archived: bool = False
     lectures: list[MockLectureSchema] = []
     evaluations: list[MockEvaluationSchema] = []
     model_config = ConfigDict(from_attributes=True)
@@ -125,7 +124,6 @@ class MockCourse(TestBase):
     title = Column(String)
     description = Column(Text, nullable=True)
     semester = Column(String)
-    archived = Column(Boolean, default=False)
     owner_uuid = Column(String, ForeignKey("users.uuid"))
     owner = relationship("MockUser", back_populates="courses")
     evaluations = relationship("MockEvaluation", back_populates="course", cascade="all, delete-orphan")
