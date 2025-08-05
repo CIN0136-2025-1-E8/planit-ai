@@ -1,7 +1,20 @@
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
 class LectureBase(BaseModel):
+    title: str
+    start_datetime: datetime
+    end_datetime: datetime
+    summary: str | None = None
+
+
+class LectureCreate(LectureBase):
+    course_uuid: str
+
+
+class LectureGenerate(BaseModel):
     title: str = Field(
         description="The main topic or title of the lecture.")
     start_datetime: str = Field(
@@ -13,14 +26,10 @@ class LectureBase(BaseModel):
         description="A brief summary of the lecture's content.")
 
 
-class LectureCreate(LectureBase):
-    course_uuid: str
-
-
 class LectureUpdate(BaseModel):
     title: str | None = None
-    start_datetime: str | None = None
-    end_datetime: str | None = None
+    start_datetime: datetime | None = None
+    end_datetime: datetime | None = None
     summary: str | None = None
     present: bool | None = None
 

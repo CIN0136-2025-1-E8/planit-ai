@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -12,6 +13,17 @@ class EvaluationTypes(Enum):
 
 
 class EvaluationBase(BaseModel):
+    type: EvaluationTypes
+    title: str
+    start_datetime: datetime
+    end_datetime: datetime
+
+
+class EvaluationCreate(EvaluationBase):
+    course_uuid: str
+
+
+class EvaluationGenerate(BaseModel):
     type: EvaluationTypes = Field(
         description="The type of evaluation. 'assignment' is a generic term for the submission of written assignments, problem sets, projects and more.")
     title: str = Field(
@@ -22,15 +34,11 @@ class EvaluationBase(BaseModel):
         description="The end date and time for the evaluation in ISO 8601 format, which is typically the deadline.")
 
 
-class EvaluationCreate(EvaluationBase):
-    course_uuid: str
-
-
 class EvaluationUpdate(BaseModel):
     type: str | None
     title: str | None
-    start_datetime: str | None
-    end_datetime: str | None
+    start_datetime: datetime | None
+    end_datetime: datetime | None
     present: bool | None = None
 
 
