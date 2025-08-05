@@ -46,3 +46,9 @@ class Evaluation(EvaluationBase):
     uuid: str
     present: bool | None = None
     model_config = ConfigDict(from_attributes=True)
+
+
+class EvaluationInSchedule(Evaluation):
+    item_type: str = "evaluation"
+    course_uuid: str
+    course_title: str

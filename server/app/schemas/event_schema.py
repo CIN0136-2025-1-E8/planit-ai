@@ -34,6 +34,11 @@ class Event(EventBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class EventInSchedule(EventBase):
+    item_type: str = "event"
+    uuid: str
+
+
 class EventsByDay(BaseModel):
     # A chave do dicionário será a data (como string 'YYYY-MM-DD')
     # O valor será uma lista de objetos Event (usando o schema Event acima)
