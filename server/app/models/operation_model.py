@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 
 from sqlalchemy import Column, String, Integer, Text, Boolean, ForeignKey
@@ -9,7 +10,7 @@ from app.core.db import Base
 class Operation(Base):
     __tablename__ = "operations"
 
-    uuid = Column(String, primary_key=True)
+    uuid = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     order = Column(Integer, nullable=False)
     batch_uuid = Column(String, nullable=False)
     action = Column(String, nullable=False)

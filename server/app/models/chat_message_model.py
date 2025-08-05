@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy import Column, String, Integer, Text, ForeignKey
 from sqlalchemy.orm import relationship
 
@@ -7,7 +9,7 @@ from app.core.db import Base
 class ChatMessage(Base):
     __tablename__ = "chat_messages"
 
-    uuid = Column(String, primary_key=True)
+    uuid = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     order = Column(Integer, nullable=False)
     role = Column(String, nullable=False)
     text = Column(Text, nullable=False)

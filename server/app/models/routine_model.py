@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy import Column, String, Text, Boolean, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
@@ -7,7 +9,7 @@ from app.core.db import Base
 class Routine(Base):
     __tablename__ = 'routines'
 
-    uuid = Column(String, primary_key=True)
+    uuid = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     title = Column(String, nullable=False)
     description = Column(Text, nullable=True)
     flexible = Column(Boolean, nullable=False)

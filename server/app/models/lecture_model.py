@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy import Column, String, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 
@@ -7,7 +9,7 @@ from app.core.db import Base
 class Lecture(Base):
     __tablename__ = "lectures"
 
-    uuid = Column(String, primary_key=True, index=True)
+    uuid = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     title = Column(String, nullable=False)
     start_datetime = Column(String, nullable=False)
     end_datetime = Column(String, nullable=False)
