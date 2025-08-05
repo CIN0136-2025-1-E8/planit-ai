@@ -19,7 +19,6 @@ class CourseCreate(CourseBase):
 class CourseUpdate(BaseModel):
     title: str | None = None
     semester: str | None = None
-    archived: bool | None = None
 
 
 class CourseGenerate(CourseBase):
@@ -29,7 +28,6 @@ class CourseGenerate(CourseBase):
 
 class Course(CourseBase):
     uuid: str
-    archived: bool = False
     lectures: list[Lecture] = []
     evaluations: list[Evaluation] = []
     model_config = ConfigDict(from_attributes=True)
@@ -37,7 +35,6 @@ class Course(CourseBase):
 
 class CourseSummary(CourseBase):
     uuid: str
-    archived: bool = False
     model_config = ConfigDict(from_attributes=True)
 
 
