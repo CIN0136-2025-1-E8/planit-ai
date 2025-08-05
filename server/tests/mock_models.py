@@ -1,8 +1,9 @@
 import uuid
+from datetime import datetime
 from enum import Enum
 
 from pydantic import BaseModel, Field, ConfigDict
-from sqlalchemy import Column, String, Boolean, ForeignKey, Text, Integer
+from sqlalchemy import Column, String, Boolean, ForeignKey, Text, Integer, DateTime
 from sqlalchemy.orm import declarative_base, relationship
 
 TestBase = declarative_base()
@@ -35,39 +36,39 @@ class MockEvaluationTypes(Enum):
     ASSIGNMENT = "assignment"
 
 
-class MockLectureCreate(BaseModel):
+class MockLectureGenerate(BaseModel):
     title: str = "AI Generated Lecture"
-    start_datetime: str = "2025-08-01T10:00:00"
-    end_datetime: str = "2025-08-01T12:00:00"
+    start_datetime: str = "2025-08-01T10:00:00Z"
+    end_datetime: str = "2025-08-01T12:00:00Z"
 
 
 class MockLectureSchema(BaseModel):
     uuid: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: str = "Test Lecture"
-    start_datetime: str = "2025-07-23T14:00:00Z"
-    end_datetime: str = "2025-07-23T15:00:00Z"
+    start_datetime: datetime = datetime.fromisoformat("2025-07-23T14:00:00Z")
+    end_datetime: datetime = datetime.fromisoformat("2025-07-23T15:00:00Z")
 
 
-class MockEvaluationCreate(BaseModel):
+class MockEvaluationGenerate(BaseModel):
     title: str = "AI Generated Evaluation"
     type: MockEvaluationTypes = MockEvaluationTypes.ASSIGNMENT
-    start_datetime: str = "2025-08-01T12:00:00"
-    end_datetime: str = "2025-08-08T23:59:59"
+    start_datetime: str = "2025-08-01T12:00:00Z"
+    end_datetime: str = "2025-08-08T23:59:59Z"
 
 
 class MockEvaluationSchema(BaseModel):
     uuid: str = Field(default_factory=lambda: str(uuid.uuid4()))
     type: MockEvaluationTypes = MockEvaluationTypes.ASSIGNMENT
     title: str = "Test Evaluation"
-    start_datetime: str = "2025-07-23T09:00:00Z"
-    end_datetime: str = "2025-07-28T23:59:59Z"
+    start_datetime: datetime = datetime.fromisoformat("2025-07-23T09:00:00Z")
+    end_datetime: datetime = datetime.fromisoformat("2025-07-28T23:59:59Z")
 
 
 class MockCourseGenerate(BaseModel):
     title: str = "New Course"
     semester: str = "2025.2"
-    lectures: list[MockLectureCreate] = [MockLectureCreate()]
-    evaluations: list[MockEvaluationCreate] = [MockEvaluationCreate()]
+    lectures: list[MockLectureGenerate] = [MockLectureGenerate()]
+    evaluations: list[MockEvaluationGenerate] = [MockEvaluationGenerate()]
 
 
 class MockCourseSchema(BaseModel):
@@ -99,8 +100,8 @@ class MockEvaluation(TestBase):
     uuid = Column(String, primary_key=True)
     title = Column(String)
     type = Column(String)
-    start_datetime = Column(String)
-    end_datetime = Column(String)
+    start_datetime = Column(DateTime(timezone=True))
+    end_datetime = Column(DateTime(timezone=True))
     present = Column(Boolean, nullable=True)
     course_uuid = Column(String, ForeignKey("courses.uuid"))
     course = relationship("MockCourse", back_populates="evaluations")
@@ -111,8 +112,8 @@ class MockLecture(TestBase):
     uuid = Column(String, primary_key=True)
     title = Column(String)
     summary = Column(Text, nullable=True)
-    start_datetime = Column(String)
-    end_datetime = Column(String)
+    start_datetime = Column(DateTime(timezone=True))
+    end_datetime = Column(DateTime(timezone=True))
     present = Column(Boolean, nullable=True)
     course_uuid = Column(String, ForeignKey("courses.uuid"))
     course = relationship("MockCourse", back_populates="lectures")

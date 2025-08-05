@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Column, String, ForeignKey, Boolean
+from sqlalchemy import Column, String, ForeignKey, Boolean, DateTime
 from sqlalchemy.orm import relationship
 
 from app.core.db import Base
@@ -12,8 +12,8 @@ class Evaluation(Base):
     uuid = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     type = Column(String, nullable=False)
     title = Column(String, nullable=False)
-    start_datetime = Column(String, nullable=False)
-    end_datetime = Column(String, nullable=False)
+    start_datetime = Column(DateTime(timezone=True), nullable=False)
+    end_datetime = Column(DateTime(timezone=True), nullable=False)
     present = Column(Boolean, nullable=False, default=False)
 
     course_uuid = Column(String, ForeignKey("courses.uuid"), index=True, nullable=False)

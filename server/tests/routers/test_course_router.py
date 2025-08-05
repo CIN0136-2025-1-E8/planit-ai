@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from io import BytesIO
 from unittest.mock import MagicMock, AsyncMock
 
@@ -90,7 +91,9 @@ async def test_create_course_success(client, mock_course_crud, mock_ai_service, 
     assert len(created_course_obj.lectures) == 1
     assert len(created_course_obj.evaluations) == 1
     assert created_course_obj.lectures[0].title == "AI Generated Lecture"
-    assert created_course_obj.lectures[0].start_datetime == "2025-08-01T13:00:00Z"
+    # 10:00 in Sao Paulo (UTC-3) is 13:00 in UTC.
+    expected_datetime = datetime(2025, 8, 1, 13, 0, tzinfo=timezone.utc)
+    assert created_course_obj.lectures[0].start_datetime == expected_datetime
 
 
 @pytest.mark.asyncio

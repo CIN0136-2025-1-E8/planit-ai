@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field
 
-from .evaluation_schema import Evaluation, EvaluationBase
-from .lecture_schema import Lecture, LectureBase
+from .evaluation_schema import Evaluation, EvaluationGenerate
+from .lecture_schema import Lecture, LectureGenerate
 
 
 class CourseBase(BaseModel):
@@ -23,8 +23,8 @@ class CourseUpdate(BaseModel):
 
 
 class CourseGenerate(CourseBase):
-    lectures: list[LectureBase] = []
-    evaluations: list[EvaluationBase] = []
+    lectures: list[LectureGenerate] = []
+    evaluations: list[EvaluationGenerate] = []
 
 
 class Course(CourseBase):
