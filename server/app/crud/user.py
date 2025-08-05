@@ -6,6 +6,10 @@ from app.crud.base import CRUDBase
 from app.models.user_model import User
 from app.schemas import UserCreate, UserCreateInDB, UserUpdate
 
+def get_user_crud():
+    return user_crud
+
+
 class CRUDUser(CRUDBase[User, UserCreateInDB, UserUpdate]):
     def create(self, db: Session, *, obj_in: UserCreate) -> User:
         hashed_password = hash_password(obj_in.password)
@@ -23,5 +27,5 @@ class CRUDUser(CRUDBase[User, UserCreateInDB, UserUpdate]):
         if "password" in update_data and update_data["password"]:
             update_data["hashed_password"] = hash_password(update_data.pop("password"))
         return super().update(db, db_obj=db_obj, obj_in=update_data)
-    
+
 user_crud = CRUDUser(User)

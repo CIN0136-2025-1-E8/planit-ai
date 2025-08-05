@@ -38,3 +38,9 @@ class Lecture(LectureBase):
     uuid: str
     present: bool | None = None
     model_config = ConfigDict(from_attributes=True)
+
+
+class LectureInSchedule(Lecture):
+    item_type: str = "lecture"
+    course_uuid: str
+    course_title: str

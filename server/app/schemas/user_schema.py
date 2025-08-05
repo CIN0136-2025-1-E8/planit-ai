@@ -1,6 +1,8 @@
+from typing import Union
+
 from pydantic import BaseModel, ConfigDict
 
-from app.schemas import Event, Routine, CourseSummary
+from app.schemas import Event, Routine, CourseSummary, LectureInSchedule, EvaluationInSchedule, EventInSchedule
 
 
 class UserBase(BaseModel):
@@ -36,3 +38,13 @@ class UserData(UserBase):
     events: list[Event]
     routines: list[Routine]
     model_config = ConfigDict(from_attributes=True)
+
+
+ScheduleItems = Union[LectureInSchedule, EvaluationInSchedule, EventInSchedule]
+
+
+class DailySchedule(BaseModel):
+    schedule_items: list[ScheduleItems]
+
+
+ScheduleResponse = dict[str, list[ScheduleItems]]
