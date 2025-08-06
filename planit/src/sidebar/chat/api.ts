@@ -9,7 +9,7 @@ export async function sendMessageToBackend(message: string): Promise<string> {
     body: formData,
   });
   if (!response.ok) throw new Error("Erro ao enviar mensagem");
-  return await response.text();
+  return await response.json();
 }
 
 

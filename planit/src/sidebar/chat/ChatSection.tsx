@@ -1,6 +1,14 @@
-// import React from "react";
-import { Box, Paper, Typography, TextField, IconButton } from "@mui/material";
+import {Box, Paper, Typography, TextField, IconButton} from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
+import ReactMarkdown from "react-markdown";
+import type {Components, ExtraProps} from "react-markdown";
+import type {ReactNode} from "react";
+
+interface CustomCodeProps extends ExtraProps {
+  inline?: boolean;
+  className?: string;
+  children?: ReactNode;
+}
 
 type Message = {
   id: string;
@@ -12,20 +20,116 @@ type ChatSectionProps = {
   messages: Message[];
   input: string;
   isLoading: boolean;
-  // messagesEndRef: React.RefObject<HTMLDivElement>;
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
   handleSubmit: (e: React.FormEvent) => void;
   setInput: React.Dispatch<React.SetStateAction<string>>;
 };
 
 export default function ChatSection({
-  messages,
-  input,
-  isLoading,
-  messagesEndRef,
-  handleSubmit,
-  setInput,
-}: ChatSectionProps) {
+                                      messages,
+                                      input,
+                                      isLoading,
+                                      messagesEndRef,
+                                      handleSubmit,
+                                      setInput,
+                                    }: ChatSectionProps) {
+  const markdownComponents: Components = {
+    p: ({node, ...props}) => <Typography variant="body2" paragraph {...props} />,
+    ul: ({node, ...props}) => <Typography component="ul" variant="body2" sx={{mt: 0, pl: "20px"}} {...props} />,
+    ol: ({node, ...props}) => <Typography component="ol" variant="body2" sx={{mt: 0, pl: "20px"}} {...props} />,
+    li: ({node, ...props}) => (
+      <li>
+        <Typography component="span" variant="body2" {...props} />
+      </li>
+    ),
+    pre: ({node, ...props}) => (
+      <Box
+        component="pre"
+        sx={{
+          bgcolor: "#bdbdbd",
+          color: "#212121",
+          p: 1.5,
+          borderRadius: 1,
+          overflowX: "auto",
+          whiteSpace: "pre-wrap",
+          wordBreak: "break-word",
+        }}
+        {...props}
+      />
+    ),
+    code: ({node, inline, className, children, ...props}: CustomCodeProps) => {
+      if (inline) {
+        return (
+          <Box
+            component="code"
+            sx={{
+              bgcolor: "#bdbdbd",
+              color: "#212121",
+              px: "5px",
+              py: "2px",
+              borderRadius: 1,
+              fontFamily: "monospace",
+              fontSize: "0.825rem",
+            }}
+            {...props}
+          >
+            {children}
+          </Box>
+        );
+      }
+      return (
+        <Box
+          component="code"
+          sx={{fontFamily: "monospace", fontSize: "0.875rem"}}
+          className={className}
+          {...props}
+        >
+          {children}
+        </Box>
+      );
+    },
+    blockquote: ({node, ...props}) => (
+      <Box
+        component="blockquote"
+        sx={{
+          borderLeft: "4px solid #bdbdbd",
+          color: "#424242",
+          pl: 2,
+          my: 1.5,
+          fontStyle: "italic",
+        }}
+        {...props}
+      />
+    ),
+    hr: ({node, ...props}) => (
+      <hr style={{border: 0, borderTop: "1px solid #bdbdbd", margin: "1em 0"}} {...props} />
+    ),
+  };
+
+  const userPaperSx = {
+    alignSelf: "flex-end",
+    bgcolor: "#1976d2",
+    color: "white",
+    borderRadius: "16px 16px 4px 16px",
+    "& a": {color: "#b3e5fc", textDecoration: "underline"},
+  };
+
+  const assistantPaperSx = {
+    alignSelf: "flex-start",
+    bgcolor: "#e0e0e0",
+    color: "#212121",
+    borderRadius: "16px 16px 16px 4px",
+    "& a": {color: "#1976d2", textDecoration: "underline"},
+    "& p:first-of-type, & ul:first-of-type, & ol:first-of-type, & pre:first-of-type, & blockquote:first-of-type, & hr:first-of-type":
+      {
+        marginTop: 0,
+      },
+    "& p:last-of-type, & ul:last-of-type, & ol:last-of-type, & pre:last-of-type, & blockquote:last-of-type, & hr:last-of-type":
+      {
+        marginBottom: 0,
+      },
+  };
+
   return (
     <>
       {/* Mensagens do chat */}
@@ -48,15 +152,17 @@ export default function ChatSection({
             sx={{
               p: 2,
               maxWidth: "80%",
-              alignSelf: message.role === "user" ? "flex-end" : "flex-start",
-              bgcolor: message.role === "user" ? "#1976d2" : "#e91e63",
-              color: "white",
-              borderRadius: message.role === "user" ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
-              whiteSpace: "pre-wrap",
               wordBreak: "break-word",
+              ...(message.role === "user" ? userPaperSx : assistantPaperSx),
             }}
           >
-            <Typography variant="body2">{message.content}</Typography>
+            {message.role === "assistant" ? (
+              <ReactMarkdown components={markdownComponents}>{message.content}</ReactMarkdown>
+            ) : (
+              <Typography variant="body2" sx={{whiteSpace: "pre-wrap"}}>
+                {message.content}
+              </Typography>
+            )}
           </Paper>
         ))}
         {isLoading && (
@@ -66,19 +172,19 @@ export default function ChatSection({
               p: 2,
               maxWidth: "80%",
               alignSelf: "flex-start",
-              bgcolor: "#e91e63",
-              color: "white",
+              bgcolor: "#e0e0e0",
+              color: "#212121",
               borderRadius: "16px 16px 16px 4px",
             }}
           >
             <Typography variant="body2">Digitando...</Typography>
           </Paper>
         )}
-        <div ref={messagesEndRef} />
+        <div ref={messagesEndRef}/>
       </Box>
       {/* Input do chat */}
-      <Box sx={{ p: 2 }}>
-        <form onSubmit={handleSubmit} style={{ display: "flex", gap: 8 }}>
+      <Box sx={{p: 2}}>
+        <form onSubmit={handleSubmit} style={{display: "flex", gap: 8}}>
           <TextField
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -90,9 +196,9 @@ export default function ChatSection({
             sx={{
               "& .MuiOutlinedInput-root": {
                 bgcolor: "#d3d3d3",
-                "& fieldset": { border: "none" },
-                "&:hover fieldset": { border: "none" },
-                "&.Mui-focused fieldset": { border: "none" },
+                "& fieldset": {border: "none"},
+                "&:hover fieldset": {border: "none"},
+                "&.Mui-focused fieldset": {border: "none"},
               },
             }}
           />
@@ -100,9 +206,9 @@ export default function ChatSection({
             type="submit"
             color="primary"
             disabled={isLoading}
-            sx={{ bgcolor: "#1976d2", color: "white", "&:hover": { bgcolor: "#1565c0" } }}
+            sx={{bgcolor: "#1976d2", color: "white", "&:hover": {bgcolor: "#1565c0"}}}
           >
-            <SendIcon />
+            <SendIcon/>
           </IconButton>
         </form>
       </Box>
