@@ -19,10 +19,14 @@ class RoutineBase(BaseModel):
     flexible: bool
     start_time: str
     end_time: str
-    weekdays: int
+    days_of_the_week: int
 
 
 class RoutineCreate(RoutineBase):
+    pass
+
+
+class RoutineCreateInDB(RoutineBase):
     owner_uuid: str
 
 
@@ -32,9 +36,10 @@ class RoutineUpdate(BaseModel):
     flexible: bool | None = None
     start_time: str | None = None
     end_time: str | None = None
-    weekdays: int | None = None
+    days_of_the_week: int | None = None
 
 
 class Routine(RoutineBase):
     uuid: str
+    owner_uuid: str
     model_config = ConfigDict(from_attributes=True)
