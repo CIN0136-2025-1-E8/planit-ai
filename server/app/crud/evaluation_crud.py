@@ -1,11 +1,12 @@
 from datetime import datetime
+from typing import Union, Any
 
 from sqlalchemy import select, and_
 from sqlalchemy.orm import Session, contains_eager
 
 from app.crud.base import CRUDBase
 from app.models import Evaluation, Course
-from app.schemas import EvaluationCreate, EvaluationUpdate
+from app.schemas import EvaluationCreate, EvaluationUpdate, EvaluationTypes
 
 
 def get_evaluation_crud():
@@ -38,6 +39,34 @@ class CRUDEvaluation(CRUDBase[Evaluation, EvaluationCreate, EvaluationUpdate]):
 
         results = list(db.execute(query).scalars().all())
         return results
+
+    def create(self, db: Session, *, obj_in: EvaluationCreate) -> Evaluation:
+        """
+        Overrides the base create method to handle the EvaluationTypes enum.
+        """
+        obj_in_data = obj_in.model_dump()
+        if isinstance(obj_in_data.get("type"), EvaluationTypes):
+            obj_in_data["type"] = obj_in_data["type"].value
+
+        db_obj = self.model(**obj_in_data)
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
+
+    def update(self, db: Session, *, db_obj: Evaluation, obj_in: Union[EvaluationUpdate, dict[str, Any]]) -> Evaluation:
+        """
+        Overrides the base update method to handle the EvaluationTypes enum.
+        """
+        if isinstance(obj_in, dict):
+            update_data = obj_in
+        else:
+            update_data = obj_in.model_dump(exclude_unset=True)
+
+        if "type" in update_data and isinstance(update_data.get("type"), EvaluationTypes):
+            update_data["type"] = update_data["type"].value
+
+        return super().update(db=db, db_obj=db_obj, obj_in=update_data)
 
 
 evaluation_crud = CRUDEvaluation(Evaluation)
