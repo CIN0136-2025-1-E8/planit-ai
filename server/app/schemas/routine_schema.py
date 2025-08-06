@@ -19,15 +19,14 @@ class RoutineBase(BaseModel):
     flexible: bool
     start_time: str
     end_time: str
-    weekdays: int
+    days_of_the_week: int
 
 
 class RoutineCreate(RoutineBase):
-    # O owner_uuid não está aqui. Ele será passado como um Query/Path Parameter no endpoint.
     pass
 
 
-class RoutineCreateInDB(RoutineBase): # Novo schema: Usado no CRUD para inserir no DB
+class RoutineCreateInDB(RoutineBase):
     owner_uuid: str
 
 
@@ -37,7 +36,7 @@ class RoutineUpdate(BaseModel):
     flexible: bool | None = None
     start_time: str | None = None
     end_time: str | None = None
-    weekdays: int | None = None
+    days_of_the_week: int | None = None
 
 
 class Routine(RoutineBase):
