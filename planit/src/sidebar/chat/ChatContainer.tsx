@@ -1,17 +1,39 @@
-// import React from "react";
-import { useState, useEffect, useRef } from "react";
+import {useEffect, useRef, useState} from "react";
 import ChatSection from "./ChatSection";
-import type { Message } from "./types";
-import { sendMessageToBackend, fetchChatHistory } from "./api";
+import type {Message} from "./types";
+import {fetchChatHistory, sendMessageToBackend} from "./api";
+
+const ALLOWED_FILE_TYPES = [
+  "application/pdf",
+  "application/javascript",
+  "text/javascript",
+  "application/x-python-code",
+  "text/x-python",
+  "text/plain",
+  "text/html",
+  "text/css",
+  "text/markdown",
+  "text/csv",
+  "text/xml",
+  "application/rtf",
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+  "image/heic",
+  "image/heif",
+];
+const MAX_FILE_COUNT = 10;
+
 
 export default function ChatContainer() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  // const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [filesToSend, setFilesToSend] = useState<File[]>([]);
+  const [fileError, setFileError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Fetch chat history on mount
   useEffect(() => {
     fetchChatHistory()
       .then((history) =>
@@ -21,6 +43,7 @@ export default function ChatContainer() {
             // role: msg.role === "model" ? "assistant" : "user",
             role: (msg.role as "model" | "user") === "model" ? "assistant" : "user",
             content: msg.text,
+            files: msg.files || [],
           }))
         )
       )
@@ -39,9 +62,47 @@ export default function ChatContainer() {
 
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      messagesEndRef.current.scrollIntoView({behavior: "smooth"});
     }
   }, [messages, isLoading]);
+
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const selectedFiles = Array.from(e.target.files);
+      const validFiles: File[] = [];
+      let error = null;
+
+      if (filesToSend.length + selectedFiles.length > MAX_FILE_COUNT) {
+        error = `Você pode selecionar no máximo ${MAX_FILE_COUNT} arquivos.`;
+      } else {
+        selectedFiles.forEach(file => {
+          if (ALLOWED_FILE_TYPES.includes(file.type)) {
+            validFiles.push(file);
+          } else {
+            error = `Tipo de arquivo não suportado: ${file.name}`;
+          }
+        });
+      }
+
+      if (error) {
+        setFileError(error);
+        setTimeout(() => setFileError(null), 5000);
+      } else {
+        setFilesToSend(prev => [...prev, ...validFiles]);
+      }
+    }
+    if (e.target) e.target.value = '';
+  };
+
+  const handleAttachmentClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleRemoveFile = (fileToRemove: File) => {
+    setFilesToSend(prev => prev.filter(file => file !== fileToRemove));
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,14 +112,16 @@ export default function ChatContainer() {
       id: Date.now().toString(),
       role: "user",
       content: input,
+      files: filesToSend.map(f => ({filename: f.name, mimetype: f.type}))
     };
 
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
+    setFilesToSend([]);
     setIsLoading(true);
 
     try {
-      const response = await sendMessageToBackend(input);
+      const response = await sendMessageToBackend(input, filesToSend);
 
       setMessages((prev) => [
         ...prev,
@@ -83,6 +146,7 @@ export default function ChatContainer() {
     }
   };
 
+
   return (
     <ChatSection
       messages={messages}
@@ -91,6 +155,13 @@ export default function ChatContainer() {
       messagesEndRef={messagesEndRef}
       handleSubmit={handleSubmit}
       setInput={setInput}
+      filesToSend={filesToSend}
+      handleAttachmentClick={handleAttachmentClick}
+      handleFileChange={handleFileChange}
+      handleRemoveFile={handleRemoveFile}
+      fileInputRef={fileInputRef}
+      fileError={fileError}
+      setFileError={setFileError}
     />
   );
 }
