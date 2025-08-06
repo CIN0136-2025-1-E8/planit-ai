@@ -1,5 +1,6 @@
 import asyncio
 import inspect
+import json
 
 from google import genai
 from google.genai.types import Content, Part, Blob, GenerateContentConfig, FunctionDeclaration, Tool, FunctionResponse, \
@@ -8,6 +9,8 @@ from pydantic import BaseModel
 
 from app.core import settings
 from app.llm_tools import tools
+
+_MAX_CONTEXT_SIZE_BYTES = 20 * 1024 * 1024
 
 
 def get_google_ai_service():
@@ -23,27 +26,59 @@ class GoogleAIService:
                 raise ValueError("Google API key not configured.")
             self.client = genai.Client(api_key=api_key)
 
+    def _get_contents_size(self, contents: list[Content]) -> int:
+        """Calculates the approximate size of the content list in bytes."""
+        dict_representation = [
+            content.model_dump_json(exclude_none=True) for content in contents
+        ]
+        return len(json.dumps(dict_representation).encode('utf-8'))
+
+    async def _trim_context_to_size(self, contents: list[Content]) -> list[Content]:
+        """
+        Trims the contents list from the beginning until it's under the size limit.
+        It removes the oldest messages (user/model pairs) first.
+        """
+        current_size = self._get_contents_size(contents)
+        while current_size > _MAX_CONTEXT_SIZE_BYTES:
+            if len(contents) < 2:
+                raise ValueError(
+                    f"A single message part exceeds the {_MAX_CONTEXT_SIZE_BYTES / (1024 * 1024)}MB limit. "
+                    "Cannot trim further."
+                )
+
+            del contents[0:2]
+            current_size = self._get_contents_size(contents)
+        return contents
+
     async def send_message(self,
                            instruction: str,
                            message: str,
+                           files: list[tuple[bytes, str]] | None = None,
                            llm_context: list[Content] | None = None
                            ) -> tuple[str, list[Content]]:
         tool_map = {func.__name__: func for func in tools}
         function_declarations = [FunctionDeclaration.from_callable_with_api_option(callable=f) for f in tools]
         sdk_tools = [Tool(function_declarations=function_declarations)]
 
-        user_content: Content = Content(role="user", parts=[Part(text=message)])
-        contents: list[Content] = list(llm_context) if llm_context else []
+        all_parts = []
+        if files:
+            file_parts = await create_parts_from_files(files)
+            all_parts.extend(file_parts)
+        all_parts.append(Part(text=message))
+
+        user_content = Content(role="user", parts=all_parts)
+        contents = list(llm_context or [])
         contents.append(user_content)
 
         while True:
+            contents = await self._trim_context_to_size(contents)
             response = await self.client.aio.models.generate_content(
                 model="gemini-2.5-flash",
                 contents=contents,
                 config=GenerateContentConfig(
                     system_instruction=instruction,
                     tools=sdk_tools,
-                    tool_config = ToolConfig(
+                    tool_config=ToolConfig(
                         function_calling_config=FunctionCallingConfig(mode=FunctionCallingConfigMode.AUTO)
                     )
                 )
@@ -101,6 +136,10 @@ class GoogleAIService:
         except ValueError:
             raise ValueError("Invalid JSON format: Couldn't find starting or ending braces.")
         return schema.model_validate_json(response)
+
+
+async def create_parts_from_files(files: list[tuple[bytes, str]]) -> list[Part]:
+    return [Part(inline_data=Blob(data=data, mime_type=mime)) for data, mime in files]
 
 
 async def create_content_from_files(role: str, files: list[tuple[bytes, str]]) -> Content:

@@ -1,4 +1,4 @@
-from .chat_schemas import ChatRole, ChatMessage, ChatMessageBase
+from .chat_schemas import ChatRole, ChatMessage, ChatMessageBase, ChatFile
 from .course_schema import Course, CourseBase, CourseCreate, CourseUpdate, CourseGenerate, CourseSummary, \
     CourseDeleteResponse
 from .evaluation_schema import EvaluationTypes, Evaluation, EvaluationBase, EvaluationCreate, EvaluationUpdate, \
