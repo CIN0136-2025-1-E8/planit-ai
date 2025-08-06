@@ -15,6 +15,26 @@ routines_router = APIRouter(
 )
 
 
+@routines_router.get(
+    path="/",
+    response_model=Routine,
+    description="Retrieves a specific routine by its UUID.",
+)
+def get_routine(
+        routine_uuid: str = Query(),
+        routine_crud: CRUDRoutine = Depends(get_routine_crud),
+        user: UserModel = Depends(get_current_user),
+        db: Session = Depends(get_db)
+):
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+    routine = routine_crud.get(db, obj_uuid=routine_uuid)
+    if not routine or routine.owner_uuid != user.uuid:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return routine
+
+
 @routines_router.post(
     path="/",
     response_model=Routine,
@@ -83,45 +103,6 @@ def create_routine(
         days_of_the_week=days_of_the_week,
     )
     routine = routine_crud.create(db=db, obj_in=routine_in)
-    return routine
-
-
-@routines_router.get(
-    path="/list",
-    response_model=list[Routine],
-    description="Retrieves a list of routines for the current user.",
-)
-def list_routines(
-        skip: int = 0,
-        limit: int = 100,
-        routine_crud: CRUDRoutine = Depends(get_routine_crud),
-        user: UserModel = Depends(get_current_user),
-        db: Session = Depends(get_db)
-):
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
-    routines = routine_crud.get_routines_by_owner(db, owner_uuid=user.uuid, skip=skip, limit=limit)
-    return routines
-
-
-@routines_router.get(
-    path="/",
-    response_model=Routine,
-    description="Retrieves a specific routine by its UUID.",
-)
-def get_routine(
-        routine_uuid: str = Query(),
-        routine_crud: CRUDRoutine = Depends(get_routine_crud),
-        user: UserModel = Depends(get_current_user),
-        db: Session = Depends(get_db)
-):
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-
-    routine = routine_crud.get(db, obj_uuid=routine_uuid)
-    if not routine or routine.owner_uuid != user.uuid:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return routine
 
 
@@ -233,3 +214,22 @@ def delete_routine(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     return db_routine
+
+
+@routines_router.get(
+    path="/list",
+    response_model=list[Routine],
+    description="Retrieves a list of routines for the current user.",
+)
+def list_routines(
+        skip: int = 0,
+        limit: int = 100,
+        routine_crud: CRUDRoutine = Depends(get_routine_crud),
+        user: UserModel = Depends(get_current_user),
+        db: Session = Depends(get_db)
+):
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+    routines = routine_crud.get_routines_by_owner(db, owner_uuid=user.uuid, skip=skip, limit=limit)
+    return routines
