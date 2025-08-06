@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.db import Base, engine
 from app.routers import chat_router, course_router, user_router, events_router
-from routers import lecture_router
+from app.routers import lecture_router
 
 Base.metadata.create_all(bind=engine)
 
