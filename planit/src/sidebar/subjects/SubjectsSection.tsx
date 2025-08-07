@@ -1,27 +1,8 @@
-// import React, { useEffect, useState } from "react";
-import { useEffect, useState } from "react";
-import {
-  Box,
-  Paper,
-  Typography,
-  Button,
-  IconButton,
-
-} from "@mui/material";
-// import { ExpandLess, ExpandMore, Delete, Add, Description } from "@mui/icons-material";
-import { ExpandLess, ExpandMore, Delete, Add } from "@mui/icons-material";
+import {useEffect, useState} from "react";
+import {Box, Button, IconButton, Paper, Typography,} from "@mui/material";
+import {Add, Delete, ExpandLess, ExpandMore} from "@mui/icons-material";
 import AddSubjectDialog from "./AddSubjectDialog";
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';
-
-// Subject and file types
-type Subject = {
-  id: string;
-  title: string; // changed from name to title
-  color: string;
-  files: { name: string; url: string }[];
-  expanded?: boolean;
-};
+import {addSubject, deleteSubject, fetchSubjects, type Subject} from './api';
 
 // Expanded color palette for new subjects
 const subjectColorPalette = [
@@ -52,52 +33,12 @@ function getRandomSubjectColor() {
   return subjectColorPalette[Math.floor(Math.random() * subjectColorPalette.length)];
 }
 
-// Helper: get color for subject (fallbacks for demo)
-const subjectColors: Record<string, string> = {
-  Desenvolvimento: "#e57373",
-  "Mat Discreta": "#64b5f6",
-  "Sistemas Digitais": "#81c784",
-  IP: "#bdbdbd",
-  CAD: "#ffb74d",
-};
-
-async function fetchSubjects(): Promise<Subject[]> {
-  
-  const res = await fetch(`${API_BASE_URL}/api/course/list`);
-  if (!res.ok) throw new Error("Erro ao buscar matérias");
-  return await res.json();
-}
-
-
-async function addSubject(title: string, file: File): Promise<any> {
-  const formData = new FormData();
-  formData.append("message", title); // nome da materia
-  formData.append("files", file);   // arquivo
-  const res = await fetch(`${API_BASE_URL}/api/course/ai`, {
-    method: "POST",
-    body: formData,
-  });
-  if (!res.ok) throw new Error("Erro ao adicionar matéria");
-  return await res.json();
-}
-
-async function deleteSubject(id: string) {
-  const formData = new FormData();
-  formData.append("course_uuid", id);
-
-  const res = await fetch(`${API_BASE_URL}/api/course/`, {
-    method: "DELETE",
-    body: formData,
-  });
-  if (!res.ok) throw new Error("Erro ao remover matéria");
-}
-
 export default function SubjectsSection() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
-  // const [newSubject, setNewSubject] = useState("");
   const [adding, setAdding] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -110,7 +51,11 @@ export default function SubjectsSection() {
 
         }))
       ))
-      .catch(() => setSubjects([]))
+      .catch((err) => {
+        console.error(err);
+        setError("Não foi possível carregar as matérias. Por favor, tente fazer o login novamente.");
+        setSubjects([]);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -122,40 +67,20 @@ export default function SubjectsSection() {
     );
   };
 
-
-  // const handleAddSubject = async (title: string, file: File | null) => {
-  //   if (!newSubject.trim()) return;
-  //   setAdding(true);
-  //   try {
-  //     const created = await addSubject(newSubject.trim(), file!);
-  //     // Normalize the created subject to ensure id and title are present
-  //     const normalized = {
-  //       ...created,
-  //       id: created.id || created.uuid || '',
-  //       title: created.title || created.name || newSubject.trim(),
-  //       color: getRandomSubjectColor(),
-  //       expanded: true,
-  //     };
-  //     setSubjects((prev) => [
-  //       ...prev,
-  //       normalized,
-  //     ]);
-  //     setNewSubject("");
-  //   } finally {
-  //     setAdding(false);
-  //   }
-  // };
-
-
   const handleDelete = async (id: string) => {
-    await deleteSubject(id);
-    setSubjects((prev) => prev.filter((s) => s.id !== id));
+    try {
+      await deleteSubject(id);
+      setSubjects((prev) => prev.filter((s) => s.id !== id));
+    } catch (err: any) {
+      setError(err.message || "Erro ao remover matéria.");
+    }
   };
 
   // New handler for dialog submit
   const handleDialogSubmit = async (title: string, file: File | null) => {
     if (!title || !file) return;
     setAdding(true);
+    setError(null);
     try {
       const created = await addSubject(title, file);
       // Normalize the created subject to ensure id and title are present
@@ -166,11 +91,10 @@ export default function SubjectsSection() {
         color: getRandomSubjectColor(),
         expanded: true,
       };
-      setSubjects((prev) => [
-        ...prev,
-        normalized,
-      ]);
+      setSubjects((prev) => [...prev, normalized]);
       setDialogOpen(false);
+    } catch (err: any) {
+      setError(err.message || "Erro ao adicionar matéria.");
     } finally {
       setAdding(false);
     }
@@ -181,6 +105,7 @@ export default function SubjectsSection() {
       <Typography variant="h6" sx={{ mb: 2 }}>
         Matérias
       </Typography>
+      {error && <Typography color="error">{error}</Typography>}
       {loading ? (
         <Typography>Carregando...</Typography>
       ) : (
@@ -193,7 +118,7 @@ export default function SubjectsSection() {
             sx={{
               mb: 2,
               p: 1.5,
-              bgcolor: subject.color || subjectColors[subject.title] || "#bdbdbd",
+              bgcolor: subject.color || "#bdbdbd",
               borderRadius: 3,
               boxShadow: "none",
             }}

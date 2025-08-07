@@ -12,19 +12,14 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    password: str
-
-
-class UserCreateInDB(UserBase):
-    hashed_password: str
-    is_active: bool = True
+    uuid: str
+    hashed_password: str = "A"
 
 
 class UserUpdate(BaseModel):
     name: str | None = None
     nickname: str | None = None
     email: str | None = None
-    password: str | None = None
 
 
 class User(UserBase):

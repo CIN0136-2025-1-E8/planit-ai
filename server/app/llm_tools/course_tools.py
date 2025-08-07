@@ -70,9 +70,10 @@ async def update_course(course_uuid: str, new_title: str | None = None, new_seme
     try:
         db: Session = next(get_db())
         course_crud = get_course_crud()
+        user: User = await get_current_user(db=db)
 
         db_course = course_crud.get(db=db, obj_uuid=course_uuid)
-        if not db_course:
+        if not db_course or db_course.owner_uuid != user.uuid:
             return {"error": "Curso não encontrado."}
 
         update_data = CourseUpdate(title=new_title, semester=new_semester).model_dump(exclude_unset=True)
@@ -93,12 +94,16 @@ async def delete_course(course_uuid: str) -> dict:
     try:
         db: Session = next(get_db())
         course_crud = get_course_crud()
+        user: User = await get_current_user(db=db)
+
+        db_course = course_crud.get(db=db, obj_uuid=course_uuid)
+        if not db_course or db_course.owner_uuid != user.uuid:
+            return {"error": "Curso não encontrado."}
+
         db_course = course_crud.remove(db=db, obj_uuid=course_uuid)
         removed_course = CourseDeleteResponse.model_validate(db_course)
         removed_course.deleted_lectures = len(db_course.lectures)
         removed_course.deleted_evaluations = len(db_course.evaluations)
-        if not removed_course:
-            return {"error": "Curso não encontrado."}
         return {"success": True,
                 "message": f"Curso '{removed_course.title}' e suas {removed_course.deleted_lectures} aulas e {removed_course.deleted_evaluations} avaliações foram apagados."}
     except Exception as e:

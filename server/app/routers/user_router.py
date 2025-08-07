@@ -2,9 +2,12 @@ from datetime import date, datetime, timedelta, time
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from fastapi import APIRouter, Depends, HTTPException, status, Form, Query
+from fastapi.security import HTTPAuthorizationCredentials
+from firebase_admin import auth
 from sqlalchemy.orm import Session
 
 from app.core.security import get_current_user
+from app.core.security import token_scheme
 from app.crud import get_user_crud, get_lecture_crud, get_evaluation_crud, get_event_crud, CRUDUser, CRUDLecture, \
     CRUDEvaluation, CRUDEvent
 from app.dependencies import get_db
@@ -15,6 +18,35 @@ user_router = APIRouter(
     prefix="/user",
     tags=["User"],
 )
+
+
+@user_router.post("/register", response_model=UserData)
+def register_user(
+        name: str = Form(),
+        nickname: str | None = Form(None),
+        user_crud: CRUDUser = Depends(get_user_crud),
+        db: Session = Depends(get_db),
+        token: HTTPAuthorizationCredentials = Depends(token_scheme)
+):
+    try:
+        decoded_token = auth.verify_id_token(token.credentials)
+        uid = decoded_token['uid']
+        email = decoded_token['email']
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token for registration"
+        )
+
+    if user_crud.get(db, obj_uuid=uid):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User profile already exists."
+        )
+
+    user_in = UserCreate(name=name, nickname=nickname, email=email, uuid=uid)
+    user = user_crud.create(db=db, obj_in=user_in)
+    return user
 
 
 @user_router.get("/", response_model=UserData)
@@ -37,7 +69,6 @@ def update_user(
         new_name: str | None = Form(None),
         new_nickname: str | None = Form(None),
         new_email: str | None = Form(None),
-        new_password: str | None = Form(None),
         user_crud: CRUDUser = Depends(get_user_crud),
         user: User = Depends(get_current_user),
         db: Session = Depends(get_db),
@@ -46,7 +77,6 @@ def update_user(
         name=new_name,
         nickname=new_nickname,
         email=new_email,
-        password=new_password,
     )
     db_user = user_crud.get(db, obj_uuid=user.uuid)
     if db_user is None:
@@ -56,31 +86,6 @@ def update_user(
         )
     updated_user = user_crud.update(db=db, db_obj=db_user, obj_in=user_new_data)
     return updated_user
-
-
-@user_router.post("/", response_model=UserData)
-def create_user(
-        name: str = Form(),
-        nickname: str | None = Form(None),
-        email: str = Form(),
-        password: str = Form(),
-        user_crud: CRUDUser = Depends(get_user_crud),
-        db: Session = Depends(get_db),
-):
-    user_in: UserCreate = UserCreate(
-        name=name,
-        nickname=nickname,
-        email=email,
-        password=password,
-    )
-    db_user = user_crud.get_by_email(db, email=user_in.email)
-    if db_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered"
-        )
-    user = user_crud.create(db=db, obj_in=user_in)
-    return user
 
 
 @user_router.delete("/", status_code=status.HTTP_204_NO_CONTENT)

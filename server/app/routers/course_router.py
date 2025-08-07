@@ -28,13 +28,14 @@ async def update_course(
         new_semester: str | None = Form(None),
         course_crud=Depends(get_course_crud),
         db: Session = Depends(get_db),
+        user: User = Depends(get_current_user),
 ):
     course_new_data = CourseUpdate(
         title=new_title,
         semester=new_semester,
     )
     course = course_crud.get(db=db, obj_uuid=course_uuid)
-    if not course:
+    if not course or course.owner_uuid != user.uuid:
         raise HTTPException(status_code=404, detail="Course not found")
     updated_course = course_crud.update(db=db, db_obj=course, obj_in=course_new_data)
     return updated_course
@@ -45,7 +46,11 @@ async def delete_course(
         course_uuid: str = Form(),
         course_crud=Depends(get_course_crud),
         db: Session = Depends(get_db),
+        user: User = Depends(get_current_user),
 ):
+    course = course_crud.get(db=db, obj_uuid=course_uuid)
+    if not course or course.owner_uuid != user.uuid:
+        raise HTTPException(status_code=404, detail="Course not found")
     removed_course = course_crud.remove(db=db, obj_uuid=course_uuid)
     response = CourseDeleteResponse.model_validate(removed_course)
     response.deleted_lectures = len(removed_course.lectures)
