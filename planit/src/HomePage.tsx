@@ -1,8 +1,6 @@
-// import React from 'react';
-import { AppBar, Toolbar, Typography, Button, Box, Container } from '@mui/material';
-import Grid from '@mui/material/Grid';
-import logo from './assets/logo.png'; 
-import { useNavigate } from 'react-router-dom';
+import {AppBar, Box, Button, Container, Grid, Toolbar, Typography} from '@mui/material';
+import logo from './assets/logo.png';
+import {useNavigate} from 'react-router-dom';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -30,7 +28,11 @@ export default function HomePage() {
             </Typography>
           </Box>
           <Box>
-            <Button variant="text" sx={{ fontWeight: 'bold', color: '#3b82f6', textTransform: 'none' }}>
+            <Button
+              variant="text"
+              sx={{fontWeight: 'bold', color: '#3b82f6', textTransform: 'none'}}
+              onClick={() => navigate("/login")}
+            >
               Login
             </Button>
             <Button
@@ -42,7 +44,7 @@ export default function HomePage() {
                 textTransform: 'none',
                 borderRadius: '12px'
               }}
-              onClick={()=> navigate("/planit")}
+              onClick={() => navigate("/register")}
             >
               Experimente o Planit
             </Button>
@@ -86,7 +88,7 @@ export default function HomePage() {
           py: 1.5,
           fontSize: '1.2rem'
         }}
-        onClick={() => navigate("/planit")}
+        onClick={() => navigate("/register")}
       >
         Experimente o Planit
       </Button>

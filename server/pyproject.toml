@@ -6,13 +6,13 @@ dependencies = [
     "SQLAlchemy~=2.0.41",
     "fastapi~=0.116.1",
     "google-genai~=1.19.0",
-    "passlib[bcrypt]~=1.7.4",
     "psycopg2-binary~=2.9.10",
     "pydantic-settings~=2.9.1",
     "pydantic~=2.11.5",
     "python-multipart~=0.0.20",
     "starlette~=0.47.2",
     "uvicorn~=0.34.3",
+    "firebase-admin~=7.1.0",
 ]
 
 [project.optional-dependencies]

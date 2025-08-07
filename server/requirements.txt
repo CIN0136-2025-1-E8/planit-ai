@@ -4,9 +4,9 @@
 #
 #    pip-compile --annotation-style=line
 #
+firebase-admin~=7.1.0
 annotated-types==0.7.0    # via pydantic
 anyio==4.9.0              # via google-genai, httpx, starlette
-bcrypt==4.3.0             # via passlib
 cachetools==5.5.2         # via google-auth
 certifi==2025.7.14        # via httpcore, httpx, requests
 charset-normalizer==3.4.2  # via requests
@@ -19,7 +19,6 @@ h11==0.16.0               # via httpcore, uvicorn
 httpcore==1.0.9           # via httpx
 httpx==0.28.1             # via google-genai
 idna==3.10                # via anyio, httpx, requests
-passlib[bcrypt]==1.7.4    # via planit-ai-server (pyproject.toml)
 psycopg2-binary==2.9.10   # via planit-ai-server (pyproject.toml)
 pyasn1==0.6.1             # via pyasn1-modules, rsa
 pyasn1-modules==0.4.2     # via google-auth

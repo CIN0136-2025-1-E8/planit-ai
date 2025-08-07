@@ -4,9 +4,9 @@
 #
 #    pip-compile --annotation-style=line --extra=dev --output-file=requirements-dev.txt
 #
+firebase-admin~=7.1.0
 annotated-types==0.7.0    # via pydantic
 anyio==4.9.0              # via google-genai, httpx, starlette
-bcrypt==4.3.0             # via passlib
 cachetools==5.5.2         # via google-auth
 certifi==2025.7.14        # via httpcore, httpx, requests
 charset-normalizer==3.4.2  # via requests
@@ -22,7 +22,6 @@ httpx==0.28.1             # via google-genai
 idna==3.10                # via anyio, httpx, requests
 iniconfig==2.1.0          # via pytest
 packaging==25.0           # via pytest
-passlib[bcrypt]==1.7.4    # via planit-ai-server (pyproject.toml)
 pluggy==1.6.0             # via pytest
 psycopg2-binary==2.9.10   # via planit-ai-server (pyproject.toml)
 pyasn1==0.6.1             # via pyasn1-modules, rsa
