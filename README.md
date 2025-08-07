@@ -152,4 +152,4 @@ comando `uvicorn app.main:app`) e ele se conectará ao banco de dados no contêi
 [Maia Ferreira](https://github.com/maia-cin)  
 [Thiago Alves](https://github.com/ThAlvesM)  
 [Denilson França](https://github.com/altinctrl)  
-[Luiz Veloso](https://github.com/luiz-veloso)  
+[Luiz Veloso](https://github.com/lm-veloso)  
