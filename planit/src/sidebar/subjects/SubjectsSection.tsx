@@ -68,6 +68,7 @@ async function fetchSubjects(): Promise<Subject[]> {
   return await res.json();
 }
 
+
 async function addSubject(title: string, file: File): Promise<any> {
   const formData = new FormData();
   formData.append("message", title); // nome da materia
@@ -81,8 +82,12 @@ async function addSubject(title: string, file: File): Promise<any> {
 }
 
 async function deleteSubject(id: string) {
-  const res = await fetch(`${API_BASE_URL}/api/subjects/${id}`, {
+  const formData = new FormData();
+  formData.append("course_uuid", id);
+
+  const res = await fetch(`${API_BASE_URL}/api/course/`, {
     method: "DELETE",
+    body: formData,
   });
   if (!res.ok) throw new Error("Erro ao remover matéria");
 }
@@ -102,6 +107,7 @@ export default function SubjectsSection() {
           ...subj,
           color: getRandomSubjectColor(),
           expanded: false,
+
         }))
       ))
       .catch(() => setSubjects([]))
