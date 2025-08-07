@@ -1,0 +1,96 @@
+.container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #d8d8d8;
+}
+
+.card {
+  background-color: #050029;
+  border-radius: 12px;
+  padding: 40px;
+  width: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo {
+  width: 60px;
+  margin-bottom: 10px;
+}
+
+.title {
+  color: white;
+  font-size: 32px;
+  margin-bottom: 30px;
+}
+
+.forms {
+  display: flex;
+  gap: 40px;
+}
+
+.formSection {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  color: white;
+  flex: 1;
+  max-width: 350px;
+  width: 300px;
+}
+
+.formSection input {
+  padding: 10px 15px;
+  border-radius: 25px;
+  border: none;
+  background-color: #111144;
+  color: white;
+}
+
+.googleBtn {
+  background-color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.divider {
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  margin: 10px 0;
+  font-size: 12px;
+  color: #aaa;
+}
+
+.divider hr{
+  flex: 1;
+  border: none;
+  border-top: 1px solid #fff;
+  margin: 8px 10px 0 10px;
+}
+
+.loginBtn,
+.registerBtn {
+  background-color: #2f4fff;
+  border: none;
+  border-radius: 25px;
+  padding: 10px;
+  color: white;
+  cursor: pointer;
+}
+
+.forgot {
+  font-size: 12px;
+  color: #76aaff;
+  text-align: right;
+  text-decoration: none;
+}

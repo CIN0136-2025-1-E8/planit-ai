@@ -1,0 +1,30 @@
+body {
+  margin: 0;
+  font-family: 'Secular One', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: 'Secular One', source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.forms {
+  display: flex;
+  gap: 40px;
+  position: relative; /* necessário para posicionar a linha */
+  align-items: stretch;
+}
+
+.separator {
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  bottom: 10%;
+  width: 1px;
+  background-color: rgba(255, 255, 255, 0.2); /* linha semi-transparente */
+  transform: translateX(-50%);
+}
