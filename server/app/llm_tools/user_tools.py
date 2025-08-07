@@ -3,79 +3,13 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from sqlalchemy.orm import Session
 
-from app.core.security import get_current_user
-from app.crud import user_crud, evaluation_crud, lecture_crud, event_crud
+from app.crud import evaluation_crud, lecture_crud, event_crud
 from app.dependencies import get_db
-from app.models import User as UserModel, Lecture as LectureModel, Evaluation as EvaluationModel, Event as EventModel
-from app.schemas import UserUpdate
-
-
-async def get_user_profile() -> dict:
-    """
-    Retrieves the profile information for the currently authenticated user.
-
-    :return: A dictionary containing a success flag and the user's profile data
-             (name, nickname, and email), or an error key with a descriptive message.
-    """
-    try:
-        db: Session = next(get_db())
-
-        user: UserModel = await get_current_user(db=db)
-        if not user:
-            return {"error": "User not authorized."}
-
-        user_profile: dict = {
-            "name": user.name,
-            "nickname": user.nickname,
-            "email": user.email,
-        }
-        return {"success": True, "user_profile": user_profile}
-    except Exception as e:
-        return {"error": f"Error while retrieving the user profile: {e}"}
-
-
-async def update_user_profile(
-        new_name: str | None = None,
-        new_nickname: str | None = None,
-) -> dict:
-    """
-    Updates the profile information for the currently authenticated user.
-
-    This tool can be used to change the user's name and/or nickname.
-    For security reasons, changing the email or password must be done by the user
-    directly through the application's interface.
-
-    :param new_name: The user's new full name.
-    :param new_nickname: The user's new nickname.
-    :return: A dictionary containing a success flag and the updated user profile data,
-             or an error key with a descriptive message.
-    """
-    try:
-        db: Session = next(get_db())
-
-        user: UserModel = await get_current_user(db=db)
-        if not user:
-            return {"error": "User not authorized."}
-
-        db_user = user_crud.get(db, obj_uuid=user.uuid)
-        if not db_user:
-            return {"error": "User not found."}
-
-        user_update = UserUpdate(name=new_name, nickname=new_nickname)
-
-        updated_user_db = user_crud.update(db=db, db_obj=db_user, obj_in=user_update)
-        updated_user = {
-            "name": updated_user_db.name,
-            "nickname": updated_user_db.nickname,
-            "email": updated_user_db.email,
-        }
-
-        return {"success": True, "user_profile": updated_user}
-    except Exception as e:
-        return {"error": f"Error while updating the user profile: {e}"}
+from app.models import Lecture as LectureModel, Evaluation as EvaluationModel, Event as EventModel
 
 
 async def get_user_schedule(
+        user_uuid: str,
         start_date_str: str | None = None,
         days: int | None = None,
         timezone: str | None = None,
@@ -108,10 +42,6 @@ async def get_user_schedule(
 
         db: Session = next(get_db())
 
-        user: UserModel = await get_current_user(db=db)
-        if not user:
-            return {"error": "User not authorized."}
-
         start_date = datetime.date.fromisoformat(start_date_str)
 
         start_of_period_local = datetime.datetime.combine(start_date, datetime.time.min, tzinfo=client_tz)
@@ -122,13 +52,13 @@ async def get_user_schedule(
         end_utc = end_of_period_local.astimezone(ZoneInfo("UTC"))
 
         lectures: list[LectureModel] = lecture_crud.get_lectures_by_owner(
-            db, owner_uuid=user.uuid, start_utc=start_utc, end_utc=end_utc, limit=1000,
+            db, owner_uuid=user_uuid, start_utc=start_utc, end_utc=end_utc, limit=1000,
         )
         evaluations: list[EvaluationModel] = evaluation_crud.get_evaluations_by_owner(
-            db, owner_uuid=user.uuid, start_utc=start_utc, end_utc=end_utc, limit=1000,
+            db, owner_uuid=user_uuid, start_utc=start_utc, end_utc=end_utc, limit=1000,
         )
         events: list[EventModel] = event_crud.get_events_by_owner(
-            db, owner_uuid=user.uuid, start_utc=start_utc, end_utc=end_utc, limit=1000,
+            db, owner_uuid=user_uuid, start_utc=start_utc, end_utc=end_utc, limit=1000,
         )
 
         all_items = lectures + evaluations + events
@@ -189,4 +119,4 @@ async def get_user_schedule(
         return {"error": f"Error while retrieving the user schedule: {e}"}
 
 
-user_tools = [get_user_profile, update_user_profile, get_user_schedule]
+user_tools = [get_user_schedule]

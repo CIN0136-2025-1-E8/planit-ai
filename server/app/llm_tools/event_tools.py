@@ -2,14 +2,14 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 
-from app.core.security import get_current_user
 from app.crud import event_crud
 from app.dependencies import get_db
-from app.models import User as UserModel, Event as EventModel
+from app.models import Event as EventModel
 from app.schemas import EventCreate, EventUpdate, Event, EventCreateInDB
 
 
 async def create_event(
+        user_uuid: str,
         title: str,
         start_datetime: str,
         end_datetime: str,
@@ -29,10 +29,6 @@ async def create_event(
     try:
         db: Session = next(get_db())
 
-        user: UserModel = await get_current_user(db=db)
-        if not user:
-            return {"error": "User not authorized."}
-
         event_in = EventCreate(
             title=title,
             description=description,
@@ -40,7 +36,7 @@ async def create_event(
             end_datetime=datetime.fromisoformat(end_datetime),
         )
 
-        event_in_db = EventCreateInDB(**event_in.model_dump(), owner_uuid=user.uuid)
+        event_in_db = EventCreateInDB(**event_in.model_dump(), owner_uuid=user_uuid)
 
         db_event: EventModel = event_crud.create(db=db, obj_in=event_in_db)
         created_event: Event = Event.model_validate(db_event)
@@ -50,6 +46,7 @@ async def create_event(
 
 
 async def update_event(
+        user_uuid: str,
         event_uuid: str,
         new_title: str | None = None,
         new_description: str | None = None,
@@ -73,12 +70,8 @@ async def update_event(
     try:
         db: Session = next(get_db())
 
-        user: UserModel = await get_current_user(db=db)
-        if not user:
-            return {"error": "User not authorized."}
-
         db_event: EventModel = event_crud.get(db=db, obj_uuid=event_uuid)
-        if not db_event or db_event.owner_uuid != user.uuid:
+        if not db_event or db_event.owner_uuid != user_uuid:
             return {"error": "Event not found."}
 
         update_data = {
@@ -97,7 +90,7 @@ async def update_event(
         return {"error": f"Error while updating the event: {e}"}
 
 
-async def delete_event(event_uuid: str) -> dict:
+async def delete_event(user_uuid: str, event_uuid: str) -> dict:
     """
     Deletes a specific event (e.g., personal event, holiday, study session) from the database.
 
@@ -111,12 +104,8 @@ async def delete_event(event_uuid: str) -> dict:
     try:
         db: Session = next(get_db())
 
-        user: UserModel = await get_current_user(db=db)
-        if not user:
-            return {"error": "User not authorized."}
-
         db_event: EventModel = event_crud.get(db=db, obj_uuid=event_uuid)
-        if not db_event or db_event.owner_uuid != user.uuid:
+        if not db_event or db_event.owner_uuid != user_uuid:
             return {"error": "Event not found."}
 
         removed_db_event: EventModel = event_crud.remove(db=db, obj_uuid=event_uuid)
