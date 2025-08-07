@@ -62,35 +62,35 @@ export default function HomePage() {
       >
         <Container maxWidth="lg">
           <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={7}>
-              <Typography variant="h2" sx={{ fontWeight: 'bold', color: '#fff', mb: 2 }}>
-                Organize sua vida de estudos com{' '}
-                <Box component="span" sx={{ color: '#60a5fa' }}>
-                  Planit
-                </Box>
-                .
-              </Typography>
-              <Typography variant="h5" sx={{ color: '#cbd5e1', mb: 4 }}>
-                Uma plataforma inteligente para planejar, acompanhar e otimizar seus estudos.
-              </Typography>
-              <Button
-                variant="contained"
-                size="large"
-                sx={{
-                  backgroundColor: '#3b82f6',
-                  fontWeight: 'bold',
-                  textTransform: 'none',
-                  borderRadius: '12px',
-                  px: 4,
-                  py: 1.5,
-                  fontSize: '1.2rem'
-                }}
-                onClick={()=> navigate("/planit")}
-              >
-    
-                Experimente o Planit
-              </Button>
-            </Grid>
+           {/* Removed the Grid item here */}
+    <Box>
+      <Typography variant="h2" sx={{ fontWeight: 'bold', color: '#fff', mb: 2 }}>
+        Organize sua vida de estudos com{' '}
+        <Box component="span" sx={{ color: '#60a5fa' }}>
+          Planit
+        </Box>
+        .
+      </Typography>
+      <Typography variant="h5" sx={{ color: '#cbd5e1', mb: 4 }}>
+        Uma plataforma inteligente para planejar, acompanhar e otimizar seus estudos.
+      </Typography>
+      <Button
+        variant="contained"
+        size="large"
+        sx={{
+          backgroundColor: '#3b82f6',
+          fontWeight: 'bold',
+          textTransform: 'none',
+          borderRadius: '12px',
+          px: 4,
+          py: 1.5,
+          fontSize: '1.2rem'
+        }}
+        onClick={() => navigate("/planit")}
+      >
+        Experimente o Planit
+      </Button>
+    </Box>
           </Grid>
         </Container>
       </Box>
