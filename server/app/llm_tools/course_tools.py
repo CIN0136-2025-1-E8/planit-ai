@@ -1,13 +1,11 @@
 from sqlalchemy.orm import Session
 
-from app.core.security import get_current_user
 from app.crud import get_course_crud
 from app.dependencies import get_db
-from app.models import User
 from app.schemas import Course, CourseSummary, CourseUpdate, CourseCreate, CourseDeleteResponse
 
 
-async def list_courses() -> dict:
+async def list_courses(user_uuid: str) -> dict:
     """
     Para ler uma lista resumida de todos os cursos disponíveis para o usuário atual.
 
@@ -20,14 +18,13 @@ async def list_courses() -> dict:
     try:
         db: Session = next(get_db())
         course_crud = get_course_crud()
-        current_user: User = await get_current_user(db=db)
-        courses = course_crud.get_all_by_owner_uuid(db=db, owner_uuid=current_user.uuid)
+        courses = course_crud.get_all_by_owner_uuid(db=db, owner_uuid=user_uuid)
         return {"courses": [CourseSummary.model_validate(course).model_dump(mode='json') for course in courses]}
     except Exception as e:
         return {"error": f"An error occurred while listing course summaries.: {e}."}
 
 
-async def list_courses_and_details() -> dict:
+async def list_courses_and_details(user_uuid: str) -> dict:
     """
     Lista todas as informações de cada curso do usuário atual, incluindo aulas e avaliações.
 
@@ -38,23 +35,21 @@ async def list_courses_and_details() -> dict:
     try:
         db: Session = next(get_db())
         course_crud = get_course_crud()
-        current_user: User = await get_current_user(db=db)
-        courses = course_crud.get_all_by_owner_uuid(db=db, owner_uuid=current_user.uuid)
+        courses = course_crud.get_all_by_owner_uuid(db=db, owner_uuid=user_uuid)
         return {"courses": [Course.model_validate(course).model_dump(mode='json') for course in courses]}
     except Exception as e:
         return {"error": f"An error occurred while listing full courses: {e}."}
 
 
-async def create_course(title: str, semester: str | None = None) -> dict:
+async def create_course(user_uuid: str, title: str, semester: str | None = None) -> dict:
     """
     Cria um curso vazio (sem aulas ou avaliações).
     """
     try:
         db: Session = next(get_db())
-        current_user: User = await get_current_user(db=db)
         course_crud = get_course_crud()
 
-        course_in = CourseCreate(title=title, semester=semester, owner_uuid=current_user.uuid)
+        course_in = CourseCreate(title=title, semester=semester, owner_uuid=user_uuid)
         db_course = course_crud.create(db=db, obj_in=course_in)
         created_course = Course.model_validate(db_course)
 
@@ -63,17 +58,21 @@ async def create_course(title: str, semester: str | None = None) -> dict:
         return {"error": f"Ocorreu um erro ao criar o curso: {e}"}
 
 
-async def update_course(course_uuid: str, new_title: str | None = None, new_semester: str | None = None) -> dict:
+async def update_course(
+        user_uuid: str,
+        course_uuid: str,
+        new_title: str | None = None,
+        new_semester: str | None = None
+) -> dict:
     """
     Atualiza os detalhes de um curso específico, como seu título ou semestre.
     """
     try:
         db: Session = next(get_db())
         course_crud = get_course_crud()
-        user: User = await get_current_user(db=db)
 
         db_course = course_crud.get(db=db, obj_uuid=course_uuid)
-        if not db_course or db_course.owner_uuid != user.uuid:
+        if not db_course or db_course.owner_uuid != user_uuid:
             return {"error": "Curso não encontrado."}
 
         update_data = CourseUpdate(title=new_title, semester=new_semester).model_dump(exclude_unset=True)
@@ -87,17 +86,16 @@ async def update_course(course_uuid: str, new_title: str | None = None, new_seme
         return {"error": f"Ocorreu um erro ao atualizar o curso: {e}"}
 
 
-async def delete_course(course_uuid: str) -> dict:
+async def delete_course(user_uuid: str, course_uuid: str) -> dict:
     """
     Apaga um curso específico e todos os seus dados associados (aulas, avaliações).
     """
     try:
         db: Session = next(get_db())
         course_crud = get_course_crud()
-        user: User = await get_current_user(db=db)
 
         db_course = course_crud.get(db=db, obj_uuid=course_uuid)
-        if not db_course or db_course.owner_uuid != user.uuid:
+        if not db_course or db_course.owner_uuid != user_uuid:
             return {"error": "Curso não encontrado."}
 
         db_course = course_crud.remove(db=db, obj_uuid=course_uuid)

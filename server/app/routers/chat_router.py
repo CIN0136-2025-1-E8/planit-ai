@@ -1,3 +1,5 @@
+import functools
+import inspect
 import json
 
 from fastapi import APIRouter, HTTPException, Depends, Form, UploadFile
@@ -9,6 +11,7 @@ from app.core import settings
 from app.core.security import get_current_user
 from app.crud import get_chat_crud
 from app.dependencies import get_db
+from app.llm_tools import tools
 from app.models import User
 from app.schemas import ChatMessage, ChatMessageBase, ChatRole, ChatFile
 from app.services import get_google_ai_service
@@ -74,6 +77,18 @@ async def send_chat_message(
                 )
             chat_files.append(ChatFile(filename=file.filename, mimetype=file.content_type))
 
+    user_specific_tools = []
+    for tool_func in tools:
+        sig = inspect.signature(tool_func)
+        if 'user_uuid' in sig.parameters:
+            @functools.wraps(tool_func)
+            async def wrapper(*args, tool_func=tool_func, **kwargs):
+                return await tool_func(*args, user_uuid=user.uuid, **kwargs)
+            new_params = [p for p_name, p in sig.parameters.items() if p_name != 'user_uuid']
+            wrapper.__signature__ = sig.replace(parameters=new_params)
+            user_specific_tools.append(wrapper)
+        else:
+            user_specific_tools.append(tool_func)
     history = chat_crud.get_chat_history(db=db, user_uuid=user.uuid)
     llm_context: list[Content] = [
         Content.model_validate(content_item)
@@ -83,6 +98,7 @@ async def send_chat_message(
     response, new_content = await ai_service.send_message(
         instruction=settings.CHAT_SYSTEM_INSTRUCTIONS,
         message=message,
+        tools=user_specific_tools,
         files=[(await file.read(), file.content_type) for file in files] if files else None,
         llm_context=llm_context)
 

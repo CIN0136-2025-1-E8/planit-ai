@@ -2,14 +2,14 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 
-from app.core.security import get_current_user
 from app.crud import lecture_crud, course_crud
 from app.dependencies import get_db
-from app.models import User as UserModel, Lecture as LectureModel, Course as CourseModel
+from app.models import Lecture as LectureModel, Course as CourseModel
 from app.schemas import LectureCreate, LectureUpdate, Lecture
 
 
 async def create_lecture(
+        user_uuid: str,
         course_uuid: str,
         title: str,
         start_datetime: str,
@@ -33,12 +33,8 @@ async def create_lecture(
     try:
         db: Session = next(get_db())
 
-        user: UserModel = await get_current_user(db=db)
-        if not user:
-            return {"error": "User not authorized."}
-
         db_course: CourseModel = course_crud.get(db=db, obj_uuid=course_uuid)
-        if not db_course or db_course.owner_uuid != user.uuid:
+        if not db_course or db_course.owner_uuid != user_uuid:
             return {"error": "Course not found."}
 
         lecture_in: LectureCreate = LectureCreate(
@@ -56,6 +52,7 @@ async def create_lecture(
 
 
 async def update_lecture(
+        user_uuid: str,
         lecture_uuid: str,
         new_title: str | None = None,
         new_start_datetime: str | None = None,
@@ -81,24 +78,20 @@ async def update_lecture(
     try:
         db: Session = next(get_db())
 
-        user: UserModel = await get_current_user(db=db)
-        if not user:
-            return {"error": "User not authorized."}
-
         db_lecture: LectureModel = lecture_crud.get(db=db, obj_uuid=lecture_uuid)
         if not db_lecture:
             return {"error": "Lecture not found."}
 
         db_course: CourseModel = course_crud.get(db=db, obj_uuid=db_lecture.course_uuid)
-        if not db_course or db_course.owner_uuid != user.uuid:
+        if not db_course or db_course.owner_uuid != user_uuid:
             return {"error": "Lecture not found."}
 
         lecture_update: LectureUpdate = LectureUpdate(
-            title= new_title,
-            summary= new_summary,
-            present= new_present,
-            start_datetime= datetime.fromisoformat(new_start_datetime) if new_start_datetime else None,
-            end_datetime= datetime.fromisoformat(new_end_datetime) if new_end_datetime else None,
+            title=new_title,
+            summary=new_summary,
+            present=new_present,
+            start_datetime=datetime.fromisoformat(new_start_datetime) if new_start_datetime else None,
+            end_datetime=datetime.fromisoformat(new_end_datetime) if new_end_datetime else None,
         )
         updated_db_lecture = lecture_crud.update(db=db, db_obj=db_lecture, obj_in=lecture_update)
         updated_lecture: Lecture = Lecture.model_validate(updated_db_lecture)
@@ -107,7 +100,7 @@ async def update_lecture(
         return {"error": f"Error while updating the lecture: {e}"}
 
 
-async def delete_lecture(lecture_uuid: str) -> dict:
+async def delete_lecture(user_uuid: str, lecture_uuid: str) -> dict:
     """
     Deletes a specific lecture from the database.
 
@@ -121,16 +114,12 @@ async def delete_lecture(lecture_uuid: str) -> dict:
     try:
         db: Session = next(get_db())
 
-        user: UserModel = await get_current_user(db=db)
-        if not user:
-            return {"error": "User not authorized."}
-
         db_lecture: LectureModel = lecture_crud.get(db=db, obj_uuid=lecture_uuid)
         if not db_lecture:
             return {"error": "Lecture not found."}
 
         db_course: CourseModel = course_crud.get(db=db, obj_uuid=db_lecture.course_uuid)
-        if not db_course or db_course.owner_uuid != user.uuid:
+        if not db_course or db_course.owner_uuid != user_uuid:
             return {"error": "Lecture not found."}
 
         removed_db_lecture: LectureModel = lecture_crud.remove(db=db, obj_uuid=lecture_uuid)

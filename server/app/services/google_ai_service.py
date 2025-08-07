@@ -1,4 +1,5 @@
 import asyncio
+import functools
 import inspect
 import json
 
@@ -8,7 +9,6 @@ from google.genai.types import Content, Part, Blob, GenerateContentConfig, Funct
 from pydantic import BaseModel
 
 from app.core import settings
-from app.llm_tools import tools
 
 _MAX_CONTEXT_SIZE_BYTES = 20 * 1024 * 1024
 
@@ -53,10 +53,14 @@ class GoogleAIService:
     async def send_message(self,
                            instruction: str,
                            message: str,
+                           tools,
                            files: list[tuple[bytes, str]] | None = None,
                            llm_context: list[Content] | None = None
                            ) -> tuple[str, list[Content]]:
-        tool_map = {func.__name__: func for func in tools}
+        tool_map = {
+            func.func.__name__ if isinstance(func, functools.partial) else func.__name__: func
+            for func in tools
+        }
         function_declarations = [FunctionDeclaration.from_callable_with_api_option(callable=f) for f in tools]
         sdk_tools = [Tool(function_declarations=function_declarations)]
 

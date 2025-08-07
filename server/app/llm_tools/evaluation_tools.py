@@ -2,14 +2,14 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 
-from app.core.security import get_current_user
 from app.crud import evaluation_crud, course_crud
 from app.dependencies import get_db
-from app.models import User as UserModel, Evaluation as EvaluationModel, Course as CourseModel
+from app.models import Evaluation as EvaluationModel, Course as CourseModel
 from app.schemas import EvaluationCreate, EvaluationUpdate, EvaluationTypes, Evaluation
 
 
 async def create_evaluation(
+        user_uuid: str,
         course_uuid: str,
         title: str,
         evaluation_type: str,
@@ -37,12 +37,8 @@ async def create_evaluation(
 
         db: Session = next(get_db())
 
-        user: UserModel = await get_current_user(db=db)
-        if not user:
-            return {"error": "User not authorized."}
-
         db_course: CourseModel = course_crud.get(db=db, obj_uuid=course_uuid)
-        if not db_course or db_course.owner_uuid != user.uuid:
+        if not db_course or db_course.owner_uuid != user_uuid:
             return {"error": "Course not found."}
 
         evaluation_in: EvaluationCreate = EvaluationCreate(
@@ -60,6 +56,7 @@ async def create_evaluation(
 
 
 async def update_evaluation(
+        user_uuid: str,
         evaluation_uuid: str,
         new_title: str | None = None,
         new_evaluation_type: str | None = None,
@@ -87,16 +84,12 @@ async def update_evaluation(
 
         db: Session = next(get_db())
 
-        user: UserModel = await get_current_user(db=db)
-        if not user:
-            return {"error": "User not authorized."}
-
         db_evaluation: EvaluationModel = evaluation_crud.get(db=db, obj_uuid=evaluation_uuid)
         if not db_evaluation:
             return {"error": "Evaluation not found."}
 
         db_course: CourseModel = course_crud.get(db=db, obj_uuid=db_evaluation.course_uuid)
-        if not db_course or db_course.owner_uuid != user.uuid:
+        if not db_course or db_course.owner_uuid != user_uuid:
             return {"error": "Evaluation not found."}
 
         evaluation_update: EvaluationUpdate = EvaluationUpdate(
@@ -112,7 +105,7 @@ async def update_evaluation(
         return {"error": f"Error while updating the evaluation: {e}"}
 
 
-async def delete_evaluation(evaluation_uuid: str) -> dict:
+async def delete_evaluation(user_uuid: str, evaluation_uuid: str) -> dict:
     """
     Deletes a specific evaluation from the database.
 
@@ -126,16 +119,12 @@ async def delete_evaluation(evaluation_uuid: str) -> dict:
     try:
         db: Session = next(get_db())
 
-        user: UserModel = await get_current_user(db=db)
-        if not user:
-            return {"error": "User not authorized."}
-
         db_evaluation: EvaluationModel = evaluation_crud.get(db=db, obj_uuid=evaluation_uuid)
         if not db_evaluation:
             return {"error": "Evaluation not found."}
 
         db_course: CourseModel = course_crud.get(db=db, obj_uuid=db_evaluation.course_uuid)
-        if not db_course or db_course.owner_uuid != user.uuid:
+        if not db_course or db_course.owner_uuid != user_uuid:
             return {"error": "Evaluation not found."}
 
         removed_db_evaluation: EvaluationModel = evaluation_crud.remove(db=db, obj_uuid=evaluation_uuid)
