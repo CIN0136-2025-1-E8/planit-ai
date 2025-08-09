@@ -72,7 +72,6 @@ const Schedule = () => {
                   }}
                 >
                   <div className="event-header">
-                    <ClockIcon />
                     <span
                       style={{
                         display: 'flex',
@@ -80,27 +79,26 @@ const Schedule = () => {
                         maxWidth: '100%',
                       }}
                     >
-                      {item.course_title && (
-                        <span
-                          style={{
-                            fontSize: '0.85em',
-                            fontWeight: 'normal',
-                            color: '#333',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'normal',
-                            marginBottom: '2px',
-                          }}
-                        >
-                          {item.course_title}
-                        </span>
-                      )}
+                      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2px', overflow: 'hidden' }}>
+                        <ClockIcon />
+                        {item.course_title && (
+                          <span
+                            style={{
+                              fontSize: '0.85em',
+                              fontWeight: 'normal',
+                              color: '#333',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {item.course_title}
+                          </span>
+                        )}
+                      </div>
                       <span
                         style={{
-                          fontSize: '1em',
+                          fontSize: '0.9em',
                           fontWeight: 'bold',
                           color: '#222',
                           wordBreak: 'break-word',
