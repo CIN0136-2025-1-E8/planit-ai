@@ -58,6 +58,11 @@ const theme = createTheme({
 export default function PlanitPage() {
   // const [activeSection, setActiveSection] = useState<"profile" | "events" | "chat" | "subjects">("chat");
   const [activeSection, setActiveSection] = useState<"profile" | "chat" | "subjects">("chat");
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const handleCalendarUpdate = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -105,15 +110,15 @@ export default function PlanitPage() {
               flexDirection: "column",
             }}
           >
-            {activeSection === "chat" && <ChatContainer />}
+            {activeSection === "chat" && <ChatContainer onCalendarUpdate={handleCalendarUpdate} />}
             {activeSection === "profile" && <ProfileSection />}
             {/*{activeSection === "events" && <CalendarSection />}*/}
-            {activeSection === "subjects" && <SubjectsSection />}
+            {activeSection === "subjects" && <SubjectsSection onCalendarUpdate={handleCalendarUpdate} />}
           </Box>
         </Paper>
         {/* Main content area with blue background, fills remaining space, no borders */}
         <Box sx={{ flex: 1, height: "100vh", bgcolor: "#040032", margin: 0, padding: 0, border: 0 }}>
-          <Schedule />
+          <Schedule refreshTrigger={refreshTrigger} />
         </Box>
       </Box>
     </ThemeProvider>

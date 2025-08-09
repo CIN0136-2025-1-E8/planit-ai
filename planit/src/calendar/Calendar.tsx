@@ -8,7 +8,7 @@ import { fetchSchedule } from './api';
 const weekDays = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 const timeLabels = ['8am', '9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm', '7pm', '8pm', '9pm'];
 
-const Schedule = () => {
+const Schedule = ({ refreshTrigger }: { refreshTrigger: number }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [schedule, setSchedule] = useState({});
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -18,7 +18,7 @@ const Schedule = () => {
     fetchSchedule(startDate, 7, timezone)
       .then((data) => setSchedule(data))
       .catch((error) => console.error(error));
-  }, [currentDate]);
+  }, [currentDate, refreshTrigger, timezone]);
 
   const handlePrevWeek = () => setCurrentDate(subDays(currentDate, 7));
   const handleNextWeek = () => setCurrentDate(addDays(currentDate, 7));

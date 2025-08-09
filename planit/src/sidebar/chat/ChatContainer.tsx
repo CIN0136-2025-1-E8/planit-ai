@@ -25,7 +25,7 @@ const ALLOWED_FILE_TYPES = [
 const MAX_FILE_COUNT = 10;
 
 
-export default function ChatContainer() {
+export default function ChatContainer({ onCalendarUpdate }: { onCalendarUpdate: () => void }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -131,6 +131,7 @@ export default function ChatContainer() {
           content: response,
         },
       ]);
+      onCalendarUpdate();
     } catch (error) {
       setMessages((prev) => [
         ...prev,

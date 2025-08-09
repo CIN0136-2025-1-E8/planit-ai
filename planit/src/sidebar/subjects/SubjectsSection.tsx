@@ -33,7 +33,7 @@ function getRandomSubjectColor() {
   return subjectColorPalette[Math.floor(Math.random() * subjectColorPalette.length)];
 }
 
-export default function SubjectsSection() {
+export default function SubjectsSection({ onCalendarUpdate }: { onCalendarUpdate: () => void }) {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
@@ -71,6 +71,7 @@ export default function SubjectsSection() {
     try {
       await deleteSubject(id);
       setSubjects((prev) => prev.filter((s) => s.id !== id));
+      onCalendarUpdate();
     } catch (err: any) {
       setError(err.message || "Erro ao remover matéria.");
     }
@@ -92,6 +93,7 @@ export default function SubjectsSection() {
         expanded: true,
       };
       setSubjects((prev) => [...prev, normalized]);
+      onCalendarUpdate();
       setDialogOpen(false);
     } catch (err: any) {
       setError(err.message || "Erro ao adicionar matéria.");
