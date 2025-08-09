@@ -1,9 +1,28 @@
 import {AppBar, Box, Button, Container, Grid, Toolbar, Typography} from '@mui/material';
 import logo from './assets/logo.png';
 import {useNavigate} from 'react-router-dom';
+import { useAuth } from './AuthContext';
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
+
+  const handleCTAClick = () => {
+    if (currentUser) {
+      navigate("/planit");
+    } else {
+      navigate("/register");
+    }
+  };
+
+  const handleLoginClick = () => {
+    if (currentUser) {
+      navigate("/planit");
+    } else {
+      navigate("/login");
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -31,7 +50,7 @@ export default function HomePage() {
             <Button
               variant="text"
               sx={{fontWeight: 'bold', color: '#3b82f6', textTransform: 'none'}}
-              onClick={() => navigate("/login")}
+              onClick={handleLoginClick}
             >
               Login
             </Button>
@@ -44,7 +63,7 @@ export default function HomePage() {
                 textTransform: 'none',
                 borderRadius: '12px'
               }}
-              onClick={() => navigate("/register")}
+              onClick={handleCTAClick}
             >
               Experimente o Planit
             </Button>
@@ -88,7 +107,7 @@ export default function HomePage() {
           py: 1.5,
           fontSize: '1.2rem'
         }}
-        onClick={() => navigate("/register")}
+        onClick={handleCTAClick}
       >
         Experimente o Planit
       </Button>
