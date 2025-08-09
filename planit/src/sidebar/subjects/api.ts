@@ -35,6 +35,7 @@ export async function addSubject(title: string, file: File): Promise<any> {
   const formData = new FormData();
   formData.append("message", title);
   formData.append("files", file);
+  formData.append("timezone", "America/Recife");
   const res = await fetch(`${API_BASE_URL}/api/course/ai`, {
     method: "POST",
     headers: {...headers},
