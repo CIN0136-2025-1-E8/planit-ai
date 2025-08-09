@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {signInWithEmailAndPassword} from 'firebase/auth';
 import {auth} from './firebase-config';
-import {Alert, AppBar, Box, Button, Container, Paper, TextField, Toolbar, Typography,} from '@mui/material';
+import {Alert, AppBar, Box, Button, CircularProgress, Container, Paper, TextField, Toolbar, Typography,} from '@mui/material';
 import logo from './assets/logo.png';
 
 export default function LoginPage() {
@@ -10,14 +10,23 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
+    setError('');
+    setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
       navigate('/planit');
     } catch (err: any) {
       setError('Email ou senha inválidos.');
+      setIsLoading(false);
     }
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    handleLogin();
   };
 
   return (
@@ -61,7 +70,7 @@ export default function LoginPage() {
             Login
           </Typography>
           {error && <Alert severity="error" sx={{width: '100%', mb: 2}}>{error}</Alert>}
-          <Box component="form" noValidate sx={{mt: 1, width: '100%'}}>
+          <Box component="form" noValidate sx={{mt: 1, width: '100%'}} onSubmit={handleSubmit}>
             <TextField
               margin="normal"
               required
@@ -73,6 +82,7 @@ export default function LoginPage() {
               autoFocus
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
             />
             <TextField
               margin="normal"
@@ -85,12 +95,13 @@ export default function LoginPage() {
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
             />
             <Button
-              type="button"
+              type="submit"
               fullWidth
               variant="contained"
-              onClick={handleLogin}
+              disabled={isLoading}
               sx={{
                 mt: 3,
                 mb: 2,
@@ -99,9 +110,10 @@ export default function LoginPage() {
                 textTransform: 'none',
                 borderRadius: '12px',
                 py: 1.5,
+                height: 52.5
               }}
             >
-              Entrar
+              {isLoading ? <CircularProgress size={24} sx={{ color: 'white' }}/> : 'Entrar'}
             </Button>
             <Box sx={{textAlign: 'center'}}>
               <Link to="/register" style={{color: '#3b82f6', textDecoration: 'none'}}>

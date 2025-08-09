@@ -21,6 +21,7 @@ import Schedule from './calendar/Calendar'
 //sessoes da sidebar
 import ChatContainer from "./sidebar/chat/ChatContainer"
 import SubjectsSection from "./sidebar/subjects/SubjectsSection"
+import ProfileSection from "./sidebar/profile/ProfileSection"
 
 // Criando o tema da página
 const theme = createTheme({
@@ -56,7 +57,7 @@ const theme = createTheme({
 
 export default function PlanitPage() {
   // const [activeSection, setActiveSection] = useState<"profile" | "events" | "chat" | "subjects">("chat");
-  const [activeSection, setActiveSection] = useState<"chat" | "subjects">("chat");
+  const [activeSection, setActiveSection] = useState<"profile" | "chat" | "subjects">("chat");
 
   return (
     <ThemeProvider theme={theme}>
@@ -81,17 +82,17 @@ export default function PlanitPage() {
           {/* Icones do topo da sidebar */}
           <Box sx={{ p: 2, display: "flex", gap: 1.5 }}>
               <img src={logo} alt="Planit Logo" style={{ height: 55, marginRight: 20 }} />
-          
-            <Avatar sx={{ bgcolor: "#e91e63" }}>
+
+            <Avatar sx={{ bgcolor: "#e91e63", cursor: 'pointer' }} onClick={() => setActiveSection("profile")}>
               <PersonIcon />
             </Avatar>
-            <Avatar sx={{ bgcolor: "#ff9800" }}>
+            <Avatar sx={{ bgcolor: "#ff9800", cursor: 'pointer' }}>
               <CalendarIcon />
             </Avatar>
-            <Avatar sx={{ bgcolor: "#4caf50" }} onClick={() => setActiveSection("chat")}>
+            <Avatar sx={{ bgcolor: "#4caf50", cursor: 'pointer' }} onClick={() => setActiveSection("chat")}>
               <ChatIcon />
             </Avatar>
-            <Avatar sx={{ bgcolor: "#9c27b0" }} onClick={() => setActiveSection("subjects")}>
+            <Avatar sx={{ bgcolor: "#9c27b0", cursor: 'pointer' }} onClick={() => setActiveSection("subjects")}>
               <FileIcon />
             </Avatar>
           </Box>
@@ -105,7 +106,7 @@ export default function PlanitPage() {
             }}
           >
             {activeSection === "chat" && <ChatContainer />}
-            {/*{activeSection === "profile" && <ProfileSection />} */}
+            {activeSection === "profile" && <ProfileSection />}
             {/*{activeSection === "events" && <CalendarSection />}*/}
             {activeSection === "subjects" && <SubjectsSection />}
           </Box>

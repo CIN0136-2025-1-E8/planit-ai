@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {createUserWithEmailAndPassword} from 'firebase/auth';
 import {auth} from './firebase-config';
-import {Alert, AppBar, Box, Button, Container, Paper, TextField, Toolbar, Typography,} from '@mui/material';
+import {Alert, AppBar, Box, Button, CircularProgress, Container, Paper, TextField, Toolbar, Typography,} from '@mui/material';
 import logo from './assets/logo.png';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
@@ -14,12 +14,16 @@ export default function RegistrationPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleRegister = async () => {
     if (!name || !email || !password) {
       setError('Por favor, preencha os campos obrigatórios.');
       return;
     }
+
+    setError('');
+    setIsLoading(true);
 
     const registerWithBackend = async (token: string) => {
       const formData = new FormData();
@@ -72,7 +76,14 @@ export default function RegistrationPage() {
       } else {
         setError(err.message || 'Ocorreu um erro durante o registro.');
       }
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    handleRegister();
   };
 
   return (
@@ -116,7 +127,7 @@ export default function RegistrationPage() {
             Criar Conta
           </Typography>
           {error && <Alert severity="error" sx={{width: '100%', mb: 2}}>{error}</Alert>}
-          <Box component="form" noValidate sx={{mt: 1, width: '100%'}}>
+          <Box component="form" noValidate sx={{mt: 1, width: '100%'}} onSubmit={handleSubmit}>
             <TextField
               margin="normal"
               required
@@ -128,6 +139,7 @@ export default function RegistrationPage() {
               autoFocus
               value={name}
               onChange={(e) => setName(e.target.value)}
+              disabled={isLoading}
             />
             <TextField
               margin="normal"
@@ -138,6 +150,7 @@ export default function RegistrationPage() {
               autoComplete="nickname"
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
+              disabled={isLoading}
             />
             <TextField
               margin="normal"
@@ -149,6 +162,7 @@ export default function RegistrationPage() {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
             />
             <TextField
               margin="normal"
@@ -161,12 +175,13 @@ export default function RegistrationPage() {
               autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
             />
             <Button
-              type="button"
+              type="submit"
               fullWidth
               variant="contained"
-              onClick={handleRegister}
+              disabled={isLoading}
               sx={{
                 mt: 3,
                 mb: 2,
@@ -175,9 +190,10 @@ export default function RegistrationPage() {
                 textTransform: 'none',
                 borderRadius: '12px',
                 py: 1.5,
+                height: 52.5
               }}
             >
-              Registrar
+              {isLoading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Registrar'}
             </Button>
             <Box sx={{textAlign: 'center'}}>
               <Link to="/login" style={{color: '#3b82f6', textDecoration: 'none'}}>
