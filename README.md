@@ -21,24 +21,37 @@ Primeiro, clone o repositório para a sua máquina local usando o seguinte coman
 
 Antes de iniciar os serviços, é crucial configurar as variáveis de ambiente.
 
-1. **Crie o arquivo de ambiente:**
+1. **Crie os arquivos de ambiente:**
 
-    Navegue até o diretório `server/` e faça uma cópia do arquivo `.env.example`:
+    Execute o seguinte comando na raiz do projeto para fazer cópias dos arquivos `.env.example`:
 
-        cp server/.env.example server/.env
+        cp server/.env.example server/.env && cp planit/.env.example planit/.env
 
-2. **Defina a Chave da API do Google:**
+2. **Baixe a chave privada Firebase:**
 
-    Abra o arquivo `server/.env` que você acabou de criar e insira sua chave da API do Google no campo `GOOGLE_API_KEY`.
+    Nas configurações do projeto Firebase, vá até a aba `Service accounts`, baixe sua chave privada e a coloque na pasta
+    `server/app/` com o nome `service-account-key.json`.
+
+3. **Defina as variáveis de ambiente:**
+
+    Abra o arquivo `server/.env` que você acabou de criar e insira sua chave da API do Google Gemini no campo `GOOGLE_API_KEY`.
 
         # server/.env
-        DEBUG=True
         GOOGLE_API_KEY="SUA_CHAVE_DE_API_VAI_AQUI"
+        GOOGLE_APPLICATION_CREDENTIALS=app/service-account-key.json
         DATABASE_URL=postgresql://testuser:testpassword@db/testdb
         #DATABASE_URL=postgresql://testuser:testpassword@localhost:5432/testdb
-        POSTGRES_USER=testuser
-        POSTGRES_PASSWORD=testpassword
-        POSTGRES_DB=testdb
+    
+    Depois, insira as configurações do projeto Firebase no arquivo `planit/.env`. Essas configurações são as mesmas que 
+    estão definidas no arquivo da chave privada baixada anteriormente.
+
+        # planit/.env
+        VITE_FIREBASE_API_KEY=""
+        VITE_FIREBASE_AUTH_DOMAIN=""
+        VITE_FIREBASE_PROJECT_ID=""
+        VITE_FIREBASE_STORAGE_BUCKET=""
+        VITE_FIREBASE_MESSAGING_SENDER_ID=""
+        VITE_FIREBASE_APP_ID=""
 
     ⚠️ **Importante:** O arquivo `.env` contém informações sensíveis e **NUNCA** deve ser enviado para o controle de 
     versão (ex: Git). Ele já está incluído no `.dockerignore` e no `.gitignore` para prevenir commits acidentais.
