@@ -16,6 +16,8 @@ Primeiro, clone o repositório para a sua máquina local usando o seguinte coman
 
 - Docker e Docker Compose, ou Podman e Podman Compose instalados. O comando `docker-compose` pode ser substituído por 
 `podman-compose`.
+- Ter uma chave de API para o Google Gemini.
+- Criar um projeto no Firebase, com autenticação ativada.
 
 ### ⚙️ Configuração Inicial
 
