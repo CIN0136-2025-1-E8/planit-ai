@@ -17,6 +17,8 @@ on:
     paths:
       - 'planit/**'
 
+  workflow_dispatch:
+
 jobs:
   frontend-ci:
     name: Frontend CI Build
